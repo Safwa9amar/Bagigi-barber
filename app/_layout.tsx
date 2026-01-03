@@ -8,14 +8,15 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
-import { useColorScheme } from "@/components/useColorScheme";
-import { Link, Slot, usePathname } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { useColorScheme } from "react-native";
+import { Slot, Stack, usePathname } from "expo-router";
 import { Fab, FabIcon } from "@/components/ui/fab";
 import { MoonIcon, SunIcon } from "@/components/ui/icon";
+import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import api from "@/lib/api";
+import { useAuthStore } from "@/store/useAuthStore";
+import { supabase } from "@/lib/supabase";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -30,7 +31,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  const [styleLoaded, setStyleLoaded] = useState(false);
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
@@ -45,31 +45,25 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const pathname = usePathname();
-  const [colorMode, setColorMode] = useState<"light" | "dark">("light");
+  const colorScheme = useColorScheme(); // "light" | "dark" | null
+
+  const colorMode = colorScheme === "dark" ? "dark" : "light";
+  const { logout } = useAuthStore();
 
   return (
-    <GluestackUIProvider mode={colorMode}>
-      <ThemeProvider value={colorMode === "dark" ? DarkTheme : DefaultTheme}>
-        <Slot />
-        <Link
-          className="absolute top-1/3 left-1/3 bg-red-300"
-          href={"/auth/login"}
-        >
-          <Text>Login</Text>
-        </Link>
-
-        {pathname === "/" && (
-          <Fab
-            onPress={() =>
-              setColorMode(colorMode === "dark" ? "light" : "dark")
-            }
-            className="m-6"
-            size="lg"
-          >
-            <FabIcon as={colorMode === "dark" ? MoonIcon : SunIcon} />
-          </Fab>
-        )}
+    <GluestackUIProvider mode={colorMode} key={colorMode}>
+      <ThemeProvider
+        value={colorMode === "dark" ? DarkTheme : DefaultTheme}
+        key={colorMode}
+      >
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="auth" />
+          <Stack.Screen name="admin" />
+          <Stack.Screen name="customer" />
+        </Stack>
+        <Button onPress={logout}>
+          <Text className="text-red-500">logout</Text>
+        </Button>
       </ThemeProvider>
     </GluestackUIProvider>
   );

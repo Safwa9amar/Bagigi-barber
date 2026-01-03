@@ -13,7 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuthStore } from "@/store/useAuthStore";
 import { t } from "@/constants/i18n";
-import { Link, useFocusEffect, useRouter } from "expo-router";
+import {
+  Link,
+  useFocusEffect,
+  useGlobalSearchParams,
+  useRouter,
+} from "expo-router";
 import { useCallback, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Controller, set, useForm } from "react-hook-form";
@@ -24,32 +29,43 @@ import InputField from "@/components/ui/InputField";
 
 const loginSchema = object({
   email: string().email(t("invalid_email")).required(t("required_email")),
-  password: string().min(8, t("min_password")).required(t("required_password")),
+
   apiError: string().notRequired(),
 });
 
 export default function Login() {
-  const { login, isLoading } = useAuthStore();
+  const { user, isLoading } = useAuthStore();
   const router = useRouter();
   const scheme = useColorScheme();
-  const [showPassword, setShowPassword] = useState(false);
+  const { email }: { email: string } = useGlobalSearchParams();
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-    watch,
-  } = useForm({ resolver: yupResolver(loginSchema) });
-  const email = watch("email");
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+    values: { email: email || "", apiError: "" },
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!user) return;
+      router.replace(
+        user.role === "ADMIN"
+          ? "../admin"
+          : user.role === "USER"
+          ? "../customer"
+          : "../guest"
+      );
+    }, [user])
+  );
 
   const onSubmit = async (data: any) => {
     console.log("LOGIN DATA:", data, isSubmitting);
     try {
-      let { token, user } = await auth.login(data.email, data.password);
-
-      login(user, token);
-      console.log(user);
+      let response = await auth.register(data.email, data.password, data.phone);
     } catch (error: any) {
       setError("apiError", {
         type: "manual",
@@ -101,43 +117,6 @@ export default function Login() {
               )}
             />
 
-            {/* Password */}
-            <Controller
-              control={control}
-              name="password"
-              render={({ field }) => (
-                <InputField
-                  {...field}
-                  icon="lock-closed-outline"
-                  placeholder="Password"
-                  secure={!showPassword}
-                  toggleSecure={() => setShowPassword(!showPassword)}
-                  error={errors.password?.message}
-                />
-              )}
-            />
-            {/* forgot password */}
-            <Link
-              href={
-                email
-                  ? `/auth/forgot_password?email=${email}`
-                  : "/auth/forgot_password"
-              }
-              asChild
-            >
-              <TouchableOpacity className="mb-4 self-end">
-                <Text className="text-secondary-500">
-                  {t("forgot_password")}
-                </Text>
-              </TouchableOpacity>
-            </Link>
-            {/* API Error */}
-            {errors.apiError && (
-              <Text className="text-red-500 my-5 text-center">
-                {errors.apiError.message}
-              </Text>
-            )}
-
             {/* Submit Button */}
             <Button
               disabled={isSubmitting}
@@ -147,17 +126,16 @@ export default function Login() {
               {isSubmitting ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text className="text-white font-medium">{t("login")}</Text>
+                <Text className="text-white font-medium">
+                  {t("reset_password")}
+                </Text>
               )}
             </Button>
           </>
         )}
-        <Link href="/auth/register" asChild>
+        <Link href="/auth/login" asChild>
           <TouchableOpacity className="mt-4 self-center">
-            <Text className="text-secondary-500">
-              {t("no_account")}
-              <Text className="font-medium">{t("register")}</Text>
-            </Text>
+            <Text className="text-secondary-500">{t("back_to_login")}</Text>
           </TouchableOpacity>
         </Link>
 

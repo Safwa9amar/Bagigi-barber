@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "Bagigi-barber",
+    "scheme": "bagigi-barber",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {

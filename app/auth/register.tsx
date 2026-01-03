@@ -24,12 +24,17 @@ import InputField from "@/components/ui/InputField";
 
 const loginSchema = object({
   email: string().email(t("invalid_email")).required(t("required_email")),
+  phone: string()
+    .matches(/^\+?[1-9]\d{1,14}$/, t("invaild_phone"))
+    .required(t("required_phone")),
   password: string().min(8, t("min_password")).required(t("required_password")),
+  confirmPassword: string()
+    .oneOf([ref("password")], t("password_match"))
+    .required(),
   apiError: string().notRequired(),
 });
 
 export default function Login() {
-  const { login, isLoading } = useAuthStore();
   const router = useRouter();
   const scheme = useColorScheme();
   const [showPassword, setShowPassword] = useState(false);
@@ -39,17 +44,15 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-    watch,
   } = useForm({ resolver: yupResolver(loginSchema) });
-  const email = watch("email");
 
   const onSubmit = async (data: any) => {
     console.log("LOGIN DATA:", data, isSubmitting);
     try {
-      let { token, user } = await auth.login(data.email, data.password);
+      let response = await auth.register(data.email, data.password, data.phone);
+      console.log("REGISTER RESPONSE:", response);
 
-      login(user, token);
-      console.log(user);
+      router.push(`/auth/confirm_code?email=${data.email}`);
     } catch (error: any) {
       setError("apiError", {
         type: "manual",
@@ -70,15 +73,13 @@ export default function Login() {
             source={require("@/assets/images/logo.png")}
             className="w-44 h-44"
           />
-          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">
-            {t("brand_name")}
-          </Text>
-          <Text className="text-typography-500 dark:text-typography-50 text-center mt-1">
+          <Text className="text-3xl font-bold mt-4">{t("brand_name")}</Text>
+          <Text className="text-typography-500 text-center mt-1">
             {t("brand_tagline")}
           </Text>
         </Box>
 
-        {isLoading ? (
+        {isSubmitting ? (
           <ActivityIndicator
             size="large"
             color={scheme === "dark" ? "#fff" : "#000"}
@@ -101,6 +102,21 @@ export default function Login() {
               )}
             />
 
+            {/* Phone */}
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field }) => (
+                <InputField
+                  {...field}
+                  icon="call-outline"
+                  placeholder="Phone number"
+                  keyboardType="phone-pad"
+                  error={errors.phone?.message}
+                />
+              )}
+            />
+
             {/* Password */}
             <Controller
               control={control}
@@ -116,21 +132,21 @@ export default function Login() {
                 />
               )}
             />
-            {/* forgot password */}
-            <Link
-              href={
-                email
-                  ? `/auth/forgot_password?email=${email}`
-                  : "/auth/forgot_password"
-              }
-              asChild
-            >
-              <TouchableOpacity className="mb-4 self-end">
-                <Text className="text-secondary-500">
-                  {t("forgot_password")}
-                </Text>
-              </TouchableOpacity>
-            </Link>
+
+            {/* Confirm Password */}
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <InputField
+                  {...field}
+                  icon="lock-closed-outline"
+                  placeholder="Confirm password"
+                  secure={!showPassword}
+                  error={errors.confirmPassword?.message}
+                />
+              )}
+            />
             {/* API Error */}
             {errors.apiError && (
               <Text className="text-red-500 my-5 text-center">
@@ -147,22 +163,22 @@ export default function Login() {
               {isSubmitting ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text className="text-white font-medium">{t("login")}</Text>
+                <Text className="text-white font-medium">{t("continue")}</Text>
               )}
             </Button>
           </>
         )}
-        <Link href="/auth/register" asChild>
+        <Link href="/auth/login" asChild>
           <TouchableOpacity className="mt-4 self-center">
             <Text className="text-secondary-500">
-              {t("no_account")}
-              <Text className="font-medium">{t("register")}</Text>
+              {t("have_account")}
+              <Text className="font-medium">{t("login")}</Text>
             </Text>
           </TouchableOpacity>
         </Link>
 
         {/* Footer */}
-        <Text className="text-xs text-center mt-6 text-typography-500 dark:text-typography-50">
+        <Text className="text-xs text-center mt-6 text-typography-500">
           {t("terms_and_privacy")}
         </Text>
       </KeyboardAvoidingView>

@@ -1,9 +1,20 @@
 model User {
-    id            Int       @id @default(autoincrement())
-    email         String    @unique
-    password      String
-    resetToken    String?   @unique
-    resetTokenExp DateTime?
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+    id                      Int       @id @default(autoincrement())
+    email                   String    @unique
+    password                String
+    phone                   String    @unique
+    role                    Role      @default(USER)
+    verified                Boolean   @default(false)
+    confirmationCode        String?
+    confirmationCodeExpires DateTime?
+    emailConfirmed          Boolean   @default(false)
+    resetToken              String?   @unique
+    resetTokenExp           DateTime?
+    createdAt               DateTime  @default(now())
+    updatedAt               DateTime  @updatedAt
+}
+
+enum Role {
+    USER
+    ADMIN
 }

@@ -13,7 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuthStore } from "@/store/useAuthStore";
 import { t } from "@/constants/i18n";
-import { Link, useFocusEffect, useRouter } from "expo-router";
+import {
+  Link,
+  useFocusEffect,
+  useGlobalSearchParams,
+  useRouter,
+} from "expo-router";
 import { useCallback, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Controller, set, useForm } from "react-hook-form";
@@ -23,33 +28,28 @@ import api, { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
 const loginSchema = object({
-  email: string().email(t("invalid_email")).required(t("required_email")),
-  password: string().min(8, t("min_password")).required(t("required_password")),
+  code: string().required(t("required_code")),
   apiError: string().notRequired(),
 });
 
 export default function Login() {
-  const { login, isLoading } = useAuthStore();
-  const router = useRouter();
+  const { user, login, isLoading } = useAuthStore();
   const scheme = useColorScheme();
-  const [showPassword, setShowPassword] = useState(false);
+  const { email }: { email: string } = useGlobalSearchParams();
+  const [resending, setResending] = useState(false);
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-    watch,
   } = useForm({ resolver: yupResolver(loginSchema) });
-  const email = watch("email");
 
   const onSubmit = async (data: any) => {
     console.log("LOGIN DATA:", data, isSubmitting);
     try {
-      let { token, user } = await auth.login(data.email, data.password);
-
+      let { token } = await auth.verifyConfirmationCode(email, data.code);
       login(user, token);
-      console.log(user);
     } catch (error: any) {
       setError("apiError", {
         type: "manual",
@@ -59,6 +59,17 @@ export default function Login() {
     }
   };
 
+  const resendCode = async () => {
+    setResending(true);
+    try {
+      let response = await auth.requestNewConfirmationCode(email);
+      console.log("RESEND CODE RESPONSE:", response);
+    } catch (error: any) {
+      console.error(error.response.data.error || error);
+    } finally {
+      setResending(false);
+    }
+  };
   return (
     <Box className="flex-1 justify-center px-6 bg-background-light dark:bg-background-dark">
       <KeyboardAvoidingView
@@ -70,67 +81,33 @@ export default function Login() {
             source={require("@/assets/images/logo.png")}
             className="w-44 h-44"
           />
-          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">
-            {t("brand_name")}
-          </Text>
-          <Text className="text-typography-500 dark:text-typography-50 text-center mt-1">
+          <Text className="text-3xl font-bold mt-4">{t("brand_name")}</Text>
+          <Text className="text-typography-500 text-center mt-1">
             {t("brand_tagline")}
           </Text>
         </Box>
 
-        {isLoading ? (
+        {isLoading || resending ? (
           <ActivityIndicator
             size="large"
             color={scheme === "dark" ? "#fff" : "#000"}
           />
         ) : (
           <>
-            {/* Email */}
-            <Controller
-              control={control}
-              name="email"
-              render={({ field }) => (
-                <InputField
-                  {...field}
-                  icon="mail-outline"
-                  placeholder="Email"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  error={errors.email?.message}
-                />
-              )}
-            />
-
             {/* Password */}
             <Controller
               control={control}
-              name="password"
+              name="code"
               render={({ field }) => (
                 <InputField
                   {...field}
                   icon="lock-closed-outline"
-                  placeholder="Password"
-                  secure={!showPassword}
-                  toggleSecure={() => setShowPassword(!showPassword)}
-                  error={errors.password?.message}
+                  placeholder="Code"
+                  error={errors.code?.message}
                 />
               )}
             />
-            {/* forgot password */}
-            <Link
-              href={
-                email
-                  ? `/auth/forgot_password?email=${email}`
-                  : "/auth/forgot_password"
-              }
-              asChild
-            >
-              <TouchableOpacity className="mb-4 self-end">
-                <Text className="text-secondary-500">
-                  {t("forgot_password")}
-                </Text>
-              </TouchableOpacity>
-            </Link>
+
             {/* API Error */}
             {errors.apiError && (
               <Text className="text-red-500 my-5 text-center">
@@ -147,22 +124,22 @@ export default function Login() {
               {isSubmitting ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text className="text-white font-medium">{t("login")}</Text>
+                <Text className="text-white font-medium">{t("verify")}</Text>
               )}
             </Button>
+            <TouchableOpacity onPress={resendCode} className="mt-4 self-center">
+              <Text className="text-secondary-500">
+                {t("did_not_receive_code")}{" "}
+                <Text className="font-medium" onPress={resendCode}>
+                  {t("resend_code")}
+                </Text>
+              </Text>
+            </TouchableOpacity>
           </>
         )}
-        <Link href="/auth/register" asChild>
-          <TouchableOpacity className="mt-4 self-center">
-            <Text className="text-secondary-500">
-              {t("no_account")}
-              <Text className="font-medium">{t("register")}</Text>
-            </Text>
-          </TouchableOpacity>
-        </Link>
 
         {/* Footer */}
-        <Text className="text-xs text-center mt-6 text-typography-500 dark:text-typography-50">
+        <Text className="text-xs text-center mt-6 text-typography-500">
           {t("terms_and_privacy")}
         </Text>
       </KeyboardAvoidingView>
