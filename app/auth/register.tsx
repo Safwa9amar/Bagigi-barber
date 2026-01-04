@@ -127,6 +127,7 @@ export default function Login() {
                   icon="lock-closed-outline"
                   placeholder="Password"
                   secure={!showPassword}
+                  secureTextEntry
                   toggleSecure={() => setShowPassword(!showPassword)}
                   error={errors.password?.message}
                 />
@@ -143,6 +144,7 @@ export default function Login() {
                   icon="lock-closed-outline"
                   placeholder="Confirm password"
                   secure={!showPassword}
+                  secureTextEntry
                   error={errors.confirmPassword?.message}
                 />
               )}

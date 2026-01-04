@@ -8,7 +8,7 @@ import {
   refreshToken,
   verifyConfirmationCode,
   requestNewConfirmationCode,
-} from '@/controllers/authController';
+} from '@/controllers/auth';
 import { authenticateJWT } from '@/middlewares/authMiddleware';
 
 const router = Router();

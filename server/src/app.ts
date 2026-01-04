@@ -1,8 +1,10 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import authRoutes from '@/routes/authRoutes';
+import servicesRoues from '@/routes/servicesRoues';
 
 const app = express();
+// app.use(express.static('uploads'));
 
 // Enable CORS
 app.use(cors());
@@ -12,9 +14,10 @@ app.use(express.json());
 import { Router } from 'express';
 const apiRouter = Router();
 
+apiRouter.use('/uploads', express.static('uploads'));
 // Mount all your route modules to the main router
 apiRouter.use('/auth', authRoutes);
-
+apiRouter.use('/services', servicesRoues);
 // Add more routes here as needed, e.g.:
 // apiRouter.use('/users', userRoutes);
 // apiRouter.use('/items', itemRoutes);

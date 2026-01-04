@@ -108,6 +108,27 @@ const auth = {
     });
     return response.data;
   },
+  forgotPassword: async (email: string) => {
+    const response = await api.post("/auth/request-password-reset", {
+      email,
+    });
+    return response.data;
+  },
+  resetPassword: async (
+    email: string,
+    newPassword: string,
+    resetToken: string
+  ): Promise<{
+    token: string;
+    user: User | null;
+  }> => {
+    const response = await api.post("/auth/reset-password", {
+      email,
+      newPassword,
+      resetToken,
+    });
+    return response.data;
+  },
   me: async (token: string) => {
     const response = await api.get("/auth/me", {
       headers: {

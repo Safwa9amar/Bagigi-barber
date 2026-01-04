@@ -29,12 +29,10 @@ import InputField from "@/components/ui/InputField";
 
 const loginSchema = object({
   email: string().email(t("invalid_email")).required(t("required_email")),
-
   apiError: string().notRequired(),
 });
 
 export default function Login() {
-  const { user, isLoading } = useAuthStore();
   const router = useRouter();
   const scheme = useColorScheme();
   const { email }: { email: string } = useGlobalSearchParams();
@@ -49,27 +47,17 @@ export default function Login() {
     values: { email: email || "", apiError: "" },
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!user) return;
-      router.replace(
-        user.role === "ADMIN"
-          ? "../admin"
-          : user.role === "USER"
-          ? "../customer"
-          : "../guest"
-      );
-    }, [user])
-  );
-
   const onSubmit = async (data: any) => {
-    console.log("LOGIN DATA:", data, isSubmitting);
     try {
-      let response = await auth.register(data.email, data.password, data.phone);
+      await auth.forgotPassword(data.email);
+      router.replace({
+        pathname: "/auth/reset_password",
+        params: { email: data.email },
+      });
     } catch (error: any) {
       setError("apiError", {
         type: "manual",
-        message: error.response.data.error || "Registration failed",
+        message: error.response.data.error || "Request failed",
       });
       console.error(error.response.data.error || error);
     }
@@ -94,7 +82,7 @@ export default function Login() {
           </Text>
         </Box>
 
-        {isLoading ? (
+        {isSubmitting ? (
           <ActivityIndicator
             size="large"
             color={scheme === "dark" ? "#fff" : "#000"}
@@ -127,7 +115,7 @@ export default function Login() {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text className="text-white font-medium">
-                  {t("reset_password")}
+                  {t("request_reset")}
                 </Text>
               )}
             </Button>

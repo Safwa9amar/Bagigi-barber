@@ -2,11 +2,12 @@
 // Simple translation system for English and French
 import enNavigation from "@/locales/en/navigation.json";
 import enLogin from "@/locales/en/login.json";
-
+import enHomeCustomer from "@/locales/en/home.customer.json";
 export const translations = {
   en: {
     navigation: enNavigation,
     login: enLogin,
+    customer: enHomeCustomer,
     // Add more types as needed
   },
 };

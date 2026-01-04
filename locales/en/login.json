@@ -12,6 +12,7 @@
   "min_password": "Password must be at least 8 characters",
   "password_match": "Passwords do not match",
   "required_password": "Password is required",
+  "confirm_password": "Confirm Password",
   "password": "Password",
   "login": "Login",
   "register": "Register",
@@ -28,6 +29,8 @@
   "forgot_password": "Forgot Password?",
   "reset_password": "Reset Password",
   "send_reset_link": "Send Reset Link",
+  "reset_token": "Reset code",
+  "request_reset": "Request Password Reset",
   "reset_link_sent": "A password reset link has been sent to your email.",
   "back_to_login": "Back to Login"
 }
