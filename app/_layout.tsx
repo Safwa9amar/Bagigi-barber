@@ -10,13 +10,8 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
-import { Slot, Stack, usePathname } from "expo-router";
-import { Fab, FabIcon } from "@/components/ui/fab";
-import { MoonIcon, SunIcon } from "@/components/ui/icon";
-import { Button } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
+import { Stack } from "expo-router";
 import { useAuthStore } from "@/store/useAuthStore";
-import { supabase } from "@/lib/supabase";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,7 +46,7 @@ function RootLayoutNav() {
   const { logout } = useAuthStore();
 
   return (
-    <GluestackUIProvider mode={colorMode} key={colorMode}>
+    <GluestackUIProvider mode={"light"} key={colorMode}>
       <ThemeProvider
         value={colorMode === "dark" ? DarkTheme : DefaultTheme}
         key={colorMode}
@@ -60,10 +55,17 @@ function RootLayoutNav() {
           <Stack.Screen name="auth" />
           <Stack.Screen name="admin" />
           <Stack.Screen name="customer" />
+          <Stack.Screen
+            name="service-details"
+            options={{
+              presentation: "modal",
+              animation: "slide_from_bottom",
+            }}
+          />
         </Stack>
-        <Button onPress={logout}>
+        {/* <Button onPress={logout}>
           <Text className="text-red-500">logout</Text>
-        </Button>
+        </Button> */}
       </ThemeProvider>
     </GluestackUIProvider>
   );

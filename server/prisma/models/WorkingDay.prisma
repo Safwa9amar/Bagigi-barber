@@ -1,0 +1,13 @@
+//////////////////////
+// WORKING DAYS
+//////////////////////
+
+model WorkingDay {
+    id        String  @id @default(uuid())
+    userId    String
+    user      User    @relation(fields: [userId], references: [id])
+    day       Int // 0 = Sunday, 6 = Saturday
+    startTime String // "09:00"
+    endTime   String // "18:00"
+    isOpen    Boolean @default(true)
+}

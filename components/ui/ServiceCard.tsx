@@ -1,5 +1,13 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ImageBackground,
+  StyleSheet,
+  Pressable,
+  Animated,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRef } from "react";
 
 type ServiceCardProps = {
   title: string;
@@ -18,31 +26,75 @@ export default function ServiceCard({
   image,
   onPress,
 }: ServiceCardProps) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+
+  const pressIn = () => {
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: 0.97,
+        useNativeDriver: true,
+      }),
+      Animated.timing(overlayOpacity, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const pressOut = () => {
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: 1,
+        friction: 4,
+        useNativeDriver: true,
+      }),
+      Animated.timing(overlayOpacity, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={onPress}>
-      {/* Image */}
-      <Image source={image} style={styles.image} />
+    <Pressable
+      onPress={onPress}
+      onPressIn={pressIn}
+      onPressOut={pressOut}
+      onHoverIn={pressIn}
+      onHoverOut={pressOut}
+    >
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <ImageBackground source={image} style={styles.card}>
+          {/* Hover / Press overlay */}
+          <Animated.View
+            style={[styles.overlay, { opacity: overlayOpacity }]}
+          />
 
-      {/* Content */}
-      <View style={styles.content}>
-        <Text style={styles.title}>{title}</Text>
-        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          <View style={styles.content}>
+            <Text style={styles.title}>{title}</Text>
+            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
 
-        <View style={styles.footer}>
-          <View style={styles.row}>
-            <Ionicons name="time-outline" size={14} color="#D4AF37" />
-            <Text style={styles.meta}>{duration}</Text>
+            <View style={styles.footer}>
+              <View style={styles.row}>
+                <Ionicons name="time-outline" size={14} color="#D4AF37" />
+                <Text style={styles.meta}>{duration}</Text>
+              </View>
+
+              <View style={styles.row}>
+                <Ionicons name="cash-outline" size={14} color="#D4AF37" />
+                <Text style={styles.price}>{price} DA</Text>
+              </View>
+            </View>
           </View>
-
-          <View style={styles.row}>
-            <Ionicons name="cash-outline" size={14} color="#D4AF37" />
-            <Text style={styles.price}>{price} DA</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
+        </ImageBackground>
+      </Animated.View>
+    </Pressable>
   );
 }
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#111",
@@ -51,29 +103,30 @@ const styles = StyleSheet.create({
     borderColor: "#D4AF37",
     marginRight: 14,
     overflow: "hidden",
-    height: 400,
-    width: 250,
-    marginVertical: 10,
-  },
-
-  image: {
-    width: "100%",
     height: 300,
+    width: "100%",
+    marginVertical: 10,
+    justifyContent: "flex-end",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#00000030",
   },
 
   content: {
     padding: 12,
+    backgroundColor: "#000A",
   },
 
   title: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "700",
   },
 
   subtitle: {
     color: "#9CA3AF",
-    fontSize: 11,
+    fontSize: 14,
     marginTop: 2,
   },
 
@@ -91,7 +144,7 @@ const styles = StyleSheet.create({
 
   meta: {
     color: "#D4AF37",
-    fontSize: 11,
+    fontSize: 12,
   },
 
   price: {

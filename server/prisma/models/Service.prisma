@@ -1,0 +1,21 @@
+//////////////////////
+// SERVICE
+//////////////////////
+
+model Service {
+    id        String  @id @default(uuid())
+    name      String
+    category  String
+    duration  Int // بالدقائق (مهم جدًا)
+    priceFrom Int
+    priceTo   Int?
+    isVip     Boolean @default(false)
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    bookings Booking[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, StatusBar } from "react-native";
 import React, { useEffect } from "react";
 import { Slot, Stack, Tabs } from "expo-router";
 import { withRoleGuard } from "@/components/auth/withRoleGuard";
@@ -20,7 +20,8 @@ const CustomerLayout = () => {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: "#D4AF37",
+          tabBarActiveTintColor: "#C5A35D",
+          animation: "shift",
         }}
       >
         <Tabs.Screen
@@ -39,14 +40,7 @@ const CustomerLayout = () => {
             ),
           }}
         />
-        <Tabs.Screen
-          name="Book"
-          options={{
-            tabBarIcon: ({ color }) => (
-              <Icon as={BookCheck} size="xl" color={color} />
-            ),
-          }}
-        />
+
         <Tabs.Screen
           name="Messages"
           options={{

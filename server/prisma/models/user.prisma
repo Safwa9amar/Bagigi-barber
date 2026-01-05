@@ -1,5 +1,5 @@
 model User {
-    id                      Int       @id @default(autoincrement())
+    id                      String    @id @default(uuid())
     email                   String    @unique
     password                String
     phone                   String    @unique
@@ -10,8 +10,13 @@ model User {
     emailConfirmed          Boolean   @default(false)
     resetToken              String?   @unique
     resetTokenExp           DateTime?
-    createdAt               DateTime  @default(now())
-    updatedAt               DateTime  @updatedAt
+
+    bookings Booking[]
+    services Service[]
+    workDays WorkingDay[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 enum Role {

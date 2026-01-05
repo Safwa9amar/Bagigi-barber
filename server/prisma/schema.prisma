@@ -8,3 +8,14 @@ datasource db {
     provider = "mysql"
     url      = env("DATABASE_URL")
 }
+
+//////////////////////
+// ENUMS
+//////////////////////
+
+enum BookingStatus {
+    PENDING // في الطابور
+    IN_PROGRESS // جاري
+    DONE // انتهى
+    CANCELLED
+}

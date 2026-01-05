@@ -21,38 +21,38 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        /* ================= PRIMARY (Brand Black) ================= */
+        /* ================= PRIMARY (Rich Blacks/Neutrals) ================= */
         primary: {
-          50: "#F8FAFC",
-          100: "#F1F5F9",
-          200: "#E2E8F0",
-          300: "#CBD5E1",
-          400: "#94A3B8",
-          500: "#0F172A", // main brand
-          600: "#020617",
-          700: "#020617",
-          800: "#020617",
-          900: "#020617",
-          950: "#000000",
+          50: "#F2F2F2",
+          100: "#E6E6E6",
+          200: "#CCCCCC",
+          300: "#999999",
+          400: "#666666",
+          500: "#1A1A1A", // Surface/Card color
+          600: "#141414",
+          700: "#0D0D0D", // Primary Background
+          800: "#080808",
+          900: "#050505",
+          950: "#000000", // Pure black
         },
 
-        /* ================= SECONDARY (Gold Accent) ================= */
+        /* ================= SECONDARY (Luxury Gold) ================= */
         secondary: {
-          50: "#FFF8E1",
-          100: "#FDECC8",
-          200: "#F6D89A",
-          300: "#E9C46A",
-          400: "#D4AF37",
-          500: "#C9A24D", // gold
-          600: "#A8892C",
-          700: "#7C651F",
-          800: "#4F4013",
-          900: "#2A2209",
+          50: "#FAF6ED",
+          100: "#F2E8D1",
+          200: "#E5D0A3",
+          300: "#D9B975",
+          400: "#CCA147",
+          500: "#C5A35D", // Main Brand Gold
+          600: "#A6894D",
+          700: "#876F3E", // Muted/Border gold
+          800: "#695630",
+          900: "#4A3D22",
         },
 
         /* ================= TERTIARY ================= */
         tertiary: {
-          500: "#64748B",
+          500: "#333333", // Muted strokes
         },
 
         /* ================= FEEDBACK ================= */
@@ -75,44 +75,44 @@ module.exports = {
 
         /* ================= TYPOGRAPHY ================= */
         typography: {
-          50: "#F9FAFB",
+          50: "#FFFFFF", // Main Headlines
           200: "#E5E7EB",
-          400: "#9CA3AF",
-          600: "#4B5563",
-          800: "#1F2937",
-          900: "#0F172A",
+          400: "#B3B3B3", // Secondary Text / Subtitles
+          600: "#71717A",
+          800: "#3F3F46",
+          900: "#18181B",
           white: "#FFFFFF",
-          gray: "#D4D4D4",
-          black: "#181718",
+          gray: "#B3B3B3",
+          black: "#0D0D0D",
         },
 
         /* ================= OUTLINE ================= */
         outline: {
-          200: "#E5E7EB",
-          300: "#D1D5DB",
-          400: "#9CA3AF",
+          200: "#262626", // Darker outlines for inputs
+          300: "#333333",
+          400: "#C5A35D", // Gold focus state
         },
 
         /* ================= BACKGROUND ================= */
         background: {
-          50: "#F9FAFB",
-          100: "#F3F4F6",
-          200: "#E5E7EB",
-          300: "#D1D5DB",
-          800: "#1F2937",
-          900: "#111827",
-          light: "#FBFBFB",
-          dark: "#0B0F19",
-          muted: "#F1F5F9",
-          success: "#ECFDF5",
-          warning: "#FFFBEB",
-          error: "#FEF2F2",
-          info: "#EFF6FF",
+          50: "#1A1A1A",
+          100: "#141414",
+          200: "#0D0D0D",
+          300: "#000000",
+          800: "#0D0D0D",
+          900: "#000000",
+          light: "#FFFFFF", // Keep for rare light-mode use
+          dark: "#232321;", // App standard
+          muted: "#1A1A1A",
+          success: "#064E3B",
+          warning: "#451A03",
+          error: "#450A0A",
+          info: "#172554",
         },
 
         /* ================= INDICATOR ================= */
         indicator: {
-          primary: "#C9A24D",
+          primary: "#C5A35D", // Gold active state
           info: "#3B82F6",
           error: "#EF4444",
         },
@@ -134,10 +134,10 @@ module.exports = {
       },
 
       boxShadow: {
-        "hard-1": "-2px 2px 8px rgba(38,38,38,0.2)",
-        "hard-2": "0 3px 10px rgba(38,38,38,0.2)",
-        "soft-1": "0 0 10px rgba(38,38,38,0.1)",
-        "soft-2": "0 0 20px rgba(38,38,38,0.2)",
+        "hard-1": "0 2px 8px rgba(0,0,0,0.4)",
+        "hard-2": "0 3px 10px rgba(0,0,0,0.5)",
+        "soft-1": "0 0 10px rgba(0,0,0,0.2)",
+        "soft-2": "0 0 20px rgba(0,0,0,0.3)",
       },
     },
   },
