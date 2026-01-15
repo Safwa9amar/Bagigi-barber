@@ -6,7 +6,7 @@ import { requestNewConfirmationCode } from './requestNewConfirmationCode';
 import { requestPasswordReset } from './requestPasswordReset';
 import { resetPassword } from './resetPassword';
 import { verifyConfirmationCode } from './verifyConfirmationCode';
-
+import { savePushToken } from './pushToken';
 export {
   login,
   me,
@@ -16,4 +16,5 @@ export {
   requestPasswordReset,
   resetPassword,
   verifyConfirmationCode,
+  savePushToken,
 };

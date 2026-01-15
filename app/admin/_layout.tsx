@@ -7,62 +7,83 @@ import {
   ListCheck,
   CalendarCheck,
   Users,
+  MessagesSquare,
+  Settings
 } from "lucide-react-native";
-import { t } from "@/constants/i18n";
+import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { withRoleGuard } from "@/components/auth/withRoleGuard";
 
+import { useChatStore } from "@/store/useChatStore";
+
 const TabsLayout = () => {
+  const { t } = useTranslation();
+  const { unreadCount } = useChatStore();
+
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#C5A35D",
+        animation: "shift",
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: t("home"),
-          headerShown: true,
-          tabBarIcon: ({ color, size }) => (
+          title: t("tabs.home"),
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
             <Icon as={House} color={color} size="xl" />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="appointments"
+        options={{
+          title: t("tabs.appointments"),
+          headerShown: true,
+          tabBarIcon: ({ color }) => (
+            <Icon as={CalendarCheck} color={color} size="xl" />
           ),
         }}
       />
       <Tabs.Screen
         name="services"
         options={{
-          title: t("services"),
-          headerShown: true,
-          tabBarIcon: ({ color, size }) => (
+          title: t("tabs.services"),
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
             <Icon as={ListCheck} color={color} size="xl" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="dashboard"
-        options={{
-          title: t("dashboard"),
-          headerShown: true,
-          tabBarIcon: ({ color, size }) => (
-            <Icon as={LayoutDashboard} color={color} size="xl" />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="appointments"
-        options={{
-          title: t("appointments"),
-          headerShown: true,
-          tabBarIcon: ({ color, size }) => (
-            <Icon as={CalendarCheck} color={color} size="xl" />
           ),
         }}
       />
       <Tabs.Screen
         name="clients"
         options={{
-          title: t("clients"),
+          title: t("tabs.clients"),
           headerShown: true,
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Icon as={Users} color={color} size="xl" />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="messages"
+        options={{
+          title: t("tabs.messages"),
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Icon as={MessagesSquare} color={color} size="xl" />
+          ),
+          tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
+          tabBarBadgeStyle: { backgroundColor: '#EF4444' }
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

@@ -1,0 +1,244 @@
+{
+    "common": {
+        "save": "Enregistrer",
+        "saveChanges": "Enregistrer les modifications",
+        "cancel": "Annuler",
+        "loading": "Chargement...",
+        "ok": "OK",
+        "error": "Erreur",
+        "notice": "Avis",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "add": "Ajouter",
+        "currency": "DZD",
+        "na": "N/A",
+        "saveSuccess": "Enregistré avec succès",
+        "updateSuccess": "Mis à jour avec succès",
+        "typeMessage": "Tapez un message...",
+        "isTyping": "écrit",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+    },
+    "home": {
+        "welcome": "Bienvenue",
+        "intro": "Bienvenue chez Bagigi",
+        "bookToday": "Réservez votre rendez-vous pour aujourd'hui",
+        "ourServices": "Nos Services Signature",
+        "search": "Rechercher un service...",
+        "all": "Tout"
+    },
+    "bookings": {
+        "title": "Mes Réservations",
+        "empty": "Aucune réservation trouvée",
+        "queuePosition": "Position dans la file: #",
+        "status": {
+            "PENDING": "En attente",
+            "IN_PROGRESS": "En cours",
+            "DONE": "Terminé",
+            "CANCELLED": "Annulé"
+        }
+    },
+    "serviceDetails": {
+        "selectDate": "Sélectionner une date",
+        "nextAvailable": "Prochain créneau disponible",
+        "queuePos": "Position dans la file:",
+        "queueInfo": "Basé sur {{count}} personnes devant vous",
+        "calculating": "Calcul de la disponibilité...",
+        "selectDateHelper": "Sélectionnez une date pour voir la disponibilité",
+        "totalPrice": "Prix Total",
+        "bookNow": "Réserver",
+        "successTitle": "Réservation Confirmée!",
+        "successMsg": "Votre rendez-vous a été réservé.",
+        "selectDateAlert": "Veuillez sélectionner une date pour votre rendez-vous.",
+        "reviews": "({{count}} avis)",
+        "fetchEstimateError": "Impossible de récupérer l'estimation",
+        "bookingFailed": "Échec de la réservation"
+    },
+    "tabs": {
+        "home": "Accueil",
+        "bookings": "Réservations",
+        "messages": "Messages",
+        "profile": "Profil",
+        "dashboard": "Tableau de bord",
+        "services": "Services",
+        "appointments": "Rendez-vous",
+        "clients": "Clients",
+        "settings": "Paramètres"
+    },
+    "profile": {
+        "title": "Profil",
+        "logout": "Déconnexion",
+        "logoutConfirm": "Déconnexion",
+        "logoutConfirmMessage": "Êtes-vous sûr de vouloir vous déconnecter ?",
+        "personalInfo": "Informations Personnelles",
+        "notifications": "Notifications",
+        "appearance": "Apparence",
+        "language": "Langue",
+        "helpCenter": "Centre d'aide",
+        "terms": "Conditions d'utilisation",
+        "privacy": "Politique de confidentialité"
+    },
+    "settings": {
+        "appearance": {
+            "title": "Apparence",
+            "subtitle": "Thème et détails",
+            "system": "Par défaut du système",
+            "light": "Mode clair",
+            "dark": "Mode sombre",
+            "info": "Les paramètres d'apparence contrôlent actuellement le thème de l'interface dans toute l'application pour tous les administrateurs."
+        },
+        "language": {
+            "title": "Langue",
+            "subtitle": "Sélectionnez votre préférence",
+            "select": "Sélectionner la langue",
+            "restart": "L'application doit redémarrer pour appliquer les changements RTL.",
+            "info": "Changer la langue traduira instantanément toute l'interface d'administration."
+        },
+        "notifications": {
+            "title": "Notifications",
+            "push": "Notifications Push",
+            "email": "Mises à jour par e-mail",
+            "promo": "Offres promotionnelles"
+        },
+        "personalInfo": {
+            "title": "Informations Personnelles",
+            "name": "Nom complet",
+            "email": "Adresse e-mail",
+            "phone": "Numéro de téléphone",
+            "save": "Enregistrer les modifications",
+            "update": "Mettre à jour le profil"
+        }
+    },
+    "admin": {
+        "dashboard": {
+            "title": "Tableau de Bord",
+            "welcome": "Bon retour, Admin",
+            "proTip": "Astuce Pro",
+            "proTipDesc": "Suivez vos réservations en attente pour vous assurer qu'aucun client ne reste en attente !",
+            "periods": {
+                "all": "Tout le temps",
+                "today": "Aujourd'hui",
+                "week": "Cette semaine",
+                "month": "Ce mois-ci"
+            },
+            "revenueSubtitle": "Revenu total pour {{period}}"
+        },
+        "stats": {
+            "totalBookings": "Total des Réservations",
+            "totalBookingsDesc": "Toutes les réservations",
+            "todayBookings": "Réservations du Jour",
+            "todayBookingsDesc": "Nouveaux rendez-vous aujourd'hui",
+            "pending": "En attente",
+            "pendingDesc": "En attente de confirmation",
+            "activeClients": "Clients Actifs",
+            "activeClientsDesc": "Utilisateurs enregistrés",
+            "totalRevenue": "Revenu Total",
+            "totalRevenueDesc": "Des réservations terminées",
+            "services": "Services",
+            "servicesDesc": "Services disponibles"
+        },
+        "settings": {
+            "shopManagement": "Gestion du Salon",
+            "account": "Compte",
+            "appPreferences": "Préférences de l'App",
+            "workingHours": "Heures de Travail",
+            "workingHoursDesc": "Configurez vos heures d'ouverture",
+            "servicesDesc": "Gérez votre catalogue de services",
+            "security": "Sécurité",
+            "securityDesc": "Mot de passe et vérification"
+        },
+        "hours": {
+            "title": "Heures de Travail",
+            "subtitle": "Planifiez votre salon",
+            "open": "Ouvert",
+            "closed": "Fermé",
+            "startTime": "Heure de début",
+            "endTime": "Heure de fin",
+            "days": {
+                "0": "Dimanche",
+                "1": "Lundi",
+                "2": "Mardi",
+                "3": "Mercredi",
+                "4": "Jeudi",
+                "5": "Vendredi",
+                "6": "Samedi"
+            }
+        },
+        "services": {
+            "title": "Mes Services",
+            "newHeader": "Notre Catalogue de Services",
+            "addService": "Ajouter un Service",
+            "findServices": "Trouver des services...",
+            "editService": "Modifier le Service",
+            "newService": "Nouveau Service",
+            "deleteTitle": "Supprimer le Service",
+            "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce service ?",
+            "saveSuccess": "Service enregistré avec succès",
+            "saveError": "Échec de l'enregistrement du service",
+            "deleteError": "Échec de la suppression du service",
+            "form": {
+                "name": "Nom du Service",
+                "category": "Catégorie",
+                "duration": "Durée (min)",
+                "priceFrom": "Prix à partir de",
+                "priceTo": "Prix jusqu'à (Opt)",
+                "description": "Description",
+                "isVip": "Marquer comme service VIP",
+                "addPhoto": "Ajouter une photo du service",
+                "placeholder": {
+                    "name": "par exemple Shampoing Signature",
+                    "category": "par exemple Coiffure",
+                    "duration": "30",
+                    "priceFrom": "1000",
+                    "priceTo": "1500",
+                    "description": "Dites-nous en plus sur ce service..."
+                },
+                "validation": {
+                    "name": "Le nom est requis",
+                    "category": "La catégorie est requise",
+                    "duration": "La durée est requise",
+                    "priceFrom": "Le prix est requis"
+                }
+            }
+        },
+        "appointments": {
+            "title": "Rendez-vous",
+            "noBookings": "Aucun rendez-vous trouvé",
+            "searchPlaceholder": "Rechercher par client...",
+            "status": {
+                "all": "Tous",
+                "pending": "En attente",
+                "inProgress": "En cours",
+                "done": "Terminé",
+                "cancelled": "Annulé"
+            },
+            "actions": {
+                "start": "Démarrer",
+                "finish": "Terminer",
+                "cancel": "Annuler",
+                "revert": "Réinitialiser"
+            },
+            "info": {
+                "client": "Client",
+                "service": "Service",
+                "date": "Date",
+                "time": "Heure",
+                "phone": "Téléphone"
+            }
+        },
+        "clients": {
+            "title": "Clients",
+            "noClients": "Aucun client trouvé",
+            "searchPlaceholder": "Rechercher par email ou téléphone...",
+            "stats": {
+                "bookings": "Réservations",
+                "joined": "Inscrit"
+            }
+        },
+        "messages": {
+            "chat": "Discussion",
+            "user": "Utilisateur",
+            "startConversation": "Commencer la conversation"
+        }
+    }
+}

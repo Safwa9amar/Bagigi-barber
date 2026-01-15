@@ -5,6 +5,7 @@ import {
   View,
   Image,
   StatusBar,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Box } from "@/components/ui/box";
@@ -15,16 +16,19 @@ import { Heading } from "@/components/ui/heading";
 import InputField from "@/components/ui/InputField";
 import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
-import { t } from "@/constants/i18n";
 import { Icon } from "@/components/ui/icon";
 import { Facebook, InstagramIcon } from "lucide-react-native";
 import Snapchat from "@/assets/icons/Snapchat";
 import Whatsup from "@/assets/icons/Whatsup";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
+
 const HomeScreen = () => {
   const router = useRouter();
   const { user } = useAuthStore();
+  const { t } = useTranslation();
+
   const [services, setServices] = useState<
     [
       {
@@ -45,16 +49,30 @@ const HomeScreen = () => {
     new Set(services?.map((service) => service.category))
   );
 
-  useEffect(() => {
-    const getData = async () => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const getData = async () => {
+    try {
       const { data } = await api.get("/services");
       if (data?.data) {
         setServices(data.data);
-        setFilteredServices(data.data);
+        // If search or filter is active, re-apply might be needed, 
+        // but useEffect below handles `services` dependency so it should update filteredServices automatically
       }
-    };
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
     getData();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getData();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     let result = services;
@@ -78,6 +96,9 @@ const HomeScreen = () => {
     <ScrollView
       className="bg-background-light dark:bg-background-dark px-5"
       contentContainerStyle={{ gap: 20, paddingTop: 24 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />
+      }
     >
       <Box className="flex-row gap-5 items-center bg-secondary-200 p-5 rounded-xl">
         <Image
@@ -86,9 +107,9 @@ const HomeScreen = () => {
         />
         <View>
           <Text size="xl">
-            {t("welcome")}, {t("welocome_to_bagigi")}
+            {t("home.welcome")}, {t("home.intro")}
           </Text>
-          <Text className="text-gray-500">{t("book_for_today")}</Text>
+          <Text className="text-gray-500">{t("home.bookToday")}</Text>
           <View className="my-4 flex flex-row justify-around">
             <Box className="bg-secondary-500  rounded-full p-3">
               <Icon as={Facebook} className="w-5 h-5" color="#fff" />
@@ -107,13 +128,13 @@ const HomeScreen = () => {
       </Box>
 
       <Heading className="dark:text-white">
-        {t("our_signature_services")}
+        {t("home.ourServices")}
       </Heading>
 
       <InputField
         className="border-secondary-500"
         icon="search"
-        placeholder={t("search_services")}
+        placeholder={t("home.search")}
         onChange={setSearchQuery as any}
       />
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -124,11 +145,10 @@ const HomeScreen = () => {
             onPress={() => setSelectedCategory(null)}
           >
             <Text
-              className={`${
-                selectedCategory === null ? "text-white" : "dark:text-white"
-              }`}
+              className={`${selectedCategory === null ? "text-white" : "dark:text-white"
+                }`}
             >
-              {t("all")}
+              {t("home.all")}
             </Text>
           </Button>
 
@@ -137,16 +157,14 @@ const HomeScreen = () => {
               key={cat}
               variant="outline"
               onPress={() => setSelectedCategory(cat)}
-              className={`rounded-full ${
-                selectedCategory === cat
-                  ? "border-secondary-500 border bg-secondary-500"
-                  : ""
-              }`}
+              className={`rounded-full ${selectedCategory === cat
+                ? "border-secondary-500 border bg-secondary-500"
+                : ""
+                }`}
             >
               <Text
-                className={`${
-                  selectedCategory === cat ? "text-white" : "dark:text-white"
-                }`}
+                className={`${selectedCategory === cat ? "text-white" : "dark:text-white"
+                  }`}
               >
                 {cat}
               </Text>

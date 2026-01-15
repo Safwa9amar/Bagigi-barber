@@ -8,6 +8,7 @@ import {
   refreshToken,
   verifyConfirmationCode,
   requestNewConfirmationCode,
+  savePushToken
 } from '@/controllers/auth';
 import { authenticateJWT } from '@/middlewares/authMiddleware';
 
@@ -22,5 +23,7 @@ router.post('/reset-password', resetPassword);
 
 router.get('/me', authenticateJWT, me);
 router.post('/refresh-token', authenticateJWT, refreshToken);
+router.post('/push-token', authenticateJWT, savePushToken);
+
 
 export default router;

@@ -17,8 +17,28 @@ export const authenticateJWT = (
     const decoded = jwt.verify(token, JWT_SECRET);
     // @ts-ignore
     req.user = decoded;
+    console.log("AuthMiddleware :", "User authenticated");
+
     next();
   } catch (err) {
+    console.error("AuthMiddleware :", "Invalid token");
     return res.status(401).json({ error: 'Invalid token' });
   }
+}
+
+
+export const isAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // @ts-ignore
+  if (req.user && req.user.role === 'ADMIN') {
+    console.log("AuthMiddleware :", "Admin access granted");
+    next();
+  } else {
+    console.error("AuthMiddleware :", "Admin access denied");
+    res.status(403).json({ error: 'Admin access required' });
+  }
 };
+

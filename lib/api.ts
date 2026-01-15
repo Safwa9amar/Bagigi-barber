@@ -4,9 +4,7 @@ import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+
 });
 
 // ---------- Request Interceptor ----------
@@ -15,6 +13,17 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Check if data is FormData (or a polyfilled version with _parts)
+  const isFormData = config.data && (
+    config.data instanceof FormData ||
+    (config.data && typeof config.data === 'object' && config.data._parts)
+  );
+
+  if (isFormData) {
+    config.headers['Content-Type'] = "multipart/form-data";
+  }
+
   return config;
 });
 
@@ -139,5 +148,73 @@ const auth = {
   },
 };
 
-export { auth };
+const booking = {
+  create: async (data: any) => {
+    const response = await api.post("/booking/create", data);
+    return response.data;
+  },
+  estimate: async (data: any) => {
+    const response = await api.post("/booking/estimate", data);
+    return response.data;
+  },
+  getMyBookings: async () => {
+    const response = await api.get("/booking/my-bookings");
+    return response.data;
+  },
+};
+
+const services = {
+  getById: async (id: string) => {
+    const response = await api.get(`/services/${id}`);
+    return response.data;
+  },
+  getAll: async () => {
+    const response = await api.get("/services");
+    return response.data;
+  },
+  create: async (data: any) => {
+    const response = await api.post("/services", data);
+    return response.data;
+  },
+  update: async (id: string, data: any) => {
+    const response = await api.put(`/services/${id}`, data);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/services/${id}`);
+    return response.data;
+  },
+};
+
+const admin = {
+  getStats: async (startDate?: string, endDate?: string) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
+    const response = await api.get(`/admin/stats?${params.toString()}`);
+    return response.data;
+  },
+  getAllBookings: async () => {
+    const response = await api.get("/admin/bookings");
+    return response.data;
+  },
+  updateBookingStatus: async (id: string, status: string) => {
+    const response = await api.patch(`/admin/bookings/${id}`, { status });
+    return response.data;
+  },
+  getAllClients: async () => {
+    const response = await api.get("/admin/clients");
+    return response.data;
+  },
+  getWorkingHours: async () => {
+    const response = await api.get("/admin/hours");
+    return response.data;
+  },
+  updateWorkingHours: async (id: string, data: { startTime: string; endTime: string; isOpen: boolean }) => {
+    const response = await api.patch(`/admin/hours/${id}`, data);
+    return response.data;
+  },
+};
+
+export { auth, booking, services, admin };
 export default api;

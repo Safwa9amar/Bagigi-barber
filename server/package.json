@@ -29,20 +29,23 @@
     "prettier": "^3.7.4",
     "prisma": "^6.17.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@prisma/client": "^6.19.1",
+    "@types/multer": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "expo-server-sdk": "^4.0.0",
     "jsonwebtoken": "^9.0.3",
     "module-alias": "^2.2.3",
+    "multer": "^2.0.2",
     "nodemailer": "^7.0.12",
+    "socket.io": "^4.8.3",
     "tsconfig-paths": "^4.2.0"
-  },
-  "prisma": {
-    "schema": "./prisma"
   }
 }

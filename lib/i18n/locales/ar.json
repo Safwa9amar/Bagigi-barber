@@ -1,0 +1,244 @@
+{
+    "common": {
+        "save": "حفظ",
+        "saveChanges": "حفظ التغييرات",
+        "cancel": "إلغاء",
+        "loading": "جارٍ التحميل...",
+        "ok": "تم",
+        "error": "خطأ",
+        "notice": "تنبيه",
+        "delete": "حذف",
+        "edit": "تعديل",
+        "add": "إضافة",
+        "currency": "د.ج",
+        "na": "غير متوفر",
+        "saveSuccess": "تم الحفظ بنجاح",
+        "updateSuccess": "تم التحديث بنجاح",
+        "typeMessage": "اكتب رسالة...",
+        "isTyping": "يستعد للرد",
+        "online": "متصل",
+        "offline": "غير متصل"
+    },
+    "home": {
+        "welcome": "مرحباً",
+        "intro": "مرحباً بكم في باجيجي",
+        "bookToday": "احجز موعدك اليوم",
+        "ourServices": "خدماتنا المميزة",
+        "search": "البحث عن خدمات...",
+        "all": "الكل"
+    },
+    "bookings": {
+        "title": "حجزاتي",
+        "empty": "لا توجد حجوزات",
+        "queuePosition": "الترتيب في الطابور: #",
+        "status": {
+            "PENDING": "قيد الانتظار",
+            "IN_PROGRESS": "جارى التنفيذ",
+            "DONE": "مكتمل",
+            "CANCELLED": "ملغي"
+        }
+    },
+    "serviceDetails": {
+        "selectDate": "اختر التاريخ",
+        "nextAvailable": "أقرب موعد متاح",
+        "queuePos": "الترتيب:",
+        "queueInfo": "بناءً على {{count}} أشخاص أمامك",
+        "calculating": "جارٍ حساب التوفر...",
+        "selectDateHelper": "اختر تاريخاً لمعرفة التوفر",
+        "totalPrice": "السعر الإجمالي",
+        "bookNow": "احجز الآن",
+        "successTitle": "تم تأكيد الحجز!",
+        "successMsg": "لقد تم حجز موعدك بنجاح.",
+        "selectDateAlert": "يرجى اختيار تاريخ لموعدك.",
+        "reviews": "({{count}} مراجعة)",
+        "fetchEstimateError": "تعذر جلب التقدير",
+        "bookingFailed": "فشل الحجز"
+    },
+    "tabs": {
+        "home": "الرئيسية",
+        "bookings": "حجزاتي",
+        "messages": "الرسائل",
+        "profile": "الملف الشخصي",
+        "dashboard": "لوحة التحكم",
+        "services": "الخدمات",
+        "appointments": "المواعيد",
+        "clients": "الزبائن",
+        "settings": "الإعدادات"
+    },
+    "profile": {
+        "title": "الملف الشخصي",
+        "logout": "تسجيل الخروج",
+        "logoutConfirm": "تسجيل الخروج",
+        "logoutConfirmMessage": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+        "personalInfo": "المعلومات الشخصية",
+        "notifications": "الإشعارات",
+        "appearance": "المظهر",
+        "language": "اللغة",
+        "helpCenter": "مركز المساعدة",
+        "terms": "شروط الخدمة",
+        "privacy": "سياسة الخصوصية"
+    },
+    "settings": {
+        "appearance": {
+            "title": "المظهر",
+            "subtitle": "السمة والتفاصيل",
+            "system": "افتراضي النظام",
+            "light": "الوضع الفاتح",
+            "dark": "الوضع الداكن",
+            "info": "تتحكم إعدادات المظهر حالياً في سمة الواجهة عبر التطبيق بالكامل لجميع المسؤولين."
+        },
+        "language": {
+            "title": "اللغة",
+            "subtitle": "اختر تفضيلاتك",
+            "select": "اختر اللغة",
+            "restart": "يجب إعادة تشغيل التطبيق لتطبيق تغييرات RTL.",
+            "info": "سيؤدي تغيير اللغة إلى ترجمة واجهة الإدارة بالكامل فوراً."
+        },
+        "notifications": {
+            "title": "الإشعارات",
+            "push": "إشعارات الهاتف",
+            "email": "تحديثات البريد الإلكتروني",
+            "promo": "العروض الترويجية"
+        },
+        "personalInfo": {
+            "title": "المعلومات الشخصية",
+            "name": "الاسم الكامل",
+            "email": "البريد الإلكتروني",
+            "phone": "رقم الهاتف",
+            "save": "حفظ التغييرات",
+            "update": "تحديث الملف الشخصي"
+        }
+    },
+    "admin": {
+        "dashboard": {
+            "title": "لوحة التحكم",
+            "welcome": "مرحباً بعودتك، أيها المشرف",
+            "proTip": "نصيحة احترافية",
+            "proTipDesc": "تتبع حجوزاتك المعلقة لضمان عدم ترك أي عميل ينتظر!",
+            "periods": {
+                "all": "كل الوقت",
+                "today": "اليوم",
+                "week": "هذا الأسبوع",
+                "month": "هذا الشهر"
+            },
+            "revenueSubtitle": "إجمالي الإيرادات لـ {{period}}"
+        },
+        "stats": {
+            "totalBookings": "إجمالي الحجوزات",
+            "totalBookingsDesc": "كل الحجوزات",
+            "todayBookings": "حجوزات اليوم",
+            "todayBookingsDesc": "مواعيد جديدة اليوم",
+            "pending": "قيد الانتظار",
+            "pendingDesc": "في انتظار التأكيد",
+            "activeClients": "العملاء النشطون",
+            "activeClientsDesc": "المستخدمون المسجلون",
+            "totalRevenue": "إجمالي الإيرادات",
+            "totalRevenueDesc": "من الحجوزات المكتملة",
+            "services": "الخدمات",
+            "servicesDesc": "الخدمات المتاحة"
+        },
+        "settings": {
+            "shopManagement": "إدارة الصالون",
+            "account": "الحساب",
+            "appPreferences": "تفضيلات التطبيق",
+            "workingHours": "ساعات العمل",
+            "workingHoursDesc": "تكوين أوقات فتح الصالون الخاص بك",
+            "servicesDesc": "إدارة كتالوج الخدمات الخاص بك",
+            "security": "الأمان",
+            "securityDesc": "كلمة المرور والتحقق"
+        },
+        "hours": {
+            "title": "ساعات العمل",
+            "subtitle": "جدولة الصالون الخاص بك",
+            "open": "مفتوح",
+            "closed": "مغلق",
+            "startTime": "وقت البدء",
+            "endTime": "وقت الانتهاء",
+            "days": {
+                "0": "الأحد",
+                "1": "الاثنين",
+                "2": "الثلاثاء",
+                "3": "الأربعاء",
+                "4": "الخميس",
+                "5": "الجمعة",
+                "6": "السبت"
+            }
+        },
+        "services": {
+            "title": "خدماتي",
+            "newHeader": "كتالوج خدماتنا",
+            "addService": "إضافة خدمة",
+            "findServices": "البحث عن خدمات...",
+            "editService": "تعديل الخدمة",
+            "newService": "خدمة جديدة",
+            "deleteTitle": "حذف الخدمة",
+            "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذه الخدمة؟",
+            "saveSuccess": "تم حفظ الخدمة بنجاح",
+            "saveError": "فشل حفظ الخدمة",
+            "deleteError": "فشل حذف الخدمة",
+            "form": {
+                "name": "اسم الخدمة",
+                "category": "الفئة",
+                "duration": "المدة (دقيقة)",
+                "priceFrom": "السعر من",
+                "priceTo": "السعر إلى (اختياري)",
+                "description": "الوصف",
+                "isVip": "تمييز كخدمة VIP",
+                "addPhoto": "إضافة صورة للخدمة",
+                "placeholder": {
+                    "name": "مثال: حلاقة توقيع",
+                    "category": "مثال: حلاقة",
+                    "duration": "30",
+                    "priceFrom": "1000",
+                    "priceTo": "1500",
+                    "description": "أخبرنا المزيد عن هذه الخدمة..."
+                },
+                "validation": {
+                    "name": "الاسم مطلوب",
+                    "category": "الفئة مطلوبة",
+                    "duration": "المدة مطلوبة",
+                    "priceFrom": "السعر مطلوب"
+                }
+            }
+        },
+        "appointments": {
+            "title": "المواعيد",
+            "noBookings": "لا توجد مواعيد",
+            "searchPlaceholder": "بحث عن طريق العميل...",
+            "status": {
+                "all": "الكل",
+                "pending": "قيد الانتظار",
+                "inProgress": "جاري التنفيذ",
+                "done": "مكتمل",
+                "cancelled": "ملغي"
+            },
+            "actions": {
+                "start": "بدء",
+                "finish": "إنهاء",
+                "cancel": "إلغاء",
+                "revert": "إعادة تعيين"
+            },
+            "info": {
+                "client": "العميل",
+                "service": "الخدمة",
+                "date": "التاريخ",
+                "time": "الوقت",
+                "phone": "الهاتف"
+            }
+        },
+        "clients": {
+            "title": "العملاء",
+            "noClients": "لا يوجد عملاء",
+            "searchPlaceholder": "البحث عن طريق البريد الإلكتروني أو الهاتف...",
+            "stats": {
+                "bookings": "الحجوزات",
+                "joined": "انضم"
+            }
+        },
+        "messages": {
+            "chat": "المحادثة",
+            "user": "المستخدم",
+            "startConversation": "ابدأ المحادثة"
+        }
+    }
+}
