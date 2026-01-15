@@ -52,7 +52,16 @@
         "selectDateAlert": "Veuillez sélectionner une date pour votre rendez-vous.",
         "reviews": "({{count}} avis)",
         "fetchEstimateError": "Impossible de récupérer l'estimation",
-        "bookingFailed": "Échec de la réservation"
+        "bookingFailed": "Échec de la réservation",
+        "reviewsTitle": "Avis clients",
+        "noReviews": "Pas encore d'avis. Soyez le premier à noter ce service !",
+        "writeReview": "Écrire un avis",
+        "rating": "Note",
+        "commentPlaceholder": "Partagez votre expérience...",
+        "submitReview": "Envoyer l'avis",
+        "reviewSuccess": "Merci ! Votre avis a été envoyé.",
+        "reviewError": "Échec de l'envoi de l'avis",
+        "alreadyReviewed": "Vous avez déjà évalué ce service"
     },
     "tabs": {
         "home": "Accueil",
@@ -76,7 +85,11 @@
         "language": "Langue",
         "helpCenter": "Centre d'aide",
         "terms": "Conditions d'utilisation",
-        "privacy": "Politique de confidentialité"
+        "privacy": "Politique de confidentialité",
+        "accountSettings": "Paramètres du compte",
+        "support": "Support et Légal",
+        "guest": "Invité",
+        "customer": "Client Premium"
     },
     "settings": {
         "appearance": {
@@ -85,20 +98,22 @@
             "system": "Par défaut du système",
             "light": "Mode clair",
             "dark": "Mode sombre",
-            "info": "Les paramètres d'apparence contrôlent actuellement le thème de l'interface dans toute l'application pour tous les administrateurs."
+            "info": "Choisir un thème ajustera l'apparence visuelle de l'application. Vous pouvez choisir entre les modes clair et sombre."
         },
         "language": {
             "title": "Langue",
             "subtitle": "Sélectionnez votre préférence",
             "select": "Sélectionner la langue",
             "restart": "L'application doit redémarrer pour appliquer les changements RTL.",
-            "info": "Changer la langue traduira instantanément toute l'interface d'administration."
+            "info": "Changer la langue traduira instantanément toute l'interface dans la langue de votre choix."
         },
         "notifications": {
             "title": "Notifications",
             "push": "Notifications Push",
             "email": "Mises à jour par e-mail",
-            "promo": "Offres promotionnelles"
+            "promo": "Offres promotionnelles",
+            "preferences": "Préférences de notification",
+            "info": "Choisissez les notifications que vous souhaitez recevoir. Nous vous recommandons de garder les notifications push activées pour les mises à jour importantes."
         },
         "personalInfo": {
             "title": "Informations Personnelles",

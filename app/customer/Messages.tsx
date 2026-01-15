@@ -184,7 +184,7 @@ const Messages = () => {
         </View>
       )}
 
-      <View style={styles.inputContainer} className="bg-white dark:bg-background-muted border-t border-outline-300 dark:border-gray-800">
+      <View style={styles.inputContainer} className="bg-white dark:bg-background-muted  border-outline-300 dark:border-gray-800">
         <TextInput
           style={styles.input}
           value={inputText}

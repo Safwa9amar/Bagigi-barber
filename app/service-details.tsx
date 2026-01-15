@@ -8,37 +8,83 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  TextInput,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
-import { booking } from "@/lib/api";
+import { services as servicesApi, booking } from "@/lib/api";
 import { Calendar } from "react-native-calendars";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { useAuthStore } from "@/store/useAuthStore";
+
+type Review = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+  };
+};
 
 type Service = {
-  id: string; // Ensure ID is passed
+  id: string;
   name: string;
   image: string;
   category: string;
   duration: string;
   price_from: string;
+  rating?: number;
+  reviews_count?: number;
+  reviews?: Review[];
 };
 
 export default function BookServiceScreen() {
   const navigation = useNavigation();
-  const service: Service = useGlobalSearchParams();
+  const params = useGlobalSearchParams();
+  const { user } = useAuthStore();
   const { t } = useTranslation();
 
   // State
+  const [service, setService] = useState<Service | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [estimation, setEstimation] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState("");
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchServiceDetails();
+    if (selectedDate) await fetchEstimate();
+    setRefreshing(false);
+  };
+
+  const fetchServiceDetails = async () => {
+    try {
+      setLoading(true);
+      const data = await servicesApi.getById(params.id as string);
+      setService(data);
+    } catch (error) {
+      console.error("Error fetching service details:", error);
+    } finally {
+      if (!selectedDate) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchServiceDetails();
+  }, [params.id]);
 
   // Fetch estimate when date changes
   useEffect(() => {
-    if (selectedDate && service.id) {
+    if (selectedDate && params.id) {
       fetchEstimate();
     }
   }, [selectedDate]);
@@ -47,7 +93,7 @@ export default function BookServiceScreen() {
     try {
       setLoading(true);
       const res = await booking.estimate({
-        serviceId: service.id,
+        serviceId: params.id as string,
         date: selectedDate,
       });
       setEstimation(res);
@@ -68,7 +114,7 @@ export default function BookServiceScreen() {
     try {
       setBookingLoading(true);
       const res = await booking.create({
-        serviceId: service.id,
+        serviceId: params.id as string,
         date: selectedDate,
       });
 
@@ -87,11 +133,51 @@ export default function BookServiceScreen() {
     }
   };
 
+  const handleSubmittingReview = async () => {
+    if (!service) return;
+    try {
+      setSubmittingReview(true);
+      await servicesApi.addReview(service.id, {
+        rating: newRating,
+        comment: newComment.trim() || undefined
+      });
+
+      Alert.alert(t("common.notice"), t("serviceDetails.reviewSuccess"));
+      setNewComment("");
+      fetchServiceDetails(); // Refresh to show new review
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert(
+        t("common.error"),
+        error.response?.data?.error === "You have already reviewed this service"
+          ? t("serviceDetails.alreadyReviewed")
+          : t("serviceDetails.reviewError")
+      );
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   const today = format(new Date(), "yyyy-MM-dd");
+
+  if (!service && loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]} className="bg-background-light dark:bg-background-dark">
+        <ActivityIndicator size="large" color="#D4AF37" />
+      </View>
+    );
+  }
+
+  if (!service) return null;
 
   return (
     <View className="bg-background-light dark:bg-background-dark" style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />
+        }
+      >
         {/* Header Image */}
         <View>
           <Image
@@ -120,7 +206,9 @@ export default function BookServiceScreen() {
             </View>
             <View style={styles.infoItem}>
               <Ionicons name="star" size={18} color="#D4AF37" />
-              <Text style={styles.infoText}>4.8 {t("serviceDetails.reviews", { count: 120 })}</Text>
+              <Text style={styles.infoText}>
+                {service.rating?.toFixed(1) || "0.0"} {t("serviceDetails.reviews", { count: service.reviews_count || 0 })}
+              </Text>
             </View>
           </View>
 
@@ -152,7 +240,7 @@ export default function BookServiceScreen() {
           </View>
 
           {/* Estimation Result */}
-          {loading ? (
+          {loading && selectedDate ? (
             <ActivityIndicator size="small" color="#D4AF37" style={{ marginTop: 20 }} />
           ) : estimation ? (
             <View style={styles.estimationCard} className="bg-white dark:bg-background-muted border-outline-300 dark:border-primary-500">
@@ -170,6 +258,81 @@ export default function BookServiceScreen() {
           ) : (
             <Text style={styles.helperText}>{t("serviceDetails.selectDateHelper")}</Text>
           )}
+
+          <View style={styles.divider} className="bg-outline-300 dark:bg-outline-200" />
+
+          {/* Reviews Section */}
+          <View className="mb-10">
+            <Text style={styles.sectionTitle} className="text-typography-900 dark:text-typography-white">
+              {t("serviceDetails.reviewsTitle")}
+            </Text>
+
+            {service.reviews && service.reviews.length > 0 ? (
+              service.reviews.map((rev) => (
+                <View key={rev.id} style={styles.reviewItem} className="border-b border-outline-200 dark:border-gray-800">
+                  <View className="flex-row justify-between mb-1">
+                    <Text className="font-bold text-typography-900 dark:text-typography-white">{rev.user.name}</Text>
+                    <View className="flex-row">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Ionicons
+                          key={s}
+                          name={s <= rev.rating ? "star" : "star-outline"}
+                          size={12}
+                          color="#D4AF37"
+                        />
+                      ))}
+                    </View>
+                  </View>
+                  {rev.comment && (
+                    <Text className="text-gray-500 dark:text-gray-400 text-sm">{rev.comment}</Text>
+                  )}
+                  <Text className="text-gray-400 text-[10px] mt-1">{new Date(rev.createdAt).toLocaleDateString()}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.helperText}>{t("serviceDetails.noReviews")}</Text>
+            )}
+
+            {/* Write a Review (Only for Customers) */}
+            {user?.role === "USER" && (
+              <View style={styles.writeReviewContainer} className="bg-secondary-50 p-5 rounded-xl mt-5 dark:bg-background-muted">
+                <Text className="font-bold text-lg mb-3 dark:text-white">{t("serviceDetails.writeReview")}</Text>
+                <View className="flex-row gap-2 mb-4">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <TouchableOpacity key={s} onPress={() => setNewRating(s)}>
+                      <Ionicons
+                        name={s <= newRating ? "star" : "star-outline"}
+                        size={28}
+                        color="#D4AF37"
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <View className="bg-white dark:bg-background-paper p-3 rounded-lg border border-outline-300 dark:border-gray-700 min-h-[80px]">
+                  <TextInput
+                    placeholder={t("serviceDetails.commentPlaceholder")}
+                    placeholderTextColor="#9CA3AF"
+                    multiline
+                    value={newComment}
+                    onChangeText={setNewComment}
+                    className="text-typography-900 dark:text-typography-white text-sm"
+                    style={{ textAlignVertical: 'top' }}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={handleSubmittingReview}
+                  disabled={submittingReview}
+                  className="bg-secondary-500 py-3 rounded-lg mt-4 items-center"
+                >
+                  {submittingReview ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text className="text-white font-bold">{t("serviceDetails.submitReview")}</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
 
         </View>
         <View style={{ height: 100 }} />
@@ -319,5 +482,13 @@ const styles = StyleSheet.create({
     color: "#000",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  reviewItem: {
+    paddingVertical: 15,
+  },
+  writeReviewContainer: {
+    marginTop: 20,
+    padding: 20,
+    borderRadius: 15,
   },
 });

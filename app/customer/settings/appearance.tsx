@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
@@ -11,52 +11,107 @@ export default function Appearance() {
     const { colorScheme, setColorScheme } = useColorScheme();
 
     const options = [
-        { label: t("settings.appearance.system"), value: 'system' },
-        { label: t("settings.appearance.light"), value: 'light' },
-        { label: t("settings.appearance.dark"), value: 'dark' },
+        { label: t("settings.appearance.system"), value: "system", icon: "phone-portrait-outline" },
+        { label: t("settings.appearance.light"), value: "light", icon: "sunny-outline" },
+        { label: t("settings.appearance.dark"), value: "dark", icon: "moon-outline" },
     ];
 
+    const AppearanceItem = ({
+        label,
+        value,
+        icon,
+        isSelected,
+    }: {
+        label: string;
+        value: string;
+        icon: any;
+        isSelected: boolean;
+    }) => (
+        <TouchableOpacity
+            onPress={() => setColorScheme(value as "light" | "dark" | "system")}
+            className={`flex-row items-center p-5 bg-white dark:bg-[#1E1E1E] mb-3 rounded-[24px] shadow-sm border ${isSelected
+                    ? "border-[#C5A35D]"
+                    : "border-gray-100 dark:border-gray-800"
+                }`}
+        >
+            <View
+                className="w-10 h-10 rounded-full items-center justify-center"
+                style={{ backgroundColor: isSelected ? "#C5A35D20" : "#C5A35D10" }}
+            >
+                <Ionicons
+                    name={icon}
+                    size={20}
+                    color={isSelected ? "#C5A35D" : "#9CA3AF"}
+                />
+            </View>
+            <Text
+                className={`flex-1 ml-4 text-sm font-black ${isSelected ? "text-[#C5A35D]" : "text-[#1A1A1A] dark:text-white"
+                    }`}
+            >
+                {label}
+            </Text>
+            {isSelected && (
+                <Ionicons name="checkmark-circle" size={24} color="#C5A35D" />
+            )}
+        </TouchableOpacity>
+    );
+
     return (
-        <View style={styles.container} className="bg-background-light dark:bg-background-dark">
-            <View style={styles.header} className="bg-white dark:bg-background-muted">
-                <TouchableOpacity onPress={() => router.replace('/customer/Profile')} style={styles.backBtn}>
-                    <Ionicons name="chevron-back" size={24} className="color-typography-900 dark:color-typography-white" />
+        <View className="flex-1 bg-gray-50 dark:bg-[#0F0F0F]">
+            {/* Header */}
+            <View className="pt-14 px-5 pb-6 bg-white dark:bg-[#0F0F0F] flex-row items-center border-b border-gray-100 dark:border-gray-800">
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="mr-4 w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1E1E1E] items-center justify-center"
+                >
+                    <Ionicons
+                        name="arrow-back"
+                        size={20}
+                        color="#1A1A1A"
+                        className="dark:text-white"
+                    />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle} className="text-typography-900 dark:text-typography-white">{t("settings.appearance.title")}</Text>
-                <View style={{ width: 24 }} />
+                <View>
+                    <Text className="text-xl font-black text-[#1A1A1A] dark:text-white">
+                        {t("settings.appearance.title")}
+                    </Text>
+                    <Text className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">
+                        {t("profile.appearance") || "App Theme"}
+                    </Text>
+                </View>
             </View>
 
-            <View style={styles.content}>
+            <ScrollView className="flex-1 p-5" showsVerticalScrollIndicator={false}>
+                <Text className="text-gray-400 font-extrabold text-[10px] uppercase tracking-widest ml-1 mb-4">
+                    {t("settings.appearance.subtitle") || "Choose your preference"}
+                </Text>
+
                 {options.map((option) => (
-                    <TouchableOpacity
+                    <AppearanceItem
                         key={option.value}
-                        className="flex-row justify-between items-center py-5 border-b border-outline-300"
-                        onPress={() => setColorScheme(option.value as 'light' | 'dark' | 'system')}
-                    >
-                        <Text className="text-base text-typography-900 dark:text-typography-white">
-                            {option.label}
-                        </Text>
-                        {colorScheme === option.value && (
-                            <Ionicons name="checkmark" size={20} color="#D4AF37" />
-                        )}
-                    </TouchableOpacity>
+                        label={option.label}
+                        value={option.value}
+                        icon={option.icon}
+                        isSelected={colorScheme === option.value}
+                    />
                 ))}
-            </View>
+
+                <View
+                    className="mt-6 p-5 rounded-[24px] bg-[#C5A35D10] border border-[#C5A35D20]"
+                    style={{ backgroundColor: "#C5A35D10" }}
+                >
+                    <View className="flex-row items-center mb-2">
+                        <Ionicons name="information-circle-outline" size={20} color="#C5A35D" />
+                        <Text className="ml-2 text-[#C5A35D] font-black text-[10px] uppercase tracking-widest">
+                            {t("common.info") || "Information"}
+                        </Text>
+                    </View>
+                    <Text className="text-gray-500 dark:text-gray-400 text-xs leading-5">
+                        {t("settings.appearance.info") ||
+                            "Changing the appearance will affect how the application looks for you. You can choose between light, dark, or system default themes."}
+                    </Text>
+                </View>
+            </ScrollView>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1 },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: 60,
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-    },
-    backBtn: { padding: 4 },
-    headerTitle: { fontSize: 18, fontWeight: 'bold' },
-    content: { padding: 20 },
-});

@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { getById, createService, updateService, deleteService } from '@/controllers/services';
+import { createReview, getServiceReviews } from '@/controllers/services/reviews';
 import prisma from '@/lib/prisma';
 import { authenticateJWT, isAdmin } from '@/middlewares/authMiddleware';
 import { upload } from '@/config/multer';
@@ -23,6 +24,11 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 router.get('/:id', getById);
+
+// Reviews
+router.post('/:serviceId/reviews', authenticateJWT, createReview);
+router.get('/:serviceId/reviews', getServiceReviews);
+
 // Admin Routes
 router.post('/', authenticateJWT, isAdmin, upload.single('image'), createService);
 router.put('/:id', authenticateJWT, isAdmin, upload.single('image'), updateService);

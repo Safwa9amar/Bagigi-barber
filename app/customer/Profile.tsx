@@ -2,17 +2,14 @@ import React from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   Image,
   Alert,
-  Switch,
 } from "react-native";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
 import { useTranslation } from "react-i18next";
 
 export default function Profile() {
@@ -21,230 +18,169 @@ export default function Profile() {
   const { t } = useTranslation();
 
   const handleLogout = () => {
-    Alert.alert(t("profile.logout"), t("profile.logoutConfirm"), [
-      { text: t("common.cancel"), style: "cancel" },
-      {
-        text: t("profile.logout"),
-        style: "destructive",
-        onPress: () => {
-          logout();
-          router.replace("/auth/login");
+    Alert.alert(
+      t("profile.logoutConfirm") || "Logout",
+      t("profile.logoutConfirmMessage") || "Are you sure you want to logout?",
+      [
+        { text: t("common.cancel") || "Cancel", style: "cancel" },
+        {
+          text: t("profile.logout") || "Logout",
+          style: "destructive",
+          onPress: async () => {
+            await logout();
+            router.replace("/auth/login");
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
-  const menuItems = [
-    {
-      title: t("profile.accountSettings"),
-      items: [
-        { icon: "person-outline", label: t("profile.personalInfo"), action: () => router.push("/customer/settings/personal-info") },
-        { icon: "color-palette-outline", label: t("profile.appearance"), action: () => router.push("/customer/settings/appearance") },
-        { icon: "notifications-outline", label: t("profile.notifications"), action: () => router.push("/customer/settings/notifications") },
-        { icon: "language-outline", label: t("profile.language"), value: "", action: () => router.push("/customer/settings/language") },
-      ],
-    },
-    {
-      title: t("profile.support"),
-      items: [
-        { icon: "help-circle-outline", label: t("profile.helpCenter"), action: () => router.push("/customer/support/help-center") },
-        { icon: "document-text-outline", label: t("profile.terms"), action: () => router.push("/customer/support/terms") },
-        { icon: "lock-closed-outline", label: t("profile.privacy"), action: () => router.push("/customer/support/privacy") },
-      ],
-    },
-  ];
+  const SettingItem = ({
+    icon,
+    label,
+    onPress,
+    detail,
+    isDestructive = false,
+  }: {
+    icon: any;
+    label: string;
+    onPress: () => void;
+    detail?: string;
+    isDestructive?: boolean;
+  }) => (
+    <TouchableOpacity
+      onPress={onPress}
+      className={`flex-row items-center p-5 bg-white dark:bg-[#1E1E1E] mb-3 rounded-[24px] shadow-sm border border-gray-100 dark:border-gray-800`}
+    >
+      <View
+        className={`w-10 h-10 rounded-full items-center justify-center ${isDestructive ? "bg-red-50 dark:bg-red-900/10" : "bg-[#C5A35D]10"
+          }`}
+        style={!isDestructive ? { backgroundColor: "#C5A35D10" } : {}}
+      >
+        <Ionicons
+          name={icon}
+          size={20}
+          color={isDestructive ? "#EF4444" : "#C5A35D"}
+        />
+      </View>
+      <View className="flex-1 ml-4">
+        <Text
+          className={`text-sm font-black ${isDestructive ? "text-red-500" : "text-[#1A1A1A] dark:text-white"
+            }`}
+        >
+          {label}
+        </Text>
+        {detail && (
+          <Text className="text-gray-400 text-[10px] font-bold mt-0.5">
+            {detail}
+          </Text>
+        )}
+      </View>
+      <Ionicons
+        name="chevron-forward"
+        size={18}
+        color={isDestructive ? "#EF444490" : "#9CA3AF"}
+      />
+    </TouchableOpacity>
+  );
+
+  const SectionTitle = ({ title }: { title: string }) => (
+    <Text className="text-gray-400 font-black text-[10px] uppercase tracking-widest ml-1 mb-3">
+      {title}
+    </Text>
+  );
 
   return (
-    <View style={styles.container} className="bg-background-light dark:bg-background-dark">
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header Section */}
-        <View style={styles.header} className="bg-white dark:bg-background-muted shadow-sm dark:shadow-none">
-          <View style={styles.avatarContainer}>
-            <Image
-              source={{
-                uri: "https://ui-avatars.com/api/?name=" + (user?.name || "User") + "&background=D4AF37&color=000",
-              }}
-              style={styles.avatar}
-            />
-            <TouchableOpacity style={styles.editIcon} className="border-white dark:border-background-muted">
-              <Ionicons name="camera" size={16} color="#000" />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.userName} className="text-typography-900 dark:text-typography-white">{user?.name || t("profile.guest")}</Text>
-          <Text style={styles.userEmail}>{user?.email || "guest@example.com"}</Text>
-          <View style={styles.roleBadge}>
-            <Text style={styles.roleText}>{user?.role || "USER"}</Text>
-          </View>
+    <View className="flex-1 bg-gray-50 dark:bg-[#0F0F0F]">
+      {/* Header */}
+      <View className="pt-16 pb-8 px-5 bg-white dark:bg-[#0F0F0F] items-center border-b border-gray-100 dark:border-gray-800">
+        <View
+          className="w-24 h-24 rounded-full items-center justify-center relative shadow-sm"
+          style={{ backgroundColor: "#C5A35D15" }}
+        >
+          <Image
+            source={{
+              uri:
+                "https://ui-avatars.com/api/?name=" +
+                (user?.name || user?.email?.split("@")[0] || "User") +
+                "&background=C5A35D&color=fff",
+            }}
+            className="w-24 h-24 rounded-full border-4 border-white dark:border-[#1E1E1E]"
+          />
+          <TouchableOpacity className="absolute bottom-0 right-0 w-8 h-8 bg-[#C5A35D] rounded-full items-center justify-center border-2 border-white dark:border-[#0F0F0F]">
+            <Ionicons name="camera" size={16} color="#fff" />
+          </TouchableOpacity>
+        </View>
+        <Text className="text-xl font-black text-[#1A1A1A] dark:text-white mt-4">
+          {user?.name || user?.email?.split("@")[0] || t("profile.guest")}
+        </Text>
+        <Text className="text-gray-400 font-bold text-xs">{user?.email}</Text>
+        <View
+          className="mt-3 px-4 py-1.5 rounded-full bg-[#C5A35D20]"
+          style={{ backgroundColor: "#C5A35D15" }}
+        >
+          <Text className="text-[#C5A35D] font-black text-[10px] uppercase tracking-widest">
+            {user?.role || "CUSTOMER"}
+          </Text>
+        </View>
+      </View>
+
+      <ScrollView
+        className="flex-1 pt-6 px-4"
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="mb-8">
+          <SectionTitle title={t("profile.accountSettings") || "Account Settings"} />
+          <SettingItem
+            icon="person-outline"
+            label={t("profile.personalInfo")}
+            onPress={() => router.push("/customer/settings/personal-info")}
+          />
+          <SettingItem
+            icon="color-palette-outline"
+            label={t("profile.appearance")}
+            onPress={() => router.push("/customer/settings/appearance")}
+          />
+          <SettingItem
+            icon="notifications-outline"
+            label={t("profile.notifications")}
+            onPress={() => router.push("/customer/settings/notifications")}
+          />
+          <SettingItem
+            icon="language-outline"
+            label={t("profile.language")}
+            onPress={() => router.push("/customer/settings/language")}
+          />
         </View>
 
-        {/* Menu Sections */}
-        {menuItems.map((section, index) => (
-          <View key={index} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={styles.sectionContent} className="bg-white dark:bg-background-muted">
-              {section.items.map((item, itemIndex) => (
-                <TouchableOpacity
-                  key={itemIndex}
-                  style={[
-                    styles.menuItem,
-                    itemIndex === section.items.length - 1 && styles.lastMenuItem,
-                  ]}
-                  className="border-outline-300 dark:border-outline-300"
-                  onPress={item.action}
-                >
-                  <View style={styles.menuItemLeft}>
-                    <View style={styles.iconContainer}>
-                      <Ionicons name={item.icon as any} size={20} color="#D4AF37" />
-                    </View>
-                    <Text style={styles.menuItemLabel} className="text-typography-900 dark:text-typography-white">{item.label}</Text>
-                  </View>
-                  <View style={styles.menuItemRight}>
-                    {item.value && (
-                      <Text style={styles.menuItemValue}>{item.value}</Text>
-                    )}
-                    <Ionicons name="chevron-forward" size={20} className="color-typography-400" />
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        ))}
+        <View className="mb-8">
+          <SectionTitle title={t("profile.support") || "Support & Legal"} />
+          <SettingItem
+            icon="help-circle-outline"
+            label={t("profile.helpCenter")}
+            onPress={() => router.push("/customer/support/help-center")}
+          />
+          <SettingItem
+            icon="document-text-outline"
+            label={t("profile.terms")}
+            onPress={() => router.push("/customer/support/terms")}
+          />
+          <SettingItem
+            icon="lock-closed-outline"
+            label={t("profile.privacy")}
+            onPress={() => router.push("/customer/support/privacy")}
+          />
+        </View>
 
-        {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-          <Text style={styles.logoutText}>{t("profile.logout")}</Text>
-        </TouchableOpacity>
+        <SettingItem
+          icon="log-out-outline"
+          label={t("profile.logout")}
+          onPress={handleLogout}
+          isDestructive={true}
+        />
 
-        <View style={{ height: 100 }} />
+        <View className="h-24" />
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    alignItems: "center",
-    paddingTop: 60,
-    paddingBottom: 30,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-  avatarContainer: {
-    position: "relative",
-    marginBottom: 15,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "#D4AF37",
-  },
-  editIcon: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: "#D4AF37",
-    padding: 8,
-    borderRadius: 20,
-    borderWidth: 2,
-  },
-  userName: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  userEmail: {
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  roleBadge: {
-    backgroundColor: "rgba(212, 175, 55, 0.1)",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "rgba(212, 175, 55, 0.3)",
-  },
-  roleText: {
-    color: "#D4AF37",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  section: {
-    marginTop: 25,
-    paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    color: "#666",
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 10,
-    marginLeft: 4,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  sectionContent: {
-    borderRadius: 16,
-    overflow: "hidden",
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#333",
-  },
-  lastMenuItem: {
-    borderBottomWidth: 0,
-  },
-  menuItemLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iconContainer: {
-    width: 36,
-    height: 36,
-    backgroundColor: "rgba(212, 175, 55, 0.1)",
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  menuItemLabel: {
-    fontSize: 16,
-  },
-  menuItemRight: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  menuItemValue: {
-    color: "#666",
-    fontSize: 14,
-    marginRight: 8,
-  },
-  logoutBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 30,
-    marginBottom: 20,
-    marginHorizontal: 20,
-    padding: 16,
-    backgroundColor: "rgba(239, 68, 68, 0.1)",
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "rgba(239, 68, 68, 0.2)",
-  },
-  logoutText: {
-    color: "#ef4444",
-    fontSize: 16,
-    fontWeight: "bold",
-    marginLeft: 8,
-  },
-});

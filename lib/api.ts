@@ -184,6 +184,10 @@ const services = {
     const response = await api.delete(`/services/${id}`);
     return response.data;
   },
+  addReview: async (serviceId: string, data: { rating: number; comment?: string }) => {
+    const response = await api.post(`/services/${serviceId}/reviews`, data);
+    return response.data;
+  },
 };
 
 const admin = {

@@ -15,6 +15,7 @@ model User {
     bookings Booking[]
     services Service[]
     workDays WorkingDay[]
+    reviews  Review[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
