@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   TextInput,
   RefreshControl,
+  Modal,
+  Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
@@ -37,6 +39,9 @@ type Service = {
   category: string;
   duration: string;
   price_from: string;
+  price_to?: string;
+  description?: string;
+  is_vip?: boolean;
   rating?: number;
   reviews_count?: number;
   reviews?: Review[];
@@ -45,15 +50,16 @@ type Service = {
 export default function BookServiceScreen() {
   const navigation = useNavigation();
   const params = useGlobalSearchParams();
-  const { user } = useAuthStore();
+  const { user, token } = useAuthStore();
   const { t } = useTranslation();
 
   // State
   const [service, setService] = useState<Service | null>(null);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [estimation, setEstimation] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [newRating, setNewRating] = useState(5);
@@ -82,6 +88,8 @@ export default function BookServiceScreen() {
     fetchServiceDetails();
   }, [params.id]);
 
+  const today = new Date().toISOString().split("T")[0];
+
   // Fetch estimate when date changes
   useEffect(() => {
     if (selectedDate && params.id) {
@@ -100,7 +108,10 @@ export default function BookServiceScreen() {
     } catch (error: any) {
       console.error(error);
       setEstimation(null);
-      Alert.alert(t("common.notice"), error.response?.data?.error || t("serviceDetails.fetchEstimateError"));
+      // Don't alert if it's just "shop closed" as that's expected for some days
+      if (error.response?.status !== 400) {
+        Alert.alert(t("common.notice"), error.response?.data?.error || t("serviceDetails.fetchEstimateError"));
+      }
     } finally {
       setLoading(false);
     }
@@ -122,12 +133,22 @@ export default function BookServiceScreen() {
         t("serviceDetails.successTitle"),
         res.message || t("serviceDetails.successMsg"),
         [
-          { text: t("common.ok"), onPress: () => navigation.goBack() }
+          {
+            text: t("common.ok"), onPress: () => {
+              fetchEstimate(); // Refresh to show current status
+            }
+          }
         ]
       );
     } catch (error: any) {
       console.error(error);
-      Alert.alert(t("common.error"), error.response?.data?.error || t("serviceDetails.bookingFailed"));
+      const errorMsg = error.response?.data?.error;
+      // Handle the localized error code from backend
+      if (errorMsg && errorMsg.includes('.')) {
+        Alert.alert(t("common.error"), t(errorMsg));
+      } else {
+        Alert.alert(t("common.error"), errorMsg || t("serviceDetails.bookingFailed"));
+      }
     } finally {
       setBookingLoading(false);
     }
@@ -158,7 +179,6 @@ export default function BookServiceScreen() {
     }
   };
 
-  const today = format(new Date(), "yyyy-MM-dd");
 
   if (!service && loading) {
     return (
@@ -169,6 +189,8 @@ export default function BookServiceScreen() {
   }
 
   if (!service) return null;
+
+  const isAlreadyBooked = !!estimation?.userBooking;
 
   return (
     <View className="bg-background-light dark:bg-background-dark" style={styles.container}>
@@ -193,9 +215,29 @@ export default function BookServiceScreen() {
         </View>
 
         <View className="bg-background-light dark:bg-background-dark" style={styles.content}>
-          {/* Service Info */}
-          <Text style={styles.category}>{service.category?.toUpperCase()}</Text>
-          <Text style={styles.title} className="text-typography-900 dark:text-typography-white">{service.name}</Text>
+          <View className="flex-row justify-between items-start">
+            <View className="flex-1">
+              <View className="flex-row items-center gap-2 mb-1">
+                <Text style={styles.category}>{service.category?.toUpperCase()}</Text>
+                {service.is_vip && (
+                  <View className="bg-[#D4AF37]/20 px-2 py-0.5 rounded-md border border-[#D4AF37]/30">
+                    <Text className="text-[#D4AF37] text-[10px] font-bold">VIP</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.title} className="text-typography-900 dark:text-typography-white">{service.name}</Text>
+            </View>
+            <View className="items-end">
+              <Text className="text-[#D4AF37] font-black text-xl">
+                {service.price_from} {t("common.currency")}
+              </Text>
+              {service.price_to && (
+                <Text className="text-gray-400 text-xs line-through">
+                  ~{service.price_to}
+                </Text>
+              )}
+            </View>
+          </View>
 
           <View style={styles.infoRow}>
             <View style={styles.infoItem}>
@@ -212,51 +254,99 @@ export default function BookServiceScreen() {
             </View>
           </View>
 
-          <View style={styles.divider} className="bg-outline-300 dark:bg-outline-200" />
-
-          {/* Date Selection */}
-          <Text style={styles.sectionTitle} className="text-typography-900 dark:text-typography-white">{t("serviceDetails.selectDate")}</Text>
-          <View style={styles.calendarContainer} className="border-outline-300 dark:border-gray-800">
-            <Calendar
-              onDayPress={(day: any) => setSelectedDate(day.dateString)}
-              markedDates={{
-                [selectedDate]: { selected: true, selectedColor: '#D4AF37' }
-              }}
-              minDate={today}
-              theme={{
-                backgroundColor: 'transparent',
-                calendarBackground: 'transparent',
-                textSectionTitleColor: '#b6c1cd',
-                selectedDayBackgroundColor: '#D4AF37',
-                selectedDayTextColor: '#000000',
-                todayTextColor: '#D4AF37',
-                dayTextColor: '#9CA3AF',
-                textDisabledColor: '#444',
-                arrowColor: '#D4AF37',
-                monthTextColor: '#D4AF37',
-                indicatorColor: '#D4AF37',
-              }}
-            />
-          </View>
-
-          {/* Estimation Result */}
-          {loading && selectedDate ? (
-            <ActivityIndicator size="small" color="#D4AF37" style={{ marginTop: 20 }} />
-          ) : estimation ? (
-            <View style={styles.estimationCard} className="bg-white dark:bg-background-muted border-outline-300 dark:border-primary-500">
-              <Text style={styles.estimationTitle}>{t("serviceDetails.nextAvailable")}</Text>
-              <Text style={styles.estimationTime} className="text-typography-900 dark:text-typography-white">{estimation.formattedEstimatedAt}</Text>
-              <Text style={styles.estimationInfo} className="text-typography-900 dark:text-typography-white">
-                {t("serviceDetails.queuePos")} <Text style={{ fontWeight: 'bold', color: '#D4AF37' }}>#{estimation.position}</Text>
-              </Text>
-              <Text style={styles.estimationSub}>
-                {t("serviceDetails.queueInfo", { count: estimation.position - 1 })}
+          {service.description && (
+            <View className="mt-6">
+              <Text className="text-gray-500 dark:text-gray-400 leading-6 text-sm">
+                {service.description}
               </Text>
             </View>
-          ) : selectedDate ? (
-            <Text style={styles.helperText}>{t("serviceDetails.calculating")}</Text>
+          )}
+
+          <View style={styles.divider} className="bg-outline-300 dark:bg-outline-200" />
+
+          {/* Date Selection - Always visible so user can check other days */}
+          <Text style={styles.sectionTitle} className="text-typography-900 dark:text-typography-white">{t("serviceDetails.selectDate")}</Text>
+
+          <TouchableOpacity
+            onPress={() => setShowCalendar(true)}
+            className="flex-row items-center justify-between p-4 bg-white dark:bg-background-muted rounded-2xl border border-outline-300 dark:border-gray-800 mb-4"
+          >
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 rounded-full bg-[#C5A35D]20 items-center justify-center mr-3" style={{ backgroundColor: '#C5A35D15' }}>
+                <Ionicons name="calendar-outline" size={20} color="#D4AF37" />
+              </View>
+              <Text className="text-typography-900 dark:text-typography-white font-bold">
+                {selectedDate ? format(new Date(selectedDate), 'PPPP') : t("serviceDetails.selectDateHelper")}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          {/* User Booking Status OR New Booking Estimation */}
+          {isAlreadyBooked ? (
+            <View className="mb-6 p-6 rounded-[24px] bg-[#C5A35D] overflow-hidden relative shadow-lg">
+              <View className="absolute -right-4 -top-4 opacity-10">
+                <Ionicons name="calendar-outline" size={120} color="#fff" />
+              </View>
+              <Text className="text-white/80 font-bold uppercase text-[10px] tracking-widest mb-1">
+                {t("serviceDetails.yourBooking")}
+              </Text>
+              <Text className="text-white text-2xl font-black mb-3">
+                {estimation.userBooking.time}
+              </Text>
+              <View className="flex-row items-center gap-4">
+                <View className="bg-white/20 px-3 py-1 rounded-full">
+                  <Text className="text-white text-xs font-bold">
+                    #{estimation.userBooking.position} in Queue
+                  </Text>
+                </View>
+                <View className="bg-black/10 px-3 py-1 rounded-full border border-white/20">
+                  <Text className="text-white text-xs font-bold uppercase">
+                    {estimation.userBooking.status}
+                  </Text>
+                </View>
+              </View>
+            </View>
           ) : (
-            <Text style={styles.helperText}>{t("serviceDetails.selectDateHelper")}</Text>
+            <>
+              {/* Estimation Card (Only if NOT already booked) */}
+              {estimation && !loading && (
+                <View style={styles.estimationCard} className="bg-white dark:bg-background-muted border-outline-300 dark:border-primary-500 mb-6">
+                  <Text style={styles.estimationTitle}>{t("serviceDetails.nextAvailable")}</Text>
+                  <Text style={styles.estimationTime} className="text-typography-900 dark:text-typography-white">{estimation.formattedEstimatedAt}</Text>
+                  <Text style={styles.estimationInfo} className="text-typography-900 dark:text-typography-white">
+                    {t("serviceDetails.queuePos")} <Text style={{ fontWeight: 'bold', color: '#D4AF37' }}>#{estimation.position}</Text>
+                  </Text>
+                </View>
+              )}
+            </>
+          )}
+
+          {/* Today's Schedule / Queue Transparency */}
+          {estimation?.schedule && estimation.schedule.length > 0 && (
+            <View className="mb-6">
+              <Text style={styles.sectionTitle} className="text-typography-900 dark:text-typography-white">
+                {t("serviceDetails.todaysSchedule")}
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+                {estimation.schedule.map((slot: any, idx: number) => (
+                  <View
+                    key={idx}
+                    className={`p-4 rounded-2xl border mr-3 items-center min-w-[90px] ${slot.isUser
+                      ? "bg-[#C5A35D] border-[#C5A35D]"
+                      : "bg-white dark:bg-background-paper border-outline-200 dark:border-gray-800"
+                      }`}
+                  >
+                    <Text className={`text-[10px] font-extrabold uppercase mb-1 ${slot.isUser ? "text-white/70" : "text-gray-400"}`}>
+                      #{slot.position} {slot.isUser ? t("serviceDetails.you") : ""}
+                    </Text>
+                    <Text className={`text-sm font-black ${slot.isUser ? "text-white" : "text-typography-900 dark:text-typography-white"}`}>
+                      {slot.time}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
           )}
 
           <View style={styles.divider} className="bg-outline-300 dark:bg-outline-200" />
@@ -334,30 +424,76 @@ export default function BookServiceScreen() {
             )}
           </View>
 
+          <Modal
+            visible={showCalendar}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setShowCalendar(false)}
+          >
+            <Pressable
+              className="flex-1 bg-black/50 justify-center p-6"
+              onPress={() => setShowCalendar(false)}
+            >
+              <Pressable className="bg-white dark:bg-[#1E1E1E] rounded-[32px] overflow-hidden p-4">
+                <View className="flex-row justify-between items-center mb-4 px-2">
+                  <Text className="text-lg font-black text-[#1A1A1A] dark:text-white">{t("serviceDetails.selectDate")}</Text>
+                  <TouchableOpacity onPress={() => setShowCalendar(false)}>
+                    <Ionicons name="close-circle" size={24} color="#9CA3AF" />
+                  </TouchableOpacity>
+                </View>
+                <Calendar
+                  onDayPress={(day: any) => {
+                    setSelectedDate(day.dateString);
+                    setShowCalendar(false);
+                  }}
+                  markedDates={{
+                    [selectedDate]: { selected: true, selectedColor: '#D4AF37' }
+                  }}
+                  minDate={today}
+                  theme={{
+                    backgroundColor: 'transparent',
+                    calendarBackground: 'transparent',
+                    textSectionTitleColor: '#b6c1cd',
+                    selectedDayBackgroundColor: '#D4AF37',
+                    selectedDayTextColor: '#000000',
+                    todayTextColor: '#D4AF37',
+                    dayTextColor: '#9CA3AF',
+                    textDisabledColor: '#444',
+                    arrowColor: '#D4AF37',
+                    monthTextColor: '#D4AF37',
+                    indicatorColor: '#D4AF37',
+                  }}
+                />
+              </Pressable>
+            </Pressable>
+          </Modal>
+
         </View>
         <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Bottom Booking Bar */}
-      <View style={styles.footer} className="bg-white dark:bg-background-muted border-outline-200 dark:border-gray-800">
-        <View>
-          <Text style={styles.totalLabel}>{t("serviceDetails.totalPrice")}</Text>
-          <Text style={styles.totalPrice} className="text-typography-900 dark:text-typography-white">
-            {service.price_from ? service.price_from + ' ' + t("common.currency") : t("common.na")}
-          </Text>
+      {!isAlreadyBooked && (
+        <View style={styles.footer} className="bg-white dark:bg-background-muted border-outline-200 dark:border-gray-800">
+          <View>
+            <Text style={styles.totalLabel}>{t("serviceDetails.totalPrice")}</Text>
+            <Text style={styles.totalPrice} className="text-typography-900 dark:text-typography-white">
+              {service.price_from ? service.price_from + ' ' + t("common.currency") : t("common.na")}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.bookBtn, (!selectedDate || !estimation || bookingLoading) && { opacity: 0.6 }]}
+            disabled={!selectedDate || !estimation || bookingLoading}
+            onPress={handleBooking}
+          >
+            {bookingLoading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.bookText}>{t("serviceDetails.bookNow")}</Text>
+            )}
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={[styles.bookBtn, (!selectedDate || !estimation || bookingLoading) && { opacity: 0.6 }]}
-          disabled={!selectedDate || !estimation || bookingLoading}
-          onPress={handleBooking}
-        >
-          {bookingLoading ? (
-            <ActivityIndicator color="#000" />
-          ) : (
-            <Text style={styles.bookText}>{t("serviceDetails.bookNow")}</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+      )}
     </View>
   );
 }

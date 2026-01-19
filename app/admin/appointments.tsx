@@ -10,22 +10,30 @@ import {
   ActivityIndicator,
   Alert,
   Linking,
+  Modal,
+  Platform,
 } from "react-native";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
-import { admin as adminApi } from "@/lib/api";
+import { admin as adminApi, services as servicesApi } from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useBookingStore } from "@/store/useBookingStore";
+import { useFocusEffect } from "expo-router";
 
 interface Booking {
   id: string;
-  userId: string;
-  user: {
+  userId?: string;
+  user?: {
     id: string;
     email: string;
     phone: string;
   };
+  guestName?: string;
+  guestPhone?: string;
+  isWalkIn: boolean;
   serviceId: string;
   service: {
     id: string;
@@ -44,8 +52,14 @@ interface Booking {
   updatedAt: string;
 }
 
+interface Service {
+  id: string;
+  name: string;
+  category: string;
+}
+
 export default function AdminAppointments() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +67,21 @@ export default function AdminAppointments() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
 
+  // Walk-in modal state
+  const [showWalkInModal, setShowWalkInModal] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [guestName, setGuestName] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Time editing state
+  const [showTimeModal, setShowTimeModal] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [newTime, setNewTime] = useState<string>("");
   const statuses = [
     { id: "all", label: t("admin.appointments.status.all") },
     { id: "PENDING", label: t("admin.appointments.status.pending") },
@@ -77,8 +106,18 @@ export default function AdminAppointments() {
     }
   }, [t]);
 
+  const fetchServices = async () => {
+    try {
+      const res = await servicesApi.getAll();
+      setServices(res.data);
+    } catch (error) {
+      console.error("Failed to fetch services:", error);
+    }
+  };
+
   useEffect(() => {
     fetchBookings();
+    fetchServices();
   }, [fetchBookings]);
 
   const onRefresh = () => {
@@ -86,9 +125,18 @@ export default function AdminAppointments() {
     fetchBookings(false);
   };
 
+  const { resetNewBookingCount } = useBookingStore();
+
+  useFocusEffect(
+    useCallback(() => {
+      resetNewBookingCount();
+      fetchBookings(false); // Refresh list when focusing
+    }, [fetchBookings, resetNewBookingCount])
+  );
+
   const updateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await adminApi.updateBookingStatus(id, newStatus);
+      const res = await adminApi.updateBookingStatus(id, { status: newStatus });
       if (res.success) {
         setBookings((prev) =>
           prev.map((b) => (b.id === id ? { ...b, status: newStatus as any } : b))
@@ -100,17 +148,91 @@ export default function AdminAppointments() {
     }
   };
 
+  const handleCreateWalkIn = async () => {
+    if (!selectedServiceId || !guestName) {
+      Alert.alert(t("common.error"), "Please fill in guest name and select a service");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await adminApi.createWalkIn({
+        serviceId: selectedServiceId,
+        guestName,
+        guestPhone
+      });
+
+      if (res.success) {
+        setShowWalkInModal(false);
+        setGuestName("");
+        setGuestPhone("");
+        setSelectedServiceId("");
+        fetchBookings(false);
+        Alert.alert(t("common.success"), "Walk-in added successfully");
+      }
+    } catch (error) {
+      console.error("Failed to add walk-in:", error);
+      Alert.alert(t("common.error"), "Failed to add walk-in client");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleNotifyUser = async (id: string) => {
+    try {
+      const res = await adminApi.notifyUser(id);
+      if (res.success) {
+        Alert.alert(t("common.success"), t("admin.appointments.notificationSent"));
+      }
+    } catch (error: any) {
+      console.error("Failed to notify user:", error);
+      Alert.alert(t("common.error"), error.response?.data?.error || "Failed to send notification");
+    }
+  };
+
+  const handleUpdateTime = async () => {
+    if (!selectedBookingId) return;
+
+    try {
+      const isoString = selectedDate.toISOString();
+      const res = await adminApi.updateBookingStatus(selectedBookingId, { estimatedAt: isoString });
+      if (res.success) {
+        setBookings((prev) =>
+          prev.map((b) => (b.id === selectedBookingId ? { ...b, estimatedAt: isoString } : b))
+        );
+        setShowTimeModal(false);
+        setSelectedBookingId("");
+        Alert.alert(t("common.success"), t("admin.appointments.timeUpdated"));
+      }
+    } catch (error) {
+      console.error("Failed to update time:", error);
+      Alert.alert(t("common.error"), "Failed to update appointment time");
+    }
+  };
+
   const handleCall = (phone: string) => {
-    Linking.openURL(`tel:${phone}`);
+    if (phone) Linking.openURL(`tel:${phone}`);
   };
 
   const filteredBookings = bookings.filter((b) => {
     const matchesStatus = selectedStatus === "all" || b.status === selectedStatus;
-    const matchesSearch =
-      b.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.user.phone.includes(searchQuery) ||
-      b.service.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
+    const q = searchQuery.toLowerCase();
+
+    // Check user info
+    const userMatch = b.user ? (
+      b.user.email.toLowerCase().includes(q) ||
+      b.user.phone.includes(q)
+    ) : false;
+
+    // Check guest info
+    const guestMatch = b.isWalkIn ? (
+      b.guestName?.toLowerCase().includes(q) ||
+      b.guestPhone?.includes(q)
+    ) : false;
+
+    const serviceMatch = b.service.name.toLowerCase().includes(q);
+
+    return matchesStatus && (userMatch || guestMatch || serviceMatch);
   });
 
   const getStatusColor = (status: string) => {
@@ -127,9 +249,16 @@ export default function AdminAppointments() {
     <View className="bg-white dark:bg-[#1E1E1E] mb-4 p-5 rounded-[24px] shadow-sm border border-gray-100 dark:border-gray-800">
       <View className="flex-row justify-between items-start mb-4">
         <View className="flex-1">
-          <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
-            {item.service.category}
-          </Text>
+          <View className="flex-row items-center mb-1">
+            <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mr-2">
+              {item.service.category}
+            </Text>
+            {item.isWalkIn && (
+              <View className="bg-[#C5A35D]10 px-2 py-0.5 rounded-md" style={{ backgroundColor: '#C5A35D15' }}>
+                <Text className="text-[#C5A35D] text-[8px] font-black uppercase">Walk-in</Text>
+              </View>
+            )}
+          </View>
           <Text className="text-[#1A1A1A] dark:text-white text-xl font-black mb-1">
             {item.service.name}
           </Text>
@@ -157,22 +286,46 @@ export default function AdminAppointments() {
 
       <View className="flex-row justify-between items-center mb-5">
         <View>
-          <Text className="text-gray-400 text-[10px] font-bold uppercase mb-1">{t("admin.appointments.info.client")}</Text>
-          <Text className="text-[#1A1A1A] dark:text-white font-extrabold text-sm">{item.user.email.split('@')[0]}</Text>
-          <Text className="text-gray-500 dark:text-gray-400 text-xs">{item.user.phone}</Text>
+          <Text className="text-gray-400 text-[10px] font-bold uppercase mb-1">{item.isWalkIn ? t("admin.appointments.info.guest") : t("admin.appointments.info.client")}</Text>
+          <Text className="text-[#1A1A1A] dark:text-white font-extrabold text-sm">
+            {item.isWalkIn ? item.guestName : item.user?.email.split('@')[0]}
+          </Text>
+          <Text className="text-gray-500 dark:text-gray-400 text-xs">{item.isWalkIn ? (item.guestPhone || '--') : item.user?.phone}</Text>
         </View>
         <View className="flex-row gap-2">
+          {!item.isWalkIn && (
+            <TouchableOpacity
+              onPress={() => router.push(`/admin/messages/${item.userId}`)}
+              className="w-10 h-10 bg-gray-50 dark:bg-[#1E1E1E] rounded-full items-center justify-center border border-gray-200 dark:border-gray-700"
+            >
+              <Ionicons name="chatbubble-ellipses" size={18} color="#C5A35D" />
+            </TouchableOpacity>
+          )}
+          {(item.user?.phone || item.guestPhone) && (
+            <TouchableOpacity
+              onPress={() => handleCall(item.isWalkIn ? item.guestPhone! : item.user!.phone)}
+              className="w-10 h-10 bg-gray-50 dark:bg-[#1E1E1E] rounded-full items-center justify-center border border-gray-200 dark:border-gray-700"
+            >
+              <Ionicons name="call" size={18} color="#C5A35D" />
+            </TouchableOpacity>
+          )}
+          {!item.isWalkIn && item.status === 'PENDING' && (
+            <TouchableOpacity
+              onPress={() => handleNotifyUser(item.id)}
+              className="w-10 h-10 bg-gray-50 dark:bg-[#1E1E1E] rounded-full items-center justify-center border border-gray-200 dark:border-gray-700"
+            >
+              <Ionicons name="notifications" size={18} color="#C5A35D" />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
-            onPress={() => router.push(`/admin/messages/${item.userId}`)}
+            onPress={() => {
+              setSelectedBookingId(item.id);
+              setSelectedDate(item.estimatedAt ? new Date(item.estimatedAt) : new Date());
+              setShowTimeModal(true);
+            }}
             className="w-10 h-10 bg-gray-50 dark:bg-[#1E1E1E] rounded-full items-center justify-center border border-gray-200 dark:border-gray-700"
           >
-            <Ionicons name="chatbubble-ellipses" size={18} color="#C5A35D" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleCall(item.user.phone)}
-            className="w-10 h-10 bg-gray-50 dark:bg-[#1E1E1E] rounded-full items-center justify-center border border-gray-200 dark:border-gray-700"
-          >
-            <Ionicons name="call" size={18} color="#C5A35D" />
+            <Ionicons name="time" size={18} color="#C5A35D" />
           </TouchableOpacity>
         </View>
       </View>
@@ -225,6 +378,20 @@ export default function AdminAppointments() {
   return (
     <View className="flex-1 bg-gray-50 dark:bg-[#0F0F0F]">
       <View className="pt-14 px-5 pb-4 bg-white dark:bg-[#0F0F0F]">
+        <View className="flex-row justify-between items-center mb-6">
+          <Text className="text-2xl font-black text-[#1A1A1A] dark:text-white">
+            {t("tabs.appointments")}
+          </Text>
+          <TouchableOpacity
+            onPress={() => setShowWalkInModal(true)}
+            className="bg-[#C5A35D] px-4 py-2 rounded-full flex-row items-center"
+          >
+            <Ionicons name="add" size={20} color="white" />
+            <Text className="text-white font-black text-xs uppercase ml-1">
+              {t("admin.appointments.addWalkIn")}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <View className="flex-row items-center bg-gray-100 dark:bg-[#1E1E1E] px-4 py-3 rounded-[20px] mb-6">
           <Ionicons name="search" size={20} color="#9CA3AF" />
@@ -283,6 +450,171 @@ export default function AdminAppointments() {
           }
         />
       )}
+
+      {/* Walk-in Modal */}
+      <Modal
+        visible={showWalkInModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowWalkInModal(false)}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white dark:bg-[#0F0F0F] rounded-t-[40px] p-6 pb-12">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-2xl font-black text-[#1A1A1A] dark:text-white">
+                {t("admin.appointments.addWalkIn")}
+              </Text>
+              <TouchableOpacity onPress={() => setShowWalkInModal(false)}>
+                <Ionicons name="close" size={24} color="#9CA3AF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View className="mb-5">
+                <Text className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mb-2 ml-1">
+                  {t("admin.appointments.guestName")}
+                </Text>
+                <TextInput
+                  value={guestName}
+                  onChangeText={setGuestName}
+                  placeholder="John Doe"
+                  placeholderTextColor="#9CA3AF"
+                  className="bg-gray-50 dark:bg-[#1E1E1E] p-4 rounded-2xl text-gray-900 dark:text-white font-bold border border-gray-100 dark:border-gray-800"
+                />
+              </View>
+
+              <View className="mb-5">
+                <Text className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mb-2 ml-1">
+                  {t("admin.appointments.guestPhone")}
+                </Text>
+                <TextInput
+                  value={guestPhone}
+                  onChangeText={setGuestPhone}
+                  placeholder="06..."
+                  keyboardType="phone-pad"
+                  placeholderTextColor="#9CA3AF"
+                  className="bg-gray-50 dark:bg-[#1E1E1E] p-4 rounded-2xl text-gray-900 dark:text-white font-bold border border-gray-100 dark:border-gray-800"
+                />
+              </View>
+
+              <View className="mb-8">
+                <Text className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mb-2 ml-1">
+                  {t("admin.appointments.info.service")}
+                </Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {services.map((service) => (
+                    <TouchableOpacity
+                      key={service.id}
+                      onPress={() => setSelectedServiceId(service.id)}
+                      className={`px-4 py-3 rounded-xl border ${selectedServiceId === service.id
+                        ? 'bg-[#C5A35D] border-[#C5A35D]'
+                        : 'bg-gray-50 dark:bg-[#1E1E1E] border-gray-100 dark:border-gray-800'
+                        }`}
+                    >
+                      <Text className={`font-bold text-xs ${selectedServiceId === service.id ? 'text-white' : 'text-gray-600 dark:text-gray-400'
+                        }`}>
+                        {service.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <TouchableOpacity
+                onPress={handleCreateWalkIn}
+                disabled={submitting}
+                className="bg-[#C5A35D] py-4 rounded-2xl items-center shadow-lg shadow-[#C5A35D]/30"
+              >
+                {submitting ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text className="text-white font-black uppercase tracking-widest">
+                    {t("common.save") || "Confirm Walk-in"}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Time Edit Modal */}
+      <Modal
+        visible={showTimeModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowTimeModal(false)}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white dark:bg-[#0F0F0F] rounded-t-[40px] p-6 pb-12">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-2xl font-black text-[#1A1A1A] dark:text-white">
+                {t("admin.appointments.updateTime")}
+              </Text>
+              <TouchableOpacity onPress={() => setShowTimeModal(false)}>
+                <Ionicons name="close" size={24} color="#9CA3AF" />
+              </TouchableOpacity>
+            </View>
+
+            <View className="mb-6">
+              <Text className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mb-2 ml-1">
+                {t("admin.appointments.info.time")}
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+                className="bg-gray-50 dark:bg-[#1E1E1E] p-4 rounded-2xl border border-gray-100 dark:border-gray-800 mb-3"
+              >
+                <Text className="text-gray-900 dark:text-white font-bold">
+                  {format(selectedDate, "MMM dd, yyyy")}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setShowTimePicker(true)}
+                className="bg-gray-50 dark:bg-[#1E1E1E] p-4 rounded-2xl border border-gray-100 dark:border-gray-800"
+              >
+                <Text className="text-gray-900 dark:text-white font-bold">
+                  {format(selectedDate, "HH:mm")}
+                </Text>
+              </TouchableOpacity>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, date) => {
+                    setShowDatePicker(false);
+                    if (date) setSelectedDate(date);
+                  }}
+                />
+              )}
+
+              {showTimePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  mode="time"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, date) => {
+                    setShowTimePicker(false);
+                    if (date) setSelectedDate(date);
+                  }}
+                />
+              )}
+            </View>
+
+            <TouchableOpacity
+              onPress={handleUpdateTime}
+              className="bg-[#C5A35D] py-4 rounded-2xl items-center shadow-lg shadow-[#C5A35D]/30"
+            >
+              <Text className="text-white font-black uppercase tracking-widest">
+                {t("common.save") || "Update Time"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

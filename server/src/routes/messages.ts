@@ -20,12 +20,26 @@ router.get('/history/:userId', async (req: Request, res: Response) => {
                     { toId: userId }
                 ]
             },
+            include: {
+                from: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
+                }
+            },
             orderBy: {
                 createdAt: 'asc'
             }
         });
 
-        res.json(messages);
+        // Map messages to include fromName
+        const messagesWithNames = messages.map(m => ({
+            ...m,
+            fromName: m.from?.name || m.from?.email?.split('@')[0] || 'Unknown'
+        }));
+
+        res.json(messagesWithNames);
     } catch (error) {
         console.error('Error fetching messages:', error);
         res.status(500).json({ error: 'Failed to fetch messages' });
@@ -34,13 +48,9 @@ router.get('/history/:userId', async (req: Request, res: Response) => {
 
 // GET /api/messages/conversations
 // Admin only: List all users who have sent messages.
-// This is a bit complex in raw SQL or Prisma without groupBy+distinct nicely.
-// We want distinct 'fromId' where role='USER'.
 router.get('/conversations', async (req: Request, res: Response) => {
     try {
-        // Group by fromId to find unique users who started a chat
-        // Also could include toId if admin started it, but let's assume users start.
-        // Prisma groupBy is good here.
+        // Find unique fromIds for USER role messages
         const senders = await prisma.message.groupBy({
             by: ['fromId'],
             where: {
@@ -51,18 +61,27 @@ router.get('/conversations', async (req: Request, res: Response) => {
             }
         });
 
-        // We probably want user details. Since User is in another store/service logic potentially,
-        // we might just return IDs and let frontend fetch or use a simpler approach if User model existed here.
-        // Assuming Auth system is separate or User model is in same DB but we didn't check relation.
-        // Let's return the list and let frontend handle name fetching or display ID for now.
+        // Fetch user names for these IDs
+        const userIds = senders.map(s => s.fromId);
+        const users = await prisma.user.findMany({
+            where: {
+                id: { in: userIds }
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true
+            }
+        });
 
-        // Better: join with User model if it exists. 
-        // I'll assume User model exists in standard Prisma setup if authStore works with it, 
-        // but I didn't see User in the schema snippet I read (it was truncated or didn't show User).
-        // I will just return the IDs and timestamps.
+        const userMap = users.reduce((acc: any, u) => {
+            acc[u.id] = u.name || u.email.split('@')[0];
+            return acc;
+        }, {});
 
         res.json(senders.map(s => ({
             userId: s.fromId,
+            userName: userMap[s.fromId] || 'Unknown',
             lastMessageAt: s._max.createdAt
         })));
     } catch (error) {

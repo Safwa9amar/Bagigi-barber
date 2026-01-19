@@ -1,4 +1,45 @@
 {
+    "brand_name": "Houari Bagigi",
+    "brand_tagline": "Book your haircut easily and professionally",
+    "continue_with_google": "Continue with Google",
+    "continue_with_whatsapp": "Continue with WhatsApp",
+    "terms_and_privacy": "By continuing, you agree to our Terms & Privacy Policy",
+    "continue": "Continue",
+    "invalid_email": "Please enter a valid email address",
+    "required_email": "Email is required",
+    "invaild_phone": "Please enter a valid phone number",
+    "required_phone": "Phone number is required",
+    "min_password": "Password must be at least 8 characters",
+    "password_match": "Passwords do not match",
+    "required_password": "Password is required",
+    "confirm_password": "Confirm Password",
+    "password": "Password",
+    "login": "Login",
+    "register": "Register",
+    "have_account": "Already have an account? ",
+    "no_account": "Don't have an account? ",
+    "confirm_code": "Confirm Code",
+    "enter_code_sent": "Enter the code sent to your email",
+    "resend_code": "Resend Code",
+    "did_not_receive_code": "Did not receive the code?",
+    "required_code": "Code is required",
+    "verify": "Verify",
+    "api_error": "An error occurred. Please try again.",
+    "forgot_password": "Forgot Password?",
+    "reset_password": "Reset Password",
+    "send_reset_link": "Send Reset Link",
+    "reset_token": "Reset code",
+    "request_reset": "Request Password Reset",
+    "reset_link_sent": "A password reset link has been sent to your email.",
+    "back_to_login": "Back to Login",
+    "password_reset_failed": "Password reset failed",
+    "verification_failed": "Verification failed",
+    "registration_failed": "Registration failed",
+    "login_failed": "Login failed",
+    "request_failed": "Request failed",
+    "email": "Email",
+    "phone_number": "Phone number",
+    "code": "Code",
     "common": {
         "save": "Save",
         "saveChanges": "Save Changes",
@@ -17,7 +58,8 @@
         "typeMessage": "Type a message...",
         "isTyping": "is typing",
         "online": "Online",
-        "offline": "Offline"
+        "offline": "Offline",
+        "info": "Information"
     },
     "home": {
         "welcome": "Welcome",
@@ -25,7 +67,10 @@
         "bookToday": "Book your appointment for today",
         "ourServices": "Our Signature Services",
         "search": "Search services...",
-        "all": "All"
+        "all": "All",
+        "latestVisit": "Latest Visit",
+        "book": "Book",
+        "nearby": "Nearby Barbershop"
     },
     "bookings": {
         "title": "My Bookings",
@@ -61,7 +106,15 @@
         "submitReview": "Submit Review",
         "reviewSuccess": "Thank you! Your review has been submitted.",
         "reviewError": "Failed to submit review",
-        "alreadyReviewed": "You have already reviewed this service"
+        "alreadyReviewed": "You have already reviewed this service",
+        "oncePerDayError": "You can only book one appointment per day",
+        "yourBooking": "Your Booking",
+        "bookingAlreadyActive": "You have an active booking for today",
+        "todaysSchedule": "Today's Schedule",
+        "viewFullSchedule": "Tap to see current queue",
+        "queueFull": "Queue is currently long",
+        "timeSlot": "Slot",
+        "you": "You"
     },
     "tabs": {
         "home": "Home",
@@ -86,10 +139,105 @@
         "helpCenter": "Help Center",
         "terms": "Terms of Service",
         "privacy": "Privacy Policy",
+        "developerInfo": "Developer Info",
         "accountSettings": "Account Settings",
         "support": "Support & Legal",
         "guest": "Guest User",
-        "customer": "Premium Customer"
+        "customer": "Premium Customer",
+        "security": "Security",
+        "changePassword": "Change Password",
+        "changePasswordDesc": "Update your password to keep your account secure.",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmNewPassword": "Confirm New Password",
+        "updatePassword": "Update Password",
+        "currentPasswordRequired": "Current password is required",
+        "newPasswordRequired": "New password is required",
+        "confirmPasswordRequired": "Please confirm your new password",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordsMustMatch": "Passwords must match",
+        "confirmPassword": "Confirm Password",
+        "confirmPasswordDesc": "Please enter your password to confirm email change.",
+        "failedUpdate": "Failed to update password"
+    },
+    "support": {
+        "helpCenter": {
+            "title": "Help Center",
+            "faqTitle": "Frequently Asked Questions",
+            "faqs": [
+                {
+                    "q": "How do I book an appointment?",
+                    "a": "Navigate to the Home tab, select a service, choose a date and time, and confirm your booking."
+                },
+                {
+                    "q": "Can I cancel my booking?",
+                    "a": "Yes, you can cancel your booking from the 'My Bookings' tab up to 2 hours before the appointment."
+                },
+                {
+                    "q": "Do you accept walk-ins?",
+                    "a": "Yes, walk-ins are welcome but appointments are prioritized to minimize wait times."
+                },
+                {
+                    "q": "What payment methods do you accept?",
+                    "a": "We currently accept cash payments at the shop."
+                }
+            ]
+        },
+        "terms": {
+            "title": "Terms of Service",
+            "sections": [
+                {
+                    "title": "1. Acceptance of Terms",
+                    "content": "By accessing and using this application, you accept and agree to be bound by the terms and provision of this agreement."
+                },
+                {
+                    "title": "2. Booking Policy",
+                    "content": "Appointments are subject to availability. You must arrive on time for your scheduled slot. We reserve the right to cancel bookings if you are more than 15 minutes late."
+                },
+                {
+                    "title": "3. User Conduct",
+                    "content": "You agree to use the service only for lawful purposes and in a way that does not infringe the rights of, restrict or inhibit anyone else's use and enjoyment of the service."
+                },
+                {
+                    "title": "4. Modifications",
+                    "content": "We reserve the right to change these terms at any time. Your continued use of the service signifies your acceptance of any adjustment to these terms."
+                }
+            ]
+        },
+        "privacy": {
+            "title": "Privacy Policy",
+            "intro": "We value your privacy and are committed to protecting your personal data.",
+            "sections": [
+                {
+                    "title": "Information Collection",
+                    "content": "We collect information you provide directly to us, such as name, email, and phone number when you register for an account."
+                },
+                {
+                    "title": "Data Usage",
+                    "content": "We use your data to provide and improve our services, communicate with you about your appointments, and send promotional offers if you adhere to them."
+                },
+                {
+                    "title": "Data Security",
+                    "content": "We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction."
+                },
+                {
+                    "title": "Contact Us",
+                    "content": "If you have any questions about this Privacy Policy, please contact us."
+                }
+            ]
+        },
+        "developer": {
+            "title": "Developer Info",
+            "role": "Full-Stack Developer",
+            "labels": {
+                "name": "Name",
+                "phone": "Phone Numbers",
+                "email": "Email Address",
+                "portfolio": "Portfolio"
+            },
+            "quote": "Transforming ideas into digital reality",
+            "availability": "Available for new projects and collaborations"
+        }
     },
     "settings": {
         "appearance": {
@@ -125,6 +273,10 @@
         }
     },
     "admin": {
+        "profile": {
+            "personalInfo": "Personal Information",
+            "admin": "Administrator"
+        },
         "dashboard": {
             "title": "Dashboard",
             "welcome": "Welcome back, Admin",
@@ -238,8 +390,16 @@
                 "service": "Service",
                 "date": "Date",
                 "time": "Time",
-                "phone": "Phone"
-            }
+                "phone": "Phone",
+                "guest": "Guest (Walk-in)"
+            },
+            "addWalkIn": "Add Walk-in",
+            "guestName": "Guest Name",
+            "guestPhone": "Guest Phone (Optional)",
+            "updateTime": "Update Time",
+            "notifyUser": "Notify User",
+            "notificationSent": "Notification sent successfully!",
+            "timeUpdated": "Appointment time updated"
         },
         "clients": {
             "title": "Clients",

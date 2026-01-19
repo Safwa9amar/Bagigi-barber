@@ -1,6 +1,20 @@
-import { useAuthStore, User } from "@/store/useAuthStore";
+import { User } from "@/store/useAuthStore";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+
+let getAccessToken: () => string | null = () => null;
+let setAccessToken: (token: string) => void = () => { };
+let logoutUser: () => void = () => { };
+
+export const setupAxiosAuth = (
+  getToken: () => string | null,
+  setToken: (token: string) => void,
+  logout: () => void
+) => {
+  getAccessToken = getToken;
+  setAccessToken = setToken;
+  logoutUser = logout;
+};
 
 const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
@@ -9,7 +23,7 @@ const api = axios.create({
 
 // ---------- Request Interceptor ----------
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token; // ✅ read from Zustand store
+  const token = getAccessToken(); // ✅ read from injected getter
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -53,8 +67,8 @@ api.interceptors.response.use(
 
         const newAccessToken = res.data.accessToken;
 
-        // ✅ Update Zustand store with new token
-        useAuthStore.getState().setToken(newAccessToken);
+        // ✅ Update Zustand store via injected setter
+        setAccessToken(newAccessToken);
 
         // ✅ Retry failed request with new token
         originalRequest.headers = {
@@ -64,8 +78,8 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (err) {
-        // Refresh failed → logout via Zustand
-        useAuthStore.getState().logout();
+        // Refresh failed → logout via injected function
+        logoutUser();
         await SecureStore.deleteItemAsync("refreshToken");
       }
     }
@@ -95,6 +109,11 @@ const auth = {
       email,
       password,
     });
+    return response.data;
+  },
+
+  logout: async () => {
+    const response = await api.post("/auth/logout");
     return response.data;
   },
 
@@ -144,6 +163,11 @@ const auth = {
         Authorization: `Bearer ${token}`,
       },
     });
+    return response.data;
+  },
+
+  updateProfile: async (data: any) => {
+    const response = await api.post("/auth/update-profile", data);
     return response.data;
   },
 };
@@ -202,8 +226,16 @@ const admin = {
     const response = await api.get("/admin/bookings");
     return response.data;
   },
-  updateBookingStatus: async (id: string, status: string) => {
-    const response = await api.patch(`/admin/bookings/${id}`, { status });
+  updateBookingStatus: async (id: string, data: { status?: string; estimatedAt?: string }) => {
+    const response = await api.patch(`/admin/bookings/${id}`, data);
+    return response.data;
+  },
+  notifyUser: async (id: string) => {
+    const response = await api.post(`/admin/bookings/${id}/notify`);
+    return response.data;
+  },
+  createWalkIn: async (data: { serviceId: string; guestName: string; guestPhone?: string }) => {
+    const response = await api.post("/admin/bookings/walk-in", data);
     return response.data;
   },
   getAllClients: async () => {

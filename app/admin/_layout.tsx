@@ -15,10 +15,34 @@ import { useTranslation } from "react-i18next";
 import { withRoleGuard } from "@/components/auth/withRoleGuard";
 
 import { useChatStore } from "@/store/useChatStore";
+import { useBookingStore } from "@/store/useBookingStore";
+import { getSocket } from "@/lib/socket";
+import { useEffect } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const TabsLayout = () => {
   const { t } = useTranslation();
   const { unreadCount } = useChatStore();
+  const { newBookingCount, incrementNewBookingCount } = useBookingStore();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (!user) return;
+
+    const socket = getSocket(user.id, "ADMIN");
+    if (!socket) return;
+
+    const handleNewBooking = (data: any) => {
+      console.log("New booking received:", data);
+      incrementNewBookingCount();
+    };
+
+    socket.on("new_booking", handleNewBooking);
+
+    return () => {
+      socket.off("new_booking", handleNewBooking);
+    };
+  }, [user, incrementNewBookingCount]);
 
   return (
     <Tabs
@@ -42,10 +66,12 @@ const TabsLayout = () => {
         name="appointments"
         options={{
           title: t("tabs.appointments"),
-          headerShown: true,
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <Icon as={CalendarCheck} color={color} size="xl" />
           ),
+          tabBarBadge: newBookingCount > 0 ? newBookingCount : undefined,
+          tabBarBadgeStyle: { backgroundColor: '#EF4444' }
         }}
       />
       <Tabs.Screen

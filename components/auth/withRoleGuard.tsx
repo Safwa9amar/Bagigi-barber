@@ -13,10 +13,10 @@ export function withRoleGuard<P extends object>(
     const router = useRouter();
 
     if (!isAuthenticated) {
-      return router.replace("/auth/login");
+      return router.replace("/(auth)");
     }
     if (!hasRole(role)) {
-      return router.replace("/auth/login");
+      return router.replace("/(auth)");
     }
     return <WrappedComponent {...props} />;
   };

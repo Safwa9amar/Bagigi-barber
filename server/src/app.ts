@@ -5,6 +5,8 @@ import servicesRoutes from '@/routes/services';
 import bookingRoutes from '@/routes/booking';
 import messageRoutes from '@/routes/messages';
 import adminRoutes from '@/routes/admin';
+import { sendPushNotification } from './lib/push';
+import prisma from './lib/prisma';
 const app = express();
 // app.use(express.static('uploads'));
 
@@ -42,10 +44,11 @@ apiRouter.use('/booking', bookingRoutes);
 apiRouter.use('/messages', messageRoutes);
 apiRouter.use('/admin', adminRoutes);
 // Mount the main router at /api
-app.use('/api', apiRouter);
+app.use('/bagigi/api', apiRouter);
 
 // Health check or root endpoint
-app.get('/api', (req: Request, res: Response) => {
+app.get('/bagigi/api', async (req: Request, res: Response) => {
+
   res.json({ status: 'ok' });
 });
 

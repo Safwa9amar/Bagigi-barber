@@ -113,6 +113,7 @@ const Messages = () => {
           setMessages(data.map((m: any) => ({
             id: m.id,
             from: m.fromId,
+            fromName: m.fromName,
             content: m.content,
             timestamp: m.createdAt,
             role: m.role
@@ -159,8 +160,8 @@ const Messages = () => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
       className="bg-background-light dark:bg-background-dark"
     >
       <View style={styles.header} className="bg-white dark:bg-background-muted shadow-sm dark:shadow-none">

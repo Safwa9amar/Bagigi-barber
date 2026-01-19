@@ -24,6 +24,8 @@ const Bookings = () => {
   const fetchBookings = async () => {
     try {
       const res = await booking.getMyBookings();
+      console.log(res);
+
       setBookings(res);
     } catch (error) {
       console.error(error);
@@ -95,21 +97,20 @@ const Bookings = () => {
         <Text style={styles.title} className="text-typography-900 dark:text-typography-white">{t("bookings.title")}</Text>
       </View>
 
-      {bookings.length === 0 ? (
-        <View style={styles.centered}>
-          <Text style={styles.emptyText}>{t("bookings.empty")}</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={bookings}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />
-          }
-        />
-      )}
+      <FlatList
+        data={bookings}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={bookings.length === 0 ? styles.centered : styles.listContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />
+        }
+        ListEmptyComponent={
+          <View style={styles.centered}>
+            <Text style={styles.emptyText} className="dark:text-gray-400">{t("bookings.empty")}</Text>
+          </View>
+        }
+      />
     </View>
   );
 };

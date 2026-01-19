@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1057978899915",
+    "project_id": "bagigi-babrber",
+    "storage_bucket": "bagigi-babrber.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057978899915:android:176ff43b2853579c9a2a4e",
+        "android_client_info": {
+          "package_name": "com.astro0666.bagigibarber"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAO9uhePjVfOAB3i-fnJIPR_zQpXMJeFu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

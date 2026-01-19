@@ -1,4 +1,45 @@
 {
+    "brand_name": "Houari Bagigi",
+    "brand_tagline": "Réservez votre coupe de cheveux facilement et professionnellement",
+    "continue_with_google": "Continuer avec Google",
+    "continue_with_whatsapp": "Continuer avec WhatsApp",
+    "terms_and_privacy": "En continuant, vous acceptez nos conditions et politique de confidentialité",
+    "continue": "Continuer",
+    "invalid_email": "Veuillez entrer une adresse e-mail valide",
+    "required_email": "L'e-mail est requis",
+    "invaild_phone": "Veuillez entrer un numéro de téléphone valide",
+    "required_phone": "Le numéro de téléphone est requis",
+    "min_password": "Le mot de passe doit contenir au moins 8 caractères",
+    "password_match": "Les mots de passe ne correspondent pas",
+    "required_password": "Le mot de passe est requis",
+    "confirm_password": "Confirmer le mot de passe",
+    "password": "Mot de passe",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "have_account": "Vous avez déjà un compte ? ",
+    "no_account": "Vous n'avez pas de compte ? ",
+    "confirm_code": "Confirmer le code",
+    "enter_code_sent": "Entrez le code envoyé à votre e-mail",
+    "resend_code": "Renvoyer le code",
+    "did_not_receive_code": "Vous n'avez pas reçu le code ?",
+    "required_code": "Le code est requis",
+    "verify": "Vérifier",
+    "api_error": "Une erreur s'est produite. Veuillez réessayer.",
+    "forgot_password": "Mot de passe oublié ?",
+    "reset_password": "Réinitialiser le mot de passe",
+    "send_reset_link": "Envoyer le lien de réinitialisation",
+    "reset_token": "Code de réinitialisation",
+    "request_reset": "Demander la réinitialisation du mot de passe",
+    "reset_link_sent": "Un lien de réinitialisation a été envoyé à votre e-mail.",
+    "back_to_login": "Retour à la connexion",
+    "password_reset_failed": "Échec de la réinitialisation du mot de passe",
+    "verification_failed": "Échec de la vérification",
+    "registration_failed": "Échec de l'inscription",
+    "login_failed": "Échec de la connexion",
+    "request_failed": "Échec de la demande",
+    "email": "E-mail",
+    "phone_number": "Numéro de téléphone",
+    "code": "Code",
     "common": {
         "save": "Enregistrer",
         "saveChanges": "Enregistrer les modifications",
@@ -17,7 +58,8 @@
         "typeMessage": "Tapez un message...",
         "isTyping": "écrit",
         "online": "En ligne",
-        "offline": "Hors ligne"
+        "offline": "Hors ligne",
+        "info": "Information"
     },
     "home": {
         "welcome": "Bienvenue",
@@ -25,7 +67,10 @@
         "bookToday": "Réservez votre rendez-vous pour aujourd'hui",
         "ourServices": "Nos Services Signature",
         "search": "Rechercher un service...",
-        "all": "Tout"
+        "all": "Tout",
+        "latestVisit": "Dernière Visite",
+        "book": "Réserver",
+        "nearby": "Salon de Coiffure à Proximité"
     },
     "bookings": {
         "title": "Mes Réservations",
@@ -61,7 +106,15 @@
         "submitReview": "Envoyer l'avis",
         "reviewSuccess": "Merci ! Votre avis a été envoyé.",
         "reviewError": "Échec de l'envoi de l'avis",
-        "alreadyReviewed": "Vous avez déjà évalué ce service"
+        "alreadyReviewed": "Vous avez déjà évalué ce service",
+        "oncePerDayError": "Vous ne pouvez réserver qu'un seul rendez-vous par jour",
+        "yourBooking": "Votre Réservation",
+        "bookingAlreadyActive": "Vous avez une réservation active pour aujourd'hui",
+        "todaysSchedule": "Programme d'aujourd'hui",
+        "viewFullSchedule": "Appuyez pour voir la file d'attente",
+        "queueFull": "La file d'attente est longue actuellement",
+        "timeSlot": "Créneau",
+        "you": "Vous"
     },
     "tabs": {
         "home": "Accueil",
@@ -86,10 +139,105 @@
         "helpCenter": "Centre d'aide",
         "terms": "Conditions d'utilisation",
         "privacy": "Politique de confidentialité",
+        "developerInfo": "Infos développeur",
         "accountSettings": "Paramètres du compte",
         "support": "Support et Légal",
         "guest": "Invité",
-        "customer": "Client Premium"
+        "customer": "Client Premium",
+        "security": "Sécurité",
+        "changePassword": "Changer le mot de passe",
+        "changePasswordDesc": "Mettez à jour votre mot de passe pour sécuriser votre compte.",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmNewPassword": "Confirmer le nouveau mot de passe",
+        "updatePassword": "Mettre à jour le mot de passe",
+        "currentPasswordRequired": "Le mot de passe actuel est requis",
+        "newPasswordRequired": "Le nouveau mot de passe est requis",
+        "confirmPasswordRequired": "Veuillez confirmer votre nouveau mot de passe",
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsMustMatch": "Les mots de passe ne correspondent pas",
+        "confirmPassword": "Confirmer le mot de passe",
+        "confirmPasswordDesc": "Veuillez entrer votre mot de passe pour confirmer le changement d'e-mail.",
+        "failedUpdate": "Échec de la mise à jour du mot de passe"
+    },
+    "support": {
+        "helpCenter": {
+            "title": "Centre d'aide",
+            "faqTitle": "Questions Fréquemment Posées",
+            "faqs": [
+                {
+                    "q": "Comment prendre rendez-vous ?",
+                    "a": "Accédez à l'onglet Accueil, sélectionnez un service, choisissez une date et une heure, puis confirmez votre réservation."
+                },
+                {
+                    "q": "Puis-je annuler ma réservation ?",
+                    "a": "Oui, vous pouvez annuler votre réservation depuis l'onglet 'Mes Réservations' jusqu'à 2 heures avant le rendez-vous."
+                },
+                {
+                    "q": "Acceptez-vous les clients sans rendez-vous ?",
+                    "a": "Oui, les clients sans rendez-vous sont les bienvenus, mais les réservations sont prioritaires pour minimiser l'attente."
+                },
+                {
+                    "q": "Quels moyens de paiement acceptez-vous ?",
+                    "a": "Nous acceptons actuellement les paiements en espèces au salon."
+                }
+            ]
+        },
+        "terms": {
+            "title": "Conditions d'utilisation",
+            "sections": [
+                {
+                    "title": "1. Acceptation des conditions",
+                    "content": "En accédant et en utilisant cette application, vous acceptez d'être lié par les termes et dispositions de cet accord."
+                },
+                {
+                    "title": "2. Politique de réservation",
+                    "content": "Les rendez-vous sont soumis à disponibilité. Vous devez arriver à l'heure pour votre créneau prévu. Nous nous réservons le droit d'annuler les réservations si vous avez plus de 15 minutes de retard."
+                },
+                {
+                    "title": "3. Conduite de l'utilisateur",
+                    "content": "Vous acceptez d'utiliser le service uniquement à des fins légales et d'une manière qui n'enfreint pas les droits d'autrui ou ne restreint pas l'utilisation du service."
+                },
+                {
+                    "title": "4. Modifications",
+                    "content": "Nous nous réservons le droit de modifier ces conditions à tout moment. Votre utilisation continue du service signifie votre acceptation de tout ajustement."
+                }
+            ]
+        },
+        "privacy": {
+            "title": "Politique de confidentialité",
+            "intro": "Nous apprécions votre vie privée et nous nous engageons à protéger vos données personnelles.",
+            "sections": [
+                {
+                    "title": "Collecte d'informations",
+                    "content": "Nous collectons les informations que vous nous fournissez directement, telles que le nom, l'e-mail et le numéro de téléphone lors de votre inscription."
+                },
+                {
+                    "title": "Utilisation des données",
+                    "content": "Nous utilisons vos données pour fournir et améliorer nos services, communiquer avec vous au sujet de vos rendez-vous et envoyer des offres promotionnelles."
+                },
+                {
+                    "title": "Sécurité des données",
+                    "content": "Nous mettons en œuvre des mesures de sécurité appropriées pour protéger vos informations personnelles contre tout accès non autorisé."
+                },
+                {
+                    "title": "Contactez-nous",
+                    "content": "Si vous avez des questions concernant cette politique de confidentialité, veuillez nous contacter."
+                }
+            ]
+        },
+        "developer": {
+            "title": "Infos développeur",
+            "role": "Développeur Full-Stack",
+            "labels": {
+                "name": "Nom",
+                "phone": "Numéros de téléphone",
+                "email": "Adresse e-mail",
+                "portfolio": "Portfolio"
+            },
+            "quote": "Transformer les idées en réalité numérique",
+            "availability": "Disponible pour de nouveaux projets et collaborations"
+        }
     },
     "settings": {
         "appearance": {
@@ -125,6 +273,10 @@
         }
     },
     "admin": {
+        "profile": {
+            "personalInfo": "Informations Personnelles",
+            "admin": "Administrateur"
+        },
         "dashboard": {
             "title": "Tableau de Bord",
             "welcome": "Bon retour, Admin",
@@ -237,9 +389,17 @@
                 "client": "Client",
                 "service": "Service",
                 "date": "Date",
-                "time": "Heure",
-                "phone": "Téléphone"
-            }
+                "time": "Time",
+                "phone": "Téléphone",
+                "guest": "Invité (Sans RDV)"
+            },
+            "addWalkIn": "Ajouter un client sans RDV",
+            "guestName": "Nom de l'invité",
+            "guestPhone": "Téléphone de l'invité (Optionnel)",
+            "updateTime": "Modifier l'heure",
+            "notifyUser": "Notifier l'utilisateur",
+            "notificationSent": "Notification envoyée avec succès!",
+            "timeUpdated": "Heure du rendez-vous mise à jour"
         },
         "clients": {
             "title": "Clients",

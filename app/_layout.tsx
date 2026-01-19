@@ -16,6 +16,15 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { View } from "react-native";
 
+// Disable console.log in production
+if (!__DEV__) {
+  console.log = () => { };
+  console.info = () => { };
+  console.warn = () => { };
+  console.debug = () => { };
+  // Keeping console.error for critical issue tracking
+}
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -32,6 +41,7 @@ import { getSocket } from "@/lib/socket";
 import { useChatStore } from "@/store/useChatStore";
 
 export default function RootLayout() {
+
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -80,6 +90,7 @@ export default function RootLayout() {
   // Register for Push Notifications
   useEffect(() => {
     registerForPushNotificationsAsync().then(async (pushToken) => {
+      console.log("Push Token:", pushToken);
       if (pushToken && user && token) {
         // Send to backend
         try {
@@ -98,12 +109,10 @@ export default function RootLayout() {
 
   return <RootLayoutNav />;
 }
+console.log(process.env.EXPO_PUBLIC_API_URL);
 
 function RootLayoutNav() {
   const { colorScheme } = useColorScheme();
-  const { logout } = useAuthStore();
-
-  // NativeWind 4 returns 'light' or 'dark' (or undefined initially)
   const colorMode = colorScheme === "dark" ? "dark" : "light";
 
   return (
@@ -112,7 +121,7 @@ function RootLayoutNav() {
         value={colorMode === "dark" ? DarkTheme : DefaultTheme}
       >
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="auth" />
+          <Stack.Screen name="(auth)" />
           <Stack.Screen name="admin" />
           <Stack.Screen name="customer" />
           <Stack.Screen

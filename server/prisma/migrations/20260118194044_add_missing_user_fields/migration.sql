@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE `User` ADD COLUMN `name` VARCHAR(191) NULL;
+
+-- AddForeignKey
+ALTER TABLE `Message` ADD CONSTRAINT `Message_fromId_fkey` FOREIGN KEY (`fromId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Message` ADD CONSTRAINT `Message_toId_fkey` FOREIGN KEY (`toId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

@@ -1,53 +1,141 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Modal } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { Input, InputField as GluestackInputField } from "@/components/ui/input";
+
+interface ProfileFormData {
+    name: string;
+    email: string;
+    phone: string;
+}
+
+const CustomInputField = ({
+    label,
+    value,
+    onChangeText,
+    icon,
+    placeholder,
+    keyboardType = 'default',
+    editable = true,
+    isPassword = false,
+    error = ""
+}: {
+    label: string,
+    value: string,
+    onChangeText: (v: string) => void,
+    icon: any,
+    placeholder: string,
+    keyboardType?: any,
+    editable?: boolean,
+    isPassword?: boolean,
+    error?: string
+}) => (
+    <View className="mb-6">
+        <Text className="text-gray-400 font-extrabold text-[10px] uppercase tracking-widest ml-1 mb-2">{label}</Text>
+        <Input
+            variant="outline"
+            size="xl"
+            isInvalid={!!error}
+            isDisabled={!editable}
+            className={`flex-row items-center bg-white dark:bg-[#1E1E1E] px-4 rounded-[20px] shadow-sm border ${error ? "border-red-500" : "border-gray-100 dark:border-gray-800"
+                } ${!editable ? "opacity-60" : ""}`}
+        >
+            <Ionicons name={icon} size={20} color={error ? "#ef4444" : "#C5A35D"} />
+            <GluestackInputField
+                className="flex-1 ml-3 text-sm font-bold text-[#1A1A1A] dark:text-white h-12"
+                value={value}
+                onChangeText={onChangeText}
+                placeholder={placeholder}
+                placeholderTextColor="#9CA3AF"
+                keyboardType={keyboardType}
+                autoCapitalize="none"
+                secureTextEntry={isPassword}
+            />
+        </Input>
+        {error ? <Text className="text-red-500 text-[10px] mt-1 ml-1 font-bold">{error}</Text> : null}
+    </View>
+);
 
 export default function AdminProfile() {
     const router = useRouter();
     const { t } = useTranslation();
-    const { user, setUser } = useAuthStore();
+    const { user, updateProfile } = useAuthStore();
 
-    const [name, setName] = useState(user?.email.split('@')[0] || "");
-    const [email, setEmail] = useState(user?.email || "");
-    const [phone, setPhone] = useState(user?.phone || "");
+    const profileSchema = yup.object().shape({
+        name: yup.string().required(t("profile.nameRequired") || "Name is required"),
+        email: yup.string().email(t("profile.invalidEmail") || "Invalid email").required(t("profile.emailRequired") || "Email is required"),
+        phone: yup.string().matches(/^0[567]\d{8}$/, t("invaild_phone") || "Invalid phone number").required(t("profile.phoneRequired") || "Phone number is required"),
+    });
+
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+        getValues,
+        watch,
+    } = useForm<ProfileFormData>({
+        resolver: yupResolver(profileSchema) as any,
+        defaultValues: {
+            name: user?.name || user?.email?.split('@')[0] || "",
+            email: user?.email || "",
+            phone: user?.phone || "",
+        }
+    });
+
+    const watchedName = watch("name");
     const [loading, setLoading] = useState(false);
 
-    const handleSave = async () => {
+    // Password Modal State
+    const [modalVisible, setModalVisible] = useState(false);
+    const [password, setPassword] = useState("");
+
+    const onSubmit = async (data: ProfileFormData) => {
+        // Check if email changed
+        if (data.email !== user?.email) {
+            setModalVisible(true);
+            return;
+        }
+
+        // Proceed without password if email hasn't changed
+        await performUpdate(data, {});
+    };
+
+    const performUpdate = async (formData: ProfileFormData, extraData: any) => {
         setLoading(true);
+
         try {
-            // In a real app, we would call an API to update the profile
-            // For now, we simulate success and update the local store if needed
-            // Actually, since this is a management app, we assume the user role is ADMIN
-            setTimeout(() => {
-                Alert.alert("Success", "Profile updated successfully");
-                setLoading(false);
-            }, 1000);
-        } catch (e) {
-            Alert.alert("Error", "Failed to update profile");
+            await updateProfile({
+                ...formData,
+                ...extraData
+            });
+            Alert.alert("Success", "Profile updated successfully");
+            setModalVisible(false);
+            setPassword("");
+            setLoading(false);
+        } catch (e: any) {
+            console.error(e);
+            let message = "Failed to update profile";
+            if (e.response?.data?.error) {
+                message = e.response.data.error;
+            }
+            Alert.alert("Error", message);
             setLoading(false);
         }
     };
 
-    const InputField = ({ label, value, onChangeText, icon, placeholder, keyboardType = 'default' }: { label: string, value: string, onChangeText: (v: string) => void, icon: any, placeholder: string, keyboardType?: any }) => (
-        <View className="mb-6">
-            <Text className="text-gray-400 font-extrabold text-[10px] uppercase tracking-widest ml-1 mb-2">{label}</Text>
-            <View className="flex-row items-center bg-white dark:bg-[#1E1E1E] px-4 py-4 rounded-[20px] shadow-sm border border-gray-100 dark:border-gray-800">
-                <Ionicons name={icon} size={20} color="#C5A35D" />
-                <TextInput
-                    className="flex-1 ml-3 text-sm font-bold text-[#1A1A1A] dark:text-white"
-                    value={value}
-                    onChangeText={onChangeText}
-                    placeholder={placeholder}
-                    placeholderTextColor="#9CA3AF"
-                    keyboardType={keyboardType}
-                    autoCapitalize="none"
-                />
-            </View>
-        </View>
-    );
+    const confirmPassword = () => {
+        if (!password) {
+            Alert.alert("Error", "Password is required");
+            return;
+        }
+        performUpdate(getValues(), { password });
+    };
 
     return (
         <KeyboardAvoidingView
@@ -72,38 +160,61 @@ export default function AdminProfile() {
                             <Ionicons name="camera" size={16} color="#fff" />
                         </TouchableOpacity>
                     </View>
-                    <Text className="text-lg font-black text-[#1A1A1A] dark:text-white mt-4">{name}</Text>
+                    <Text className="text-lg font-black text-[#1A1A1A] dark:text-white mt-4">{watchedName}</Text>
                     <Text className="text-gray-400 font-bold text-xs">{t("admin.profile.admin") || "Administrator"}</Text>
                 </View>
 
-                <InputField
-                    label={t("settings.personalInfo.name")}
-                    value={name}
-                    onChangeText={setName}
-                    icon="person-outline"
-                    placeholder="Your Name"
+                <Controller
+                    control={control}
+                    name="name"
+                    render={({ field: { onChange, value } }) => (
+                        <CustomInputField
+                            label={t("settings.personalInfo.name")}
+                            value={value}
+                            onChangeText={onChange}
+                            icon="person-outline"
+                            placeholder="Your Name"
+                            error={errors.name?.message}
+                        />
+                    )}
                 />
-                <InputField
-                    label={t("settings.personalInfo.email")}
-                    value={email}
-                    onChangeText={setEmail}
-                    icon="mail-outline"
-                    placeholder="your@email.com"
-                    keyboardType="email-address"
+
+                <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, value } }) => (
+                        <CustomInputField
+                            label={t("settings.personalInfo.email")}
+                            value={value}
+                            onChangeText={onChange}
+                            icon="mail-outline"
+                            placeholder="your@email.com"
+                            keyboardType="email-address"
+                            error={errors.email?.message}
+                        />
+                    )}
                 />
-                <InputField
-                    label={t("settings.personalInfo.phone")}
-                    value={phone}
-                    onChangeText={setPhone}
-                    icon="call-outline"
-                    placeholder="+213 000 000 000"
-                    keyboardType="phone-pad"
+
+                <Controller
+                    control={control}
+                    name="phone"
+                    render={({ field: { onChange, value } }) => (
+                        <CustomInputField
+                            label={t("settings.personalInfo.phone")}
+                            value={value}
+                            onChangeText={onChange}
+                            icon="call-outline"
+                            placeholder="+213 000 000 000"
+                            keyboardType="phone-pad"
+                            error={errors.phone?.message}
+                        />
+                    )}
                 />
 
                 <View className="h-10" />
 
                 <TouchableOpacity
-                    onPress={handleSave}
+                    onPress={handleSubmit(onSubmit)}
                     disabled={loading}
                     className="bg-[#C5A35D] p-5 rounded-[24px] items-center justify-center shadow-lg shadow-[#C5A35D]/40"
                 >
@@ -116,6 +227,52 @@ export default function AdminProfile() {
 
                 <View className="h-20" />
             </ScrollView>
+
+            {/* Password Confirmation Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View className="flex-1 justify-center items-center bg-black/50">
+                    <View className="m-5 bg-white dark:bg-[#1E1E1E] rounded-[24px] p-6 w-[90%] shadow-xl">
+                        <Text className="text-xl font-black mb-2 text-[#1A1A1A] dark:text-white">
+                            {t("profile.confirmPassword") || "Confirm Password"}
+                        </Text>
+                        <Text className="text-sm text-gray-500 mb-6">
+                            {t("profile.confirmPasswordDesc") || "Please enter your password to confirm email change."}
+                        </Text>
+
+                        <CustomInputField
+                            label={t("auth.password") || "Password"}
+                            value={password}
+                            onChangeText={setPassword}
+                            icon="lock-closed-outline"
+                            placeholder="******"
+                            isPassword={true}
+                        />
+
+                        <View className="flex-row justify-end space-x-3 gap-2">
+                            <TouchableOpacity
+                                className="px-5 py-3 rounded-xl bg-gray-100 dark:bg-gray-800"
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text className="font-bold text-gray-600 dark:text-gray-300">{t("common.cancel") || "Cancel"}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                className="px-5 py-3 rounded-xl bg-[#C5A35D]"
+                                onPress={confirmPassword}
+                                disabled={loading}
+                            >
+                                {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text className="font-black text-white">{t("common.confirm") || "Confirm"}</Text>}
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </KeyboardAvoidingView>
     );
 }

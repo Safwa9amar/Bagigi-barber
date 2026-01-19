@@ -20,8 +20,8 @@ export default function AdminSettings() {
                     text: t("profile.logout") || "Logout",
                     style: "destructive",
                     onPress: async () => {
-                        await logout();
-                        router.replace("/login");
+                        logout();
+                        router.replace("/(auth)");
                     }
                 },
             ]
@@ -80,7 +80,7 @@ export default function AdminSettings() {
                         icon="shield-checkmark-outline"
                         label={t("admin.settings.security")}
                         detail={t("admin.settings.securityDesc")}
-                        onPress={() => { }}
+                        onPress={() => router.push("/admin/settings/security")}
                     />
                 </View>
 
@@ -97,6 +97,12 @@ export default function AdminSettings() {
                         label={t("settings.language.title")}
                         detail={t("settings.language.subtitle")}
                         onPress={() => router.push("/admin/settings/language")}
+                    />
+                    <SettingItem
+                        icon="code-slash-outline"
+                        label={t("profile.developerInfo")}
+                        detail={t("profile.support")}
+                        onPress={() => router.push("/admin/settings/developer")}
                     />
                 </View>
 

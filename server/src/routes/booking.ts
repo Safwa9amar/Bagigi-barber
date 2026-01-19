@@ -7,7 +7,7 @@ import { list } from '@/controllers/booking/list';
 const router = Router();
 
 router.post('/create', authenticateJWT, create);
-router.post('/estimate', estimate); // Public or Auth? estimate usually public or auth.
+router.post('/estimate', authenticateJWT, estimate);
 router.get('/my-bookings', authenticateJWT, list);
 
 export default router;

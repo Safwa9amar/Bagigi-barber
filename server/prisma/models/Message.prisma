@@ -7,8 +7,6 @@ model Message {
     role      String   // 'ADMIN' | 'USER' - helpful for quick UI formatting
     createdAt DateTime @default(now())
     
-    // We can add relations if User model exists, but for now loose coupling via ID is fine 
-    // to avoid messing up existing User model if not strictly needed.
-    // However, relating to User is better if possible. 
-    // Assuming User model exists based on auth store, let's check schema again.
+    from      User     @relation("SentMessages", fields: [fromId], references: [id])
+    to        User?    @relation("ReceivedMessages", fields: [toId], references: [id])
 }

@@ -22,7 +22,7 @@ const CustomerLayout = () => {
     console.log("Customer layout mounted");
   }, []);
   return (
-    <View style={{ flex: 1, paddingTop: 50 }}>
+    <View style={{ flex: 1, paddingTop: 20 }}>
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -79,6 +79,10 @@ const CustomerLayout = () => {
           options={{ href: null }}
         />
         <Tabs.Screen
+          name="settings/security"
+          options={{ href: null }}
+        />
+        <Tabs.Screen
           name="settings/language"
           options={{ href: null }}
         />
@@ -94,8 +98,13 @@ const CustomerLayout = () => {
           name="support/privacy"
           options={{ href: null }}
         />
+
         <Tabs.Screen
           name="settings/appearance"
+          options={{ href: null }}
+        />
+        <Tabs.Screen
+          name="support/developer"
           options={{ href: null }}
         />
       </Tabs>

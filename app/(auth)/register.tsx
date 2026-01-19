@@ -12,7 +12,7 @@ import { Box } from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuthStore } from "@/store/useAuthStore";
-import { t } from "@/constants/i18n";
+import { useTranslation } from "react-i18next";
 import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,22 +22,25 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api, { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-const loginSchema = object({
-  email: string().email(t("invalid_email")).required(t("required_email")),
-  phone: string()
-    .matches(/^\+?[1-9]\d{1,14}$/, t("invaild_phone"))
-    .required(t("required_phone")),
-  password: string().min(8, t("min_password")).required(t("required_password")),
-  confirmPassword: string()
-    .oneOf([ref("password")], t("password_match"))
-    .required(),
-  apiError: string().notRequired(),
-});
+
 
 export default function Login() {
   const router = useRouter();
   const scheme = useColorScheme();
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useTranslation();
+
+  const loginSchema = object({
+    email: string().email(t("invalid_email")).required(t("required_email")),
+    phone: string()
+      .matches(/^0[567]\d{8}$/, t("invaild_phone"))
+      .required(t("required_phone")),
+    password: string().min(8, t("min_password")).required(t("required_password")),
+    confirmPassword: string()
+      .oneOf([ref("password")], t("password_match"))
+      .required(),
+    apiError: string().notRequired(),
+  });
 
   const {
     control,
@@ -52,11 +55,11 @@ export default function Login() {
       let response = await auth.register(data.email, data.password, data.phone);
       console.log("REGISTER RESPONSE:", response);
 
-      router.push(`/auth/confirm_code?email=${data.email}`);
+      router.push(`/(auth)/confirm_code?email=${data.email}`);
     } catch (error: any) {
       setError("apiError", {
         type: "manual",
-        message: error.response.data.error || "Registration failed",
+        message: error.response.data.error || t("registration_failed"),
       });
       console.error(error.response.data.error || error);
     }
@@ -73,8 +76,8 @@ export default function Login() {
             source={require("@/assets/images/logo.png")}
             className="w-44 h-44"
           />
-          <Text className="text-3xl font-bold mt-4">{t("brand_name")}</Text>
-          <Text className="text-typography-500 text-center mt-1">
+          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">{t("brand_name")}</Text>
+          <Text className="text-typography-500 dark:text-typography-50 text-center mt-1">
             {t("brand_tagline")}
           </Text>
         </Box>
@@ -94,7 +97,7 @@ export default function Login() {
                 <InputField
                   {...field}
                   icon="mail-outline"
-                  placeholder="Email"
+                  placeholder={t("email")}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   error={errors.email?.message}
@@ -110,7 +113,7 @@ export default function Login() {
                 <InputField
                   {...field}
                   icon="call-outline"
-                  placeholder="Phone number"
+                  placeholder={t("phone_number")}
                   keyboardType="phone-pad"
                   error={errors.phone?.message}
                 />
@@ -125,7 +128,7 @@ export default function Login() {
                 <InputField
                   {...field}
                   icon="lock-closed-outline"
-                  placeholder="Password"
+                  placeholder={t("password")}
                   secure={!showPassword}
                   secureTextEntry
                   toggleSecure={() => setShowPassword(!showPassword)}
@@ -142,7 +145,7 @@ export default function Login() {
                 <InputField
                   {...field}
                   icon="lock-closed-outline"
-                  placeholder="Confirm password"
+                  placeholder={t("confirm_password")}
                   secure={!showPassword}
                   secureTextEntry
                   error={errors.confirmPassword?.message}
@@ -170,7 +173,7 @@ export default function Login() {
             </Button>
           </>
         )}
-        <Link href="/auth/login" asChild>
+        <Link href="/(auth)" asChild>
           <TouchableOpacity className="mt-4 self-center">
             <Text className="text-secondary-500">
               {t("have_account")}
@@ -180,7 +183,7 @@ export default function Login() {
         </Link>
 
         {/* Footer */}
-        <Text className="text-xs text-center mt-6 text-typography-500">
+        <Text className="text-xs text-center mt-6 text-typography-500 dark:text-typography-50">
           {t("terms_and_privacy")}
         </Text>
       </KeyboardAvoidingView>

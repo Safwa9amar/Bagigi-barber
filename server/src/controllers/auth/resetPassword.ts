@@ -27,7 +27,7 @@ export const resetPassword = async (req: Request, res: Response) => {
       where: { email },
       data: { password: hashed, resetToken: null, resetTokenExp: null },
     });
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
     res.status(200).json({

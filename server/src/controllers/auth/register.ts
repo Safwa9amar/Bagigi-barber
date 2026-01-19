@@ -38,6 +38,13 @@ export const register = async (req: Request, res: Response) => {
     // 🔹 Send confirmation email
     await sendConfirmationEmail(email, confirmationCode);
 
+    // 🔹 Notify Admins of new signup
+    const { notifyAdmins } = await import('@/lib/notification-service');
+    await notifyAdmins(
+      'New User Signup! 👤',
+      `A new user (${email}) just registered.`
+    );
+
     res
       .status(201)
       .json({ message: 'User registered. Please confirm your email.' });

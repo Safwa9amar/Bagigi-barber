@@ -36,7 +36,6 @@ const AdminChatDetail = () => {
     const router = useRouter();
     const { t } = useTranslation();
     const { resetUnreadCount } = useChatStore();
-
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState("");
     const [isConnected, setIsConnected] = useState(false);
@@ -49,15 +48,24 @@ const AdminChatDetail = () => {
 
     const SERVER_URL = (process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000").replace('/api', '/api');
 
+    const [userName, setUserName] = useState<string>("");
+
     const fetchHistory = useCallback(async (showLoading = true) => {
         if (showLoading) setLoading(true);
         try {
             const res = await fetch(`${SERVER_URL}/messages/history/${targetUserId}`);
             const data = await res.json();
             if (Array.isArray(data)) {
+                // Peek at the first user-role message from the history to get the name if we don't have it
+                const firstUserMsg = data.find((m: any) => m.role === 'USER' && m.fromName);
+                if (firstUserMsg && !userName) {
+                    setUserName(firstUserMsg.fromName);
+                }
+
                 setMessages(data.map((m: any) => ({
                     id: m.id,
                     from: m.fromId,
+                    fromName: m.fromName,
                     content: m.content,
                     timestamp: m.createdAt,
                     role: m.role
@@ -69,7 +77,7 @@ const AdminChatDetail = () => {
             if (showLoading) setLoading(false);
             setRefreshing(false);
         }
-    }, [SERVER_URL, targetUserId]);
+    }, [SERVER_URL, targetUserId, userName]);
 
     useEffect(() => {
         if (!user || !targetUserId) return;
@@ -89,9 +97,14 @@ const AdminChatDetail = () => {
         const handleConnect = () => setIsConnected(true);
         const handleDisconnect = () => setIsConnected(false);
 
-        const handleMessage = (msg: Message) => {
-            if (msg.from === targetUserId) {
-                setMessages((prev) => [...prev, { ...msg, id: msg.id || Date.now().toString() }]);
+        const handleMessage = (msg: Message | any) => {
+            if (msg.from === targetUserId || msg.to === targetUserId) {
+                if (msg.fromName && !userName) setUserName(msg.fromName);
+
+                setMessages((prev) => {
+                    if (prev.some(m => m.id === msg.id)) return prev;
+                    return [...prev, { ...msg, id: msg.id || Date.now().toString() }];
+                });
                 setIsUserTyping(false);
                 setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
                 resetUnreadCount(); // Keep resetting while on screen
@@ -119,7 +132,7 @@ const AdminChatDetail = () => {
             socket.off("typing", handleTyping);
             socket.off("stop_typing", handleStopTyping);
         };
-    }, [user, targetUserId, fetchHistory, resetUnreadCount]);
+    }, [user, targetUserId, fetchHistory, resetUnreadCount, userName]);
 
     const onRefresh = () => {
         setRefreshing(true);
@@ -195,7 +208,8 @@ const AdminChatDetail = () => {
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
             className="bg-gray-50 dark:bg-[#0F0F0F]"
         >
             <View className="pt-14 pb-4 px-5 bg-white dark:bg-[#0F0F0F] flex-row items-center border-b border-gray-100 dark:border-gray-800">
@@ -204,9 +218,9 @@ const AdminChatDetail = () => {
                 </TouchableOpacity>
                 <View className="flex-1">
                     <Text className="text-lg font-black text-[#1A1A1A] dark:text-white">
-                        {typeof targetUserId === 'string'
+                        {userName || (typeof targetUserId === 'string'
                             ? `${t("admin.messages.user")}: ${targetUserId.substring(0, 8)}`
-                            : t("admin.messages.chat")}
+                            : t("admin.messages.chat"))}
                     </Text>
                     <View className="flex-row items-center">
                         <View className={`w-2 h-2 rounded-full mr-1.5 ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />

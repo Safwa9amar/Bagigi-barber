@@ -12,7 +12,7 @@ import { Box } from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuthStore } from "@/store/useAuthStore";
-import { t } from "@/constants/i18n";
+import { useTranslation } from "react-i18next";
 import {
   Link,
   useFocusEffect,
@@ -27,17 +27,20 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api, { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-const loginSchema = object({
-  code: string().required(t("required_code")),
-  apiError: string().notRequired(),
-});
+
 
 export default function Login() {
   const { user, login, isLoading } = useAuthStore();
   const scheme = useColorScheme();
   const { email }: { email: string } = useGlobalSearchParams();
   const [resending, setResending] = useState(false);
+  const router = useRouter();
+  const { t } = useTranslation();
 
+  const loginSchema = object({
+    code: string().required(t("required_code")),
+    apiError: string().notRequired(),
+  });
   const {
     control,
     handleSubmit,
@@ -46,20 +49,24 @@ export default function Login() {
   } = useForm({ resolver: yupResolver(loginSchema) });
 
   const onSubmit = async (data: any) => {
+
     console.log("LOGIN DATA:", data, isSubmitting);
     try {
-      let { token } = await auth.verifyConfirmationCode(email, data.code);
+      let { token, user } = await auth.verifyConfirmationCode(email, data.code);
       login(user, token);
+
     } catch (error: any) {
       setError("apiError", {
         type: "manual",
-        message: error.response.data.error || "Registration failed",
+        message: error.response.data.error || t("verification_failed"),
       });
+
       console.error(error.response.data.error || error);
     }
   };
 
   const resendCode = async () => {
+
     setResending(true);
     try {
       let response = await auth.requestNewConfirmationCode(email);
@@ -70,6 +77,7 @@ export default function Login() {
       setResending(false);
     }
   };
+
   return (
     <Box className="flex-1 justify-center px-6 bg-background-light dark:bg-background-dark">
       <KeyboardAvoidingView
@@ -81,8 +89,8 @@ export default function Login() {
             source={require("@/assets/images/logo.png")}
             className="w-44 h-44"
           />
-          <Text className="text-3xl font-bold mt-4">{t("brand_name")}</Text>
-          <Text className="text-typography-500 text-center mt-1">
+          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">{t("brand_name")}</Text>
+          <Text className="text-typography-500 dark:text-typography-50 text-center mt-1">
             {t("brand_tagline")}
           </Text>
         </Box>
@@ -102,7 +110,7 @@ export default function Login() {
                 <InputField
                   {...field}
                   icon="lock-closed-outline"
-                  placeholder="Code"
+                  placeholder={t("code")}
                   error={errors.code?.message}
                 />
               )}
@@ -139,7 +147,7 @@ export default function Login() {
         )}
 
         {/* Footer */}
-        <Text className="text-xs text-center mt-6 text-typography-500">
+        <Text className="text-xs text-center mt-6 text-typography-500 dark:text-typography-50">
           {t("terms_and_privacy")}
         </Text>
       </KeyboardAvoidingView>

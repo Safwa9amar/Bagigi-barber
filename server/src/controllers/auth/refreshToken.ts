@@ -19,7 +19,7 @@ export const refreshToken = async (req: Request, res: Response) => {
     });
     if (!user) return res.status(404).json({ error: 'User not found' });
     const newAccessToken = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN },
     );

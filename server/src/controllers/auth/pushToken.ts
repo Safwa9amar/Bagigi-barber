@@ -9,7 +9,16 @@ export const savePushToken = async (
 ): Promise<void> => {
     try {
         const { pushToken } = req.body;
-        const userId = (req as any).user.userId; // From authenticateJWT middleware
+        const user = (req as any).user;
+        const userId = user?.id || user?.userId;
+
+        console.log('Push token request from user:', userId, 'Payload:', user);
+
+        if (!userId) {
+            console.error('Push token error: No userId found in token');
+            res.status(401).json({ message: 'Unauthorized: User mapping failed' });
+            return;
+        }
 
         if (!pushToken) {
             res.status(400).json({ message: 'Push token is required' });

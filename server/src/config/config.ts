@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 
-dotenv.config();
+const envPath = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+dotenv.config({ path: envPath });
 
 interface Config {
   port: number;

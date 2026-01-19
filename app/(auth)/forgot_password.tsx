@@ -12,7 +12,7 @@ import { Box } from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuthStore } from "@/store/useAuthStore";
-import { t } from "@/constants/i18n";
+import { useTranslation } from "react-i18next";
 import {
   Link,
   useFocusEffect,
@@ -27,15 +27,18 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api, { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-const loginSchema = object({
-  email: string().email(t("invalid_email")).required(t("required_email")),
-  apiError: string().notRequired(),
-});
+
 
 export default function Login() {
   const router = useRouter();
   const scheme = useColorScheme();
   const { email }: { email: string } = useGlobalSearchParams();
+  const { t } = useTranslation();
+
+  const loginSchema = object({
+    email: string().email(t("invalid_email")).required(t("required_email")),
+    apiError: string().notRequired(),
+  });
 
   const {
     control,
@@ -51,13 +54,13 @@ export default function Login() {
     try {
       await auth.forgotPassword(data.email);
       router.replace({
-        pathname: "/auth/reset_password",
+        pathname: "/(auth)/reset_password",
         params: { email: data.email },
       });
     } catch (error: any) {
       setError("apiError", {
         type: "manual",
-        message: error.response.data.error || "Request failed",
+        message: error.response.data.error || t("request_failed"),
       });
       console.error(error.response.data.error || error);
     }
@@ -97,7 +100,7 @@ export default function Login() {
                 <InputField
                   {...field}
                   icon="mail-outline"
-                  placeholder="Email"
+                  placeholder={t("email")}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   error={errors.email?.message}
@@ -121,7 +124,7 @@ export default function Login() {
             </Button>
           </>
         )}
-        <Link href="/auth/login" asChild>
+        <Link href="/(auth)" asChild>
           <TouchableOpacity className="mt-4 self-center">
             <Text className="text-secondary-500">{t("back_to_login")}</Text>
           </TouchableOpacity>

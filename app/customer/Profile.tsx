@@ -27,8 +27,8 @@ export default function Profile() {
           text: t("profile.logout") || "Logout",
           style: "destructive",
           onPress: async () => {
-            await logout();
-            router.replace("/auth/login");
+            logout();
+            router.replace("/(auth)");
           },
         },
       ]
@@ -137,6 +137,11 @@ export default function Profile() {
             onPress={() => router.push("/customer/settings/personal-info")}
           />
           <SettingItem
+            icon="shield-checkmark-outline"
+            label={t("profile.security") || "Security"}
+            onPress={() => router.push("/customer/settings/security")}
+          />
+          <SettingItem
             icon="color-palette-outline"
             label={t("profile.appearance")}
             onPress={() => router.push("/customer/settings/appearance")}
@@ -169,6 +174,11 @@ export default function Profile() {
             icon="lock-closed-outline"
             label={t("profile.privacy")}
             onPress={() => router.push("/customer/support/privacy")}
+          />
+          <SettingItem
+            icon="code-slash-outline"
+            label={t("profile.developerInfo")}
+            onPress={() => router.push("/customer/support/developer")}
           />
         </View>
 

@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "@/src/api";
+import api, { auth } from "@/lib/api";
 import axios from "axios";
-import { auth } from "../lib/api";
 
 export interface User {
   id: string;
@@ -30,7 +29,8 @@ interface AuthState {
   login: (user: User | null, token: string) => void;
   logout: () => void;
   hasRole: (role: string) => boolean;
-  checkAuth: () => Promise<void>; // <-- added
+  checkAuth: () => Promise<void>;
+  updateProfile: (data: any) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -59,14 +59,20 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
         }),
 
-      logout: () =>
+      logout: async () => {
+        try {
+          await auth.logout();
+        } catch (error) {
+          console.warn("Logout request failed:", error);
+        }
         set({
           user: null,
           token: null,
           refreshToken: null,
           isAuthenticated: false,
           isLoading: false,
-        }),
+        });
+      },
 
       checkAuth: async () => {
         const { token, refreshToken } = get();
@@ -97,6 +103,26 @@ export const useAuthStore = create<AuthState>()(
           });
         }
       },
+
+      updateProfile: async (data: any) => {
+        set({ isLoading: true });
+        try {
+          const res = await auth.updateProfile(data);
+          // If the backend returns a full user object, update the store
+          if (res.user) {
+            set((state) => ({
+              user: { ...state.user, ...res.user },
+              isLoading: false,
+            }));
+          } else {
+            set({ isLoading: false });
+          }
+        } catch (error) {
+          console.error("Update profile error:", error);
+          set({ isLoading: false });
+          throw error;
+        }
+      },
     }),
 
     {
@@ -114,4 +140,13 @@ export const useAuthStore = create<AuthState>()(
       },
     }
   )
+);
+
+// Setup Axios Interceptors
+import { setupAxiosAuth } from "@/lib/api";
+
+setupAxiosAuth(
+  () => useAuthStore.getState().token,
+  (token) => useAuthStore.getState().setToken(token),
+  () => useAuthStore.getState().logout()
 );

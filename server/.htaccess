@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Prevent access to dotfiles (like .env)
+    RewriteRule (^\.|/\.) - [F]
+
+    # WebSocket Upgrade Support
+    # This helps pass the Upgrade header through to the Node.js application
+    # Note: On some cPanel configurations (Phusion Passenger), this might be handled automatically,
+    # but explicit rules can help if it's failing.
+    RewriteCond %{HTTP:Upgrade} =websocket [NC]
+    RewriteRule /(.*)           ws://127.0.0.1:%{ENV:PORT}/$1 [P,L]
+    
+    # Fallback: exact path match for socket.io if the above generic rule fails
+    RewriteCond %{REQUEST_URI}  ^/bagigi/api/socket.io [NC]
+    RewriteCond %{QUERY_STRING} transport=websocket [NC]
+    RewriteRule /(.*)           ws://127.0.0.1:%{ENV:PORT}/$1 [P,L]
+
+</IfModule>

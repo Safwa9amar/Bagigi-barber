@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '@/lib/prisma';
 import { addMinutes, format, isBefore, max, parse, startOfDay, set } from 'date-fns';
+import { socketIo } from '@/socket';
 
 export async function create(req: Request, res: Response) {
   try {
@@ -28,9 +29,29 @@ export async function create(req: Request, res: Response) {
       return res.status(404).json({ error: 'Service not found' });
     }
 
-    // 2. Fetch Shop Working Hours for the requested day
-    // We need to know the day of week (0=Sunday, etc)
     const requestedDate = new Date(date);
+    const startOfRequestedDay = startOfDay(requestedDate);
+    const endOfRequestedDay = set(requestedDate, { hours: 23, minutes: 59, seconds: 59, milliseconds: 999 });
+
+    // 1.5 Check if user already has a booking for this day
+    const existingBooking = await prisma.booking.findFirst({
+      where: {
+        userId,
+        estimatedAt: {
+          gte: startOfRequestedDay,
+          lte: endOfRequestedDay
+        },
+        status: {
+          not: 'CANCELLED'
+        }
+      }
+    });
+
+    if (existingBooking) {
+      return res.status(400).json({ error: 'serviceDetails.oncePerDayError' });
+    }
+
+    // 2. Fetch Shop Working Hours for the requested day
     const dayOfWeek = requestedDate.getDay();
 
     // Find a provider/admin. For now, we assume single-provider or we pick the service owner.
@@ -63,8 +84,7 @@ export async function create(req: Request, res: Response) {
     // But for a new booking, we are SETTING estimatedAt.
     // So we look for bookings where estimatedAt is within the requested day.
 
-    const startOfRequestedDay = startOfDay(requestedDate);
-    const endOfRequestedDay = set(requestedDate, { hours: 23, minutes: 59, seconds: 59 });
+    // So we look for bookings where estimatedAt is within the requested day.
 
     const todaysBookings = await prisma.booking.findMany({
       where: {
@@ -128,6 +148,25 @@ export async function create(req: Request, res: Response) {
         estimatedAt: calculatedStartTime,
       },
     });
+
+    // Notify admins via Socket.IO
+    socketIo.to('admin').emit('new_booking', {
+      id: booking.id,
+      position: booking.position,
+      serviceName: service.name,
+      estimatedAt: booking.estimatedAt
+    });
+
+    // 🔹 Notify admins via Push Notification
+    try {
+      const { notifyAdmins } = await import('@/lib/notification-service');
+      await notifyAdmins(
+        'New Booking! 📅',
+        `User #${booking.userId?.substring(0, 5)}... booked ${service.name} (#${booking.position} in queue)`
+      );
+    } catch (pe) {
+      console.error("Failed to send admin push for booking:", pe);
+    }
 
     return res.json({
       ...booking,
