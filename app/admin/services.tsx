@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, Alert, Modal, TextInput, ScrollView, Platform, KeyboardAvoidingView, Image, RefreshControl } from "react-native";
-import * as ImagePicker from 'expo-image-picker';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  Modal,
+  TextInput,
+  ScrollView,
+  Platform,
+  KeyboardAvoidingView,
+  Image,
+  RefreshControl,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,10 +28,13 @@ interface Service {
   name: string;
   category: string;
   duration: number | string;
-  price_from: number | string;
-  price_to?: number | string;
+  priceFrom?: number | string;
+  priceTo?: number | string;
+  price_from?: number | string; // Backend might return this
+  price_to?: number | string; // Backend might return this
   description?: string;
   is_vip?: boolean;
+  isVip?: boolean;
   image?: string;
 }
 
@@ -32,15 +48,22 @@ const serviceSchema = yup.object().shape({
   isVip: yup.boolean().required().default(false),
 });
 
-const getServiceSchema = (t: any) => yup.object().shape({
-  name: yup.string().required(t("admin.services.form.validation.name")),
-  category: yup.string().required(t("admin.services.form.validation.category")),
-  duration: yup.string().required(t("admin.services.form.validation.duration")),
-  priceFrom: yup.string().required(t("admin.services.form.validation.priceFrom")),
-  priceTo: yup.string().optional().default(""),
-  description: yup.string().optional().default(""),
-  isVip: yup.boolean().required().default(false),
-});
+const getServiceSchema = (t: any) =>
+  yup.object().shape({
+    name: yup.string().required(t("admin.services.form.validation.name")),
+    category: yup
+      .string()
+      .required(t("admin.services.form.validation.category")),
+    duration: yup
+      .string()
+      .required(t("admin.services.form.validation.duration")),
+    priceFrom: yup
+      .string()
+      .required(t("admin.services.form.validation.priceFrom")),
+    priceTo: yup.string().optional().default(""),
+    description: yup.string().optional().default(""),
+    isVip: yup.boolean().required().default(false),
+  });
 
 type ServiceFormData = yup.InferType<typeof serviceSchema>;
 
@@ -55,7 +78,13 @@ export default function AdminServices() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { control, handleSubmit, reset, watch, formState: { errors } } = useForm<ServiceFormData>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<ServiceFormData>({
     resolver: yupResolver(getServiceSchema(t)),
     defaultValues: {
       name: "",
@@ -64,8 +93,8 @@ export default function AdminServices() {
       priceFrom: "",
       priceTo: "",
       description: "",
-      isVip: false
-    }
+      isVip: false,
+    },
   });
 
   const isVip = watch("isVip");
@@ -106,29 +135,35 @@ export default function AdminServices() {
           onPress: async () => {
             try {
               await axios.delete(`${SERVER_URL}/services/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
               });
               fetchServices();
             } catch (e) {
               Alert.alert(t("common.error"), t("admin.services.deleteError"));
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     );
   };
 
   const openModal = (service?: Service) => {
     if (service) {
       setEditingId(service.id);
+      // Handle both camelCase and snake_case field names from backend
+      const priceFromValue = service.priceFrom || service.price_from;
+      const priceToValue = service.priceTo || service.price_to;
+      const isVipValue =
+        service.isVip !== undefined ? service.isVip : service.is_vip;
+
       reset({
         name: service.name,
         category: service.category,
-        duration: String(service.duration).replace(' min', ''),
-        priceFrom: String(service.price_from),
-        priceTo: service.price_to ? String(service.price_to) : "",
+        duration: String(service.duration).replace(" min", ""),
+        priceFrom: priceFromValue ? String(priceFromValue) : "",
+        priceTo: priceToValue ? String(priceToValue) : "",
         description: service.description || "",
-        isVip: Boolean(service.is_vip)
+        isVip: Boolean(isVipValue),
       });
       setSelectedImage(service.image || null);
     } else {
@@ -140,7 +175,7 @@ export default function AdminServices() {
         priceFrom: "",
         priceTo: "",
         description: "",
-        isVip: false
+        isVip: false,
       });
       setSelectedImage(null);
     }
@@ -163,28 +198,31 @@ export default function AdminServices() {
   const handleSave = async (data: ServiceFormData) => {
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('name', data.name);
-      formDataToSend.append('category', data.category);
-      formDataToSend.append('duration', data.duration);
-      formDataToSend.append('priceFrom', data.priceFrom);
-      if (data.priceTo) formDataToSend.append('priceTo', data.priceTo);
-      formDataToSend.append('description', data.description || "");
-      formDataToSend.append('isVip', String(data.isVip));
+      formDataToSend.append("name", data.name);
+      formDataToSend.append("category", data.category);
+      formDataToSend.append("duration", data.duration);
+      formDataToSend.append("priceFrom", data.priceFrom);
+      if (data.priceTo) formDataToSend.append("priceTo", data.priceTo);
+      formDataToSend.append("description", data.description || "");
+      formDataToSend.append("isVip", String(data.isVip));
 
-      if (selectedImage && !selectedImage.startsWith('/uploads')) {
-        const filename = selectedImage.split('/').pop();
-        const match = /\.(\w+)$/.exec(filename || '');
+      if (selectedImage && !selectedImage.startsWith("/uploads")) {
+        const filename = selectedImage.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename || "");
         const type = match ? `image/${match[1]}` : `image`;
 
         // @ts-ignore
-        formDataToSend.append('image', { uri: selectedImage, name: filename, type });
+        formDataToSend.append("image", {
+          uri: selectedImage,
+          name: filename,
+          type,
+        });
       }
 
       if (editingId) {
-        await servicesApi.update(editingId, formDataToSend)
+        await servicesApi.update(editingId, formDataToSend);
       } else {
         await servicesApi.create(formDataToSend);
-
       }
       setModalVisible(false);
       fetchServices();
@@ -194,25 +232,30 @@ export default function AdminServices() {
     }
   };
 
+  const categories = [
+    t("home.all"),
+    ...new Set(services.map((s) => s.category)),
+  ];
 
-  const categories = [t("home.all"), ...new Set(services.map(s => s.category))];
-
-  const filteredServices = services.filter(service => {
-    const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredServices = services.filter((service) => {
+    const matchesSearch =
+      service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       service.category.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || selectedCategory === t("home.all") || service.category === selectedCategory;
+    const matchesCategory =
+      !selectedCategory ||
+      selectedCategory === t("home.all") ||
+      service.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
-
 
   const renderItem = ({ item }: { item: Service }) => (
     <View className="bg-white dark:bg-[#2C2C2C] p-5 rounded-[24px] mb-4 shadow-sm border border-gray-100 dark:border-transparent">
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-1">
           <View className="flex-row items-center gap-2 mb-1">
-            <Text className="text-lg font-black text-gray-900 dark:text-white">{item.name}</Text>
-
+            <Text className="text-lg font-black text-gray-900 dark:text-white">
+              {item.name}
+            </Text>
           </View>
           <Text className="text-gray-500 dark:text-gray-400 text-base font-medium">
             {item.category} • {item.duration} min
@@ -233,18 +276,18 @@ export default function AdminServices() {
           </TouchableOpacity>
         </View>
       </View>
-      <Text className="text-secondary-600 dark:text-[#C5A35D] font-extrabold text-md">{t("common.currency")} {item.price_from}</Text>
+      <Text className="text-secondary-600 dark:text-[#C5A35D] font-extrabold text-md">
+        {t("common.currency")} {item.priceFrom || item.price_from}
+      </Text>
     </View>
   );
 
   return (
     <View className="flex-1 bg-background-light dark:bg-background-dark">
-
-
       <FlatList
         data={filteredServices}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: 20 }}
         refreshControl={
           <RefreshControl
@@ -258,13 +301,17 @@ export default function AdminServices() {
           <View className="mb-6 gap-5">
             {/* Header */}
             <View className="pt-14 px-1 flex-row justify-between items-center">
-              <Text className="text-xl font-black text-gray-900 dark:text-white">{t("admin.services.title")}</Text>
+              <Text className="text-xl font-black text-gray-900 dark:text-white">
+                {t("admin.services.title")}
+              </Text>
               <TouchableOpacity
                 onPress={() => openModal()}
                 className="bg-white dark:bg-[#2C2C2C] px-5 py-3 rounded-full border border-gray-200 dark:border-gray-700 flex-row items-center gap-2 shadow-sm"
               >
                 <Ionicons name="add" size={16} color="#C5A35D" />
-                <Text className="text-gray-900 dark:text-white font-extrabold text-md">{t("admin.services.addService")}</Text>
+                <Text className="text-gray-900 dark:text-white font-extrabold text-md">
+                  {t("admin.services.addService")}
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -286,22 +333,32 @@ export default function AdminServices() {
             </View>
 
             {/* Category Filter */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="flex-row"
+            >
               {categories.map((cat) => {
-                const isActive = selectedCategory === cat || (!selectedCategory && cat === t("home.all"));
+                const isActive =
+                  selectedCategory === cat ||
+                  (!selectedCategory && cat === t("home.all"));
                 return (
                   <TouchableOpacity
                     key={cat}
                     onPress={() => setSelectedCategory(cat)}
-                    className={`px-6 py-3 rounded-full mr-3 border ${isActive
-                      ? 'bg-[#C5A35D] border-[#C5A35D]'
-                      : 'bg-white dark:bg-[#333333] border-gray-200 dark:border-gray-700'
-                      } shadow-sm`}
+                    className={`px-6 py-3 rounded-full mr-3 border ${
+                      isActive
+                        ? "bg-[#C5A35D] border-[#C5A35D]"
+                        : "bg-white dark:bg-[#333333] border-gray-200 dark:border-gray-700"
+                    } shadow-sm`}
                   >
-                    <Text className={`font-black text-sm ${isActive
-                      ? 'text-white'
-                      : 'text-gray-600 dark:text-gray-400'
-                      }`}>
+                    <Text
+                      className={`font-black text-sm ${
+                        isActive
+                          ? "text-white"
+                          : "text-gray-600 dark:text-gray-400"
+                      }`}
+                    >
                       {cat}
                     </Text>
                   </TouchableOpacity>
@@ -313,12 +370,17 @@ export default function AdminServices() {
       />
 
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 justify-end">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1 justify-end"
+        >
           <View className="flex-1 bg-black/50 justify-end">
             <View className="bg-white dark:bg-background-muted rounded-t-3xl p-6 h-[85%]">
               <View className="flex-row justify-between items-center mb-6">
                 <Text className="text-xl font-bold text-typography-900 dark:text-typography-white">
-                  {editingId ? t("admin.services.editService") : t("admin.services.newService")}
+                  {editingId
+                    ? t("admin.services.editService")
+                    : t("admin.services.newService")}
                 </Text>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
                   <Ionicons name="close" size={24} color="#9CA3AF" />
@@ -328,25 +390,40 @@ export default function AdminServices() {
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View className="gap-4">
                   {/* Image Picker */}
-                  <TouchableOpacity onPress={pickImage} className="h-48 bg-gray-100 dark:bg-[#333333] rounded-[24px] items-center justify-center overflow-hidden mb-2 border-2 border-dashed border-gray-200 dark:border-gray-700">
+                  <TouchableOpacity
+                    onPress={pickImage}
+                    className="h-48 bg-gray-100 dark:bg-[#333333] rounded-[24px] items-center justify-center overflow-hidden mb-2 border-2 border-dashed border-gray-200 dark:border-gray-700"
+                  >
                     {selectedImage ? (
                       <Image
-                        source={{ uri: selectedImage.startsWith('/uploads') ? process.env.EXPO_PUBLIC_API_URL + selectedImage : selectedImage }}
+                        source={{
+                          uri: selectedImage.startsWith("/uploads")
+                            ? process.env.EXPO_PUBLIC_API_URL + selectedImage
+                            : selectedImage,
+                        }}
                         className="w-full h-full"
                         resizeMode="cover"
                       />
                     ) : (
                       <View className="items-center">
                         <View className="bg-secondary-50 dark:bg-[#1E293B] p-4 rounded-full mb-3">
-                          <Ionicons name="image-outline" size={36} color="#C5A35D" />
+                          <Ionicons
+                            name="image-outline"
+                            size={36}
+                            color="#C5A35D"
+                          />
                         </View>
-                        <Text className="text-gray-500 dark:text-gray-400 font-bold text-base">{t("admin.services.form.addPhoto")}</Text>
+                        <Text className="text-gray-500 dark:text-gray-400 font-bold text-base">
+                          {t("admin.services.form.addPhoto")}
+                        </Text>
                       </View>
                     )}
                   </TouchableOpacity>
 
                   <View>
-                    <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">{t("admin.services.form.name")}</Text>
+                    <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                      {t("admin.services.form.name")}
+                    </Text>
                     <Controller
                       control={control}
                       name="name"
@@ -355,18 +432,26 @@ export default function AdminServices() {
                           onBlur={onBlur}
                           onChangeText={onChange}
                           value={value}
-                          className={`bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border ${errors.name ? 'border-red-500' : 'border-gray-100 dark:border-transparent'}`}
-                          placeholder={t("admin.services.form.placeholder.name")}
+                          className={`bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border ${errors.name ? "border-red-500" : "border-gray-100 dark:border-transparent"}`}
+                          placeholder={t(
+                            "admin.services.form.placeholder.name",
+                          )}
                           placeholderTextColor="#9CA3AF"
                         />
                       )}
                     />
-                    {errors.name && <Text className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors.name.message}</Text>}
+                    {errors.name && (
+                      <Text className="text-red-500 text-xs mt-1 ml-1 font-medium">
+                        {errors.name.message}
+                      </Text>
+                    )}
                   </View>
 
                   <View className="flex-row gap-4">
                     <View className="flex-1">
-                      <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">{t("admin.services.form.category")}</Text>
+                      <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                        {t("admin.services.form.category")}
+                      </Text>
                       <Controller
                         control={control}
                         name="category"
@@ -375,16 +460,24 @@ export default function AdminServices() {
                             onBlur={onBlur}
                             onChangeText={onChange}
                             value={value}
-                            className={`bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border ${errors.category ? 'border-red-500' : 'border-gray-100 dark:border-transparent'}`}
-                            placeholder={t("admin.services.form.placeholder.category")}
+                            className={`bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border ${errors.category ? "border-red-500" : "border-gray-100 dark:border-transparent"}`}
+                            placeholder={t(
+                              "admin.services.form.placeholder.category",
+                            )}
                             placeholderTextColor="#9CA3AF"
                           />
                         )}
                       />
-                      {errors.category && <Text className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors.category.message}</Text>}
+                      {errors.category && (
+                        <Text className="text-red-500 text-xs mt-1 ml-1 font-medium">
+                          {errors.category.message}
+                        </Text>
+                      )}
                     </View>
                     <View className="flex-1">
-                      <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">{t("admin.services.form.duration")}</Text>
+                      <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                        {t("admin.services.form.duration")}
+                      </Text>
                       <Controller
                         control={control}
                         name="duration"
@@ -394,19 +487,27 @@ export default function AdminServices() {
                             onChangeText={onChange}
                             value={value}
                             keyboardType="numeric"
-                            className={`bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border ${errors.duration ? 'border-red-500' : 'border-gray-100 dark:border-transparent'}`}
-                            placeholder={t("admin.services.form.placeholder.duration")}
+                            className={`bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border ${errors.duration ? "border-red-500" : "border-gray-100 dark:border-transparent"}`}
+                            placeholder={t(
+                              "admin.services.form.placeholder.duration",
+                            )}
                             placeholderTextColor="#9CA3AF"
                           />
                         )}
                       />
-                      {errors.duration && <Text className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors.duration.message}</Text>}
+                      {errors.duration && (
+                        <Text className="text-red-500 text-xs mt-1 ml-1 font-medium">
+                          {errors.duration.message}
+                        </Text>
+                      )}
                     </View>
                   </View>
 
                   <View className="flex-row gap-4">
                     <View className="flex-1">
-                      <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">{t("admin.services.form.priceFrom")}</Text>
+                      <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                        {t("admin.services.form.priceFrom")}
+                      </Text>
                       <Controller
                         control={control}
                         name="priceFrom"
@@ -416,16 +517,24 @@ export default function AdminServices() {
                             onChangeText={onChange}
                             value={value}
                             keyboardType="numeric"
-                            className={`bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border ${errors.priceFrom ? 'border-red-500' : 'border-gray-100 dark:border-transparent'}`}
-                            placeholder={t("admin.services.form.placeholder.priceFrom")}
+                            className={`bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border ${errors.priceFrom ? "border-red-500" : "border-gray-100 dark:border-transparent"}`}
+                            placeholder={t(
+                              "admin.services.form.placeholder.priceFrom",
+                            )}
                             placeholderTextColor="#9CA3AF"
                           />
                         )}
                       />
-                      {errors.priceFrom && <Text className="text-red-500 text-xs mt-1 ml-1 font-medium">{errors.priceFrom.message}</Text>}
+                      {errors.priceFrom && (
+                        <Text className="text-red-500 text-xs mt-1 ml-1 font-medium">
+                          {errors.priceFrom.message}
+                        </Text>
+                      )}
                     </View>
                     <View className="flex-1">
-                      <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">{t("admin.services.form.priceTo")}</Text>
+                      <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                        {t("admin.services.form.priceTo")}
+                      </Text>
                       <Controller
                         control={control}
                         name="priceTo"
@@ -436,7 +545,9 @@ export default function AdminServices() {
                             value={value || ""}
                             keyboardType="numeric"
                             className="bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border border-gray-100 dark:border-transparent"
-                            placeholder={t("admin.services.form.placeholder.priceTo")}
+                            placeholder={t(
+                              "admin.services.form.placeholder.priceTo",
+                            )}
                             placeholderTextColor="#9CA3AF"
                           />
                         )}
@@ -445,7 +556,9 @@ export default function AdminServices() {
                   </View>
 
                   <View>
-                    <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">{t("admin.services.form.description")}</Text>
+                    <Text className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-1">
+                      {t("admin.services.form.description")}
+                    </Text>
                     <Controller
                       control={control}
                       name="description"
@@ -457,9 +570,11 @@ export default function AdminServices() {
                           multiline
                           numberOfLines={3}
                           className="bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px] text-lg text-gray-900 dark:text-white border border-gray-100 dark:border-transparent h-28"
-                          placeholder={t("admin.services.form.placeholder.description")}
+                          placeholder={t(
+                            "admin.services.form.placeholder.description",
+                          )}
                           placeholderTextColor="#9CA3AF"
-                          style={{ textAlignVertical: 'top' }}
+                          style={{ textAlignVertical: "top" }}
                         />
                       )}
                     />
@@ -473,16 +588,31 @@ export default function AdminServices() {
                         onPress={() => onChange(!value)}
                         className="flex-row items-center gap-3 mt-2 bg-gray-50 dark:bg-[#333333] p-4 rounded-[16px]"
                       >
-                        <View className={`w-6 h-6 rounded-md border-2 ${value ? 'bg-[#C5A35D] border-[#C5A35D]' : 'border-gray-300 dark:border-gray-600'} items-center justify-center`}>
-                          {value && <Ionicons name="checkmark" size={16} color="white" />}
+                        <View
+                          className={`w-6 h-6 rounded-md border-2 ${value ? "bg-[#C5A35D] border-[#C5A35D]" : "border-gray-300 dark:border-gray-600"} items-center justify-center`}
+                        >
+                          {value && (
+                            <Ionicons
+                              name="checkmark"
+                              size={16}
+                              color="white"
+                            />
+                          )}
                         </View>
-                        <Text className="text-lg font-bold text-gray-900 dark:text-white">{t("admin.services.form.isVip")}</Text>
+                        <Text className="text-lg font-bold text-gray-900 dark:text-white">
+                          {t("admin.services.form.isVip")}
+                        </Text>
                       </TouchableOpacity>
                     )}
                   />
 
-                  <TouchableOpacity onPress={() => handleSubmit(handleSave)()} className="bg-[#C5A35D] p-5 rounded-[24px] items-center mt-6 mb-10 shadow-lg shadow-secondary-500/30">
-                    <Text className="text-white font-black text-2xl">{t("common.saveChanges")}</Text>
+                  <TouchableOpacity
+                    onPress={() => handleSubmit(handleSave)()}
+                    className="bg-[#C5A35D] p-5 rounded-[24px] items-center mt-6 mb-10 shadow-lg shadow-secondary-500/30"
+                  >
+                    <Text className="text-white font-black text-2xl">
+                      {t("common.saveChanges")}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </ScrollView>

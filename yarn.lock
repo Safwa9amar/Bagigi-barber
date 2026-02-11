@@ -5118,9 +5118,9 @@ expo-updates-interface@~2.0.0:
   resolved "https://registry.npmjs.org/expo-updates-interface/-/expo-updates-interface-2.0.0.tgz"
   integrity sha512-pTzAIufEZdVPKql6iMi5ylVSPqV1qbEopz9G6TSECQmnNde2nwq42PxdFBaUEd8IZJ/fdJLQnOT3m6+XJ5s7jg==
 
-expo-updates@^29.0.16:
+expo-updates@~29.0.16:
   version "29.0.16"
-  resolved "https://registry.npmjs.org/expo-updates/-/expo-updates-29.0.16.tgz"
+  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-29.0.16.tgz#1eadab125202ead173bee0bd04cae4cbf9299650"
   integrity sha512-E9/fxRz/Eurtc7hxeI/6ZPyHH3To9Xoccm1kXoICZTRojmuTo+dx0Xv53UHyHn4G5zGMezyaKF2Qtj3AKcT93w==
   dependencies:
     "@expo/code-signing-certificates" "^0.0.6"

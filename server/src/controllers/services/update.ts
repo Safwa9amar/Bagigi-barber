@@ -11,19 +11,26 @@ export const updateService = async (req: Request, res: Response, next: NextFunct
         const existing = await prisma.service.findUnique({ where: { id } });
         if (!existing) return res.status(404).json({ error: 'Service not found' });
 
+        // Build update data object, only including defined values
+        const updateData: any = {};
+        
+        if (name !== undefined) updateData.name = name;
+        if (category !== undefined) updateData.category = category;
+        if (duration !== undefined && duration !== '') updateData.duration = Number(duration);
+        if (priceFrom !== undefined && priceFrom !== '') updateData.priceFrom = Number(priceFrom);
+        if (priceTo !== undefined && priceTo !== '') updateData.priceTo = Number(priceTo);
+        if (description !== undefined) updateData.description = description;
+        if (imagePath !== undefined) updateData.image = imagePath;
+        
+        if (isVip !== undefined) {
+            const vipValue = isVip === 'true' || isVip === true;
+            updateData.isVip = vipValue;
+            updateData.is_vip = vipValue;
+        }
+
         const service = await prisma.service.update({
             where: { id },
-            data: {
-                name,
-                category,
-                duration: duration ? Number(duration) : undefined,
-                priceFrom: priceFrom ? Number(priceFrom) : undefined,
-                priceTo: priceTo ? Number(priceTo) : undefined,
-                description,
-                isVip: isVip !== undefined ? (isVip === 'true' || isVip === true) : undefined,
-                is_vip: isVip !== undefined ? (isVip === 'true' || isVip === true) : undefined,
-                image: imagePath
-            }
+            data: updateData
         });
 
         res.json(service);
