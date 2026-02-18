@@ -1,28 +1,31 @@
 import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
+let socketRole: string | null = null; // track the role the socket was created with
 
 const SERVER_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/bagigi/api";
-// We want to extract the base URL (origin) for the socket connection
-// If SERVER_URL is https://ataa-platform.com/bagigi/api, we want https://ataa-platform.com
-// If SERVER_URL is http://localhost:3000/bagigi/api, we want http://localhost:3000
 const SOCKET_URL = SERVER_URL.replace('/bagigi/api', '').replace('/api', '');
 
 export const getSocket = (userId: string, role: string) => {
+    // If socket exists but was created with a different role, disconnect and recreate
+    if (socket && socketRole !== role) {
+        socket.disconnect();
+        socket = null;
+        socketRole = null;
+    }
+
     if (!socket) {
+        socketRole = role;
         socket = io(SOCKET_URL, {
             path: '/bagigi/api/socket.io',
-            transports: ['polling', 'websocket'], // Force trying polling first, then upgrade (default but explicit is safe)
+            transports: ['polling', 'websocket'],
             reconnection: true,
             reconnectionAttempts: 5,
-            query: {
-                userId,
-                role,
-            },
+            query: { userId, role },
         });
 
         socket.on("connect", () => {
-            console.log("Global socket connected");
+            console.log(`Global socket connected as ${role}`);
         });
 
         socket.on("disconnect", () => {
@@ -36,5 +39,6 @@ export const disconnectSocket = () => {
     if (socket) {
         socket.disconnect();
         socket = null;
+        socketRole = null;
     }
 };

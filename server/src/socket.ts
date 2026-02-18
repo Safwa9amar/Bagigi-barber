@@ -81,10 +81,11 @@ io.on('connection', (socket: Socket) => {
 
         const fromName = sender?.name || sender?.email?.split('@')[0] || "Unknown";
 
-        // Construct payload
+        // Construct payload — include `to` so clients can filter by conversation
         const message = {
             id: savedMessage.id,
             from: userId,
+            to: role === 'ADMIN' ? data.to : undefined,
             fromName: fromName,
             content: savedMessage.content,
             timestamp: savedMessage.createdAt.toISOString(),
@@ -92,16 +93,16 @@ io.on('connection', (socket: Socket) => {
         };
 
         if (role === 'ADMIN' && data.to) {
-            // Admin sending to specific user
+            // Admin → User: deliver to user and echo back to admin sender
             io.to(data.to).emit('receive_message', message);
+            io.to(userId).emit('receive_message', message);
 
-            // SEND PUSH NOTIFICATION TO USER
+            // Push notification to user
             try {
                 const recipient = await prisma.user.findUnique({
                     where: { id: data.to },
                     select: { pushToken: true }
                 });
-
                 if (recipient?.pushToken) {
                     await sendPushNotification(
                         recipient.pushToken,
@@ -109,17 +110,16 @@ io.on('connection', (socket: Socket) => {
                         data.content,
                         { messageId: message.id }
                     );
-                    console.log(`Push sent to ${data.to}`);
                 }
             } catch (pe) {
                 console.error("Failed to send push:", pe);
             }
-
-            // User sending to admin
+        } else {
+            // User → Admin: deliver to admin room and echo back to sender
             io.to('admin').emit('receive_message', message);
             io.to(userId).emit('receive_message', message);
 
-            // NOTIFY ADMINS
+            // Push notification to admins
             try {
                 const { notifyAdmins } = await import('@/lib/notification-service');
                 await notifyAdmins(

@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "build": "expo export --platform web --output-dir dist",
     "build:preview": "expo export --platform web --output-dir dist",
+    "eas:update": "npx eas update --branch main --message 'update deploy'",
     "test": "jest --watchAll"
   },
   "jest": {

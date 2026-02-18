@@ -1,5 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+} from "react-native";
 import { io, Socket } from "socket.io-client";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -28,6 +37,7 @@ const Messages = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isAdminTyping, setIsAdminTyping] = useState(false);
   const socketRef = useRef<Socket | null>(null);
+  const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<any>(null);
 
   // Replace with your actual server URL or use env var
@@ -52,19 +62,31 @@ const Messages = () => {
     const handleMessage = (msg: Message) => {
       console.log("Received message in screen:", msg);
       setMessages((prev) => {
-        if (prev.some(m => m.id === msg.id)) return prev;
+        if (prev.some((m) => m.id === msg.id)) return prev;
+        // Replace optimistic temp message with the real server message
+        const tempIdx = prev.findIndex(
+          (m) =>
+            m.id.startsWith("temp-") &&
+            m.from === msg.from &&
+            m.content === msg.content,
+        );
+        if (tempIdx !== -1) {
+          const updated = [...prev];
+          updated[tempIdx] = msg;
+          return updated;
+        }
         return [...prev, msg];
       });
       setIsAdminTyping(false);
-      resetUnreadCount(); // Keep resetting while on screen
+      resetUnreadCount();
     };
 
     const handleTyping = (data: { from: string }) => {
-      if (data.from === 'admin') setIsAdminTyping(true);
+      if (data.from === "admin") setIsAdminTyping(true);
     };
 
     const handleStopTyping = (data: { from: string }) => {
-      if (data.from === 'admin') setIsAdminTyping(false);
+      if (data.from === "admin") setIsAdminTyping(false);
     };
 
     socket.on("connect", handleConnect);
@@ -107,17 +129,21 @@ const Messages = () => {
     // Fetch history
     const fetchHistory = async () => {
       try {
-        const res = await axios.get(`${SERVER_URL}/messages/history/${user.id}`);
+        const res = await axios.get(
+          `${SERVER_URL}/messages/history/${user.id}`,
+        );
         const data = res.data;
         if (Array.isArray(data)) {
-          setMessages(data.map((m: any) => ({
-            id: m.id,
-            from: m.fromId,
-            fromName: m.fromName,
-            content: m.content,
-            timestamp: m.createdAt,
-            role: m.role
-          })));
+          setMessages(
+            data.map((m: any) => ({
+              id: m.id,
+              from: m.fromId,
+              fromName: m.fromName,
+              content: m.content,
+              timestamp: m.createdAt,
+              role: m.role,
+            })),
+          );
         }
       } catch (e) {
         console.error("Failed to fetch history", e);
@@ -131,27 +157,56 @@ const Messages = () => {
     if (!inputText.trim() || !socketRef.current) return;
 
     const content = inputText.trim();
-    socketRef.current.emit("send_message", { content });
-    socketRef.current.emit("stop_typing", {}); // Stop typing when sending
-    setInputText("");
 
-    // Optimistic UI update could go here, but since server echoes back to our room, 
-    // we can wait for receive_message to avoid duplication logic.
+    // Optimistic update — show message immediately while waiting for server echo
+    const optimisticMsg: Message = {
+      id: `temp-${Date.now()}`,
+      from: user!.id,
+      content,
+      timestamp: new Date().toISOString(),
+      role: "USER",
+    };
+    setMessages((prev) => [...prev, optimisticMsg]);
+
+    socketRef.current.emit("send_message", { content });
+    socketRef.current.emit("stop_typing", {});
+    setInputText("");
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
   };
 
   const renderItem = ({ item }: { item: Message }) => {
-    const isMe = item.from === user?.id && item.role !== 'ADMIN';
+    const isMe = item.from === user?.id && item.role !== "ADMIN";
     return (
-      <View style={[
-        styles.messageBubble,
-        isMe ? styles.myMessage : styles.theirMessage
-      ]} className={isMe ? "bg-primary-500" : "bg-gray-200 dark:bg-background-muted"}>
-        <Text style={[styles.messageText, isMe ? styles.myMessageText : styles.theirMessageText]}
-          className={isMe ? "text-white" : "text-typography-900 dark:text-typography-white"}>
+      <View
+        style={[
+          styles.messageBubble,
+          isMe ? styles.myMessage : styles.theirMessage,
+        ]}
+        className={
+          isMe ? "bg-primary-500" : "bg-gray-200 dark:bg-background-muted"
+        }
+      >
+        <Text
+          style={[
+            styles.messageText,
+            isMe ? styles.myMessageText : styles.theirMessageText,
+          ]}
+          className={
+            isMe
+              ? "text-white"
+              : "text-typography-900 dark:text-typography-white"
+          }
+        >
           {item.content}
         </Text>
-        <Text style={styles.timestamp} className={isMe ? "text-primary-100" : "text-gray-500"}>
-          {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        <Text
+          style={styles.timestamp}
+          className={isMe ? "text-primary-100" : "text-gray-500"}
+        >
+          {new Date(item.timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </Text>
       </View>
     );
@@ -164,18 +219,33 @@ const Messages = () => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
       className="bg-background-light dark:bg-background-dark"
     >
-      <View style={styles.header} className="bg-white dark:bg-background-muted shadow-sm dark:shadow-none">
-        <Text style={styles.headerTitle} className="text-typography-900 dark:text-typography-white">
+      <View
+        style={styles.header}
+        className="bg-white dark:bg-background-muted shadow-sm dark:shadow-none"
+      >
+        <Text
+          style={styles.headerTitle}
+          className="text-typography-900 dark:text-typography-white"
+        >
           {t("tabs.messages")}
         </Text>
-        <View style={[styles.statusDot, { backgroundColor: isConnected ? '#10B981' : '#EF4444' }]} />
+        <View
+          style={[
+            styles.statusDot,
+            { backgroundColor: isConnected ? "#10B981" : "#EF4444" },
+          ]}
+        />
       </View>
 
       <FlatList
+        ref={flatListRef}
         data={messages}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
+        onContentSizeChange={() =>
+          flatListRef.current?.scrollToEnd({ animated: false })
+        }
         inverted={false} // Normal order
       />
 
@@ -185,7 +255,10 @@ const Messages = () => {
         </View>
       )}
 
-      <View style={styles.inputContainer} className="bg-white dark:bg-background-muted  border-outline-300 dark:border-gray-800">
+      <View
+        style={styles.inputContainer}
+        className="bg-white dark:bg-background-muted  border-outline-300 dark:border-gray-800"
+      >
         <TextInput
           style={styles.input}
           value={inputText}
@@ -194,7 +267,11 @@ const Messages = () => {
           placeholderTextColor="#9CA3AF"
           className="text-typography-900 dark:text-typography-white bg-gray-100 dark:bg-background-paper"
         />
-        <TouchableOpacity onPress={sendMessage} style={styles.sendBtn} className="bg-primary-500">
+        <TouchableOpacity
+          onPress={sendMessage}
+          style={styles.sendBtn}
+          className="bg-primary-500"
+        >
           <Ionicons name="send" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -208,36 +285,36 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 20,
     paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    zIndex: 10
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    zIndex: 10,
   },
-  headerTitle: { fontSize: 24, fontWeight: 'bold' },
+  headerTitle: { fontSize: 24, fontWeight: "bold" },
   statusDot: { width: 10, height: 10, borderRadius: 5 },
   listContent: { padding: 20, paddingBottom: 10 },
   messageBubble: {
-    maxWidth: '80%',
+    maxWidth: "80%",
     padding: 12,
     borderRadius: 16,
     marginBottom: 10,
   },
   myMessage: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     borderBottomRightRadius: 4,
   },
   theirMessage: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     borderBottomLeftRadius: 4,
   },
   messageText: { fontSize: 16 },
-  myMessageText: { color: '#fff' },
+  myMessageText: { color: "#fff" },
   theirMessageText: {},
-  timestamp: { fontSize: 10, marginTop: 4, alignSelf: 'flex-end' },
+  timestamp: { fontSize: 10, marginTop: 4, alignSelf: "flex-end" },
   inputContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 15,
-    alignItems: 'center',
+    alignItems: "center",
   },
   input: {
     flex: 1,
@@ -250,12 +327,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   typingIndicator: {
     marginBottom: -5,
-  }
+  },
 });
 
 export default Messages;
