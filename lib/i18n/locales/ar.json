@@ -12,6 +12,8 @@
     "min_password": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
     "password_match": "كلمات المرور غير متطابقة",
     "required_password": "كلمة المرور مطلوبة",
+    "required_confirm_password": "يرجى تأكيد كلمة المرور",
+    "required_reset_token": "رمز إعادة التعيين مطلوب",
     "confirm_password": "تأكيد كلمة المرور",
     "password": "كلمة المرور",
     "login": "تسجيل الدخول",
@@ -59,7 +61,13 @@
         "isTyping": "يستعد للرد",
         "online": "متصل",
         "offline": "غير متصل",
-        "info": "معلومات"
+        "info": "معلومات",
+        "confirm": "تأكيد",
+        "success": "نجاح",
+        "loadingError": "فشل تحميل البيانات"
+    },
+    "auth": {
+        "password": "كلمة المرور"
     },
     "home": {
         "welcome": "مرحباً",
@@ -158,7 +166,12 @@
         "passwordsMustMatch": "كلمات المرور غير متطابقة",
         "confirmPassword": "تأكيد كلمة المرور",
         "confirmPasswordDesc": "يرجى إدخال كلمة المرور لتأكيد تغيير البريد الإلكتروني.",
-        "failedUpdate": "فشل تحديث كلمة المرور"
+        "failedUpdate": "فشل تحديث كلمة المرور",
+        "nameRequired": "الاسم مطلوب",
+        "emailRequired": "البريد الإلكتروني مطلوب",
+        "phoneRequired": "رقم الهاتف مطلوب",
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "subscription": "الاشتراك"
     },
     "support": {
         "helpCenter": {
@@ -312,7 +325,8 @@
             "workingHoursDesc": "تكوين أوقات فتح الصالون الخاص بك",
             "servicesDesc": "إدارة كتالوج الخدمات الخاص بك",
             "security": "الأمان",
-            "securityDesc": "كلمة المرور والتحقق"
+            "securityDesc": "كلمة المرور والتحقق",
+            "manageDesc": "إدارة نشاطك وحسابك"
         },
         "hours": {
             "title": "ساعات العمل",
@@ -415,5 +429,26 @@
             "user": "المستخدم",
             "startConversation": "ابدأ المحادثة"
         }
+    },
+    "trial": {
+        "title": "الاشتراك",
+        "access_suspended": "تم تعليق الوصول",
+        "trial_ended": "انتهت الفترة التجريبية",
+        "trial_ended_desc": "انتهت فترتك التجريبية لمدة {{days}} أيام. جميع الصفحات مغلقة حتى يتم تأكيد الدفع.",
+        "trial_end_date": "تاريخ انتهاء الفترة التجريبية",
+        "payment_details": "تفاصيل الدفع",
+        "bank_info": "معلومات البنك (CCP)",
+        "baridimob_rip": "رقم RIP BaridiMob",
+        "account_holder": "صاحب الحساب",
+        "upload_receipt": "رفع وصل الدفع",
+        "need_help": "هل تحتاج مساعدة؟ اتصل بنا عبر واتساب",
+        "logout": "تسجيل الخروج",
+        "success": "نجاح",
+        "receipt_uploaded": "تم رفع الوصل وإرساله بنجاح.",
+        "error": "خطأ",
+        "upload_failed": "فشل في رفع وصل الدفع",
+        "copy_success": "تم النسخ إلى الحافظة",
+        "support_agent": "وكيل الدعم",
+        "chat": "دردشة"
     }
 }

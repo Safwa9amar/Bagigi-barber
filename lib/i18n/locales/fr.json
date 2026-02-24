@@ -12,6 +12,8 @@
     "min_password": "Le mot de passe doit contenir au moins 8 caractères",
     "password_match": "Les mots de passe ne correspondent pas",
     "required_password": "Le mot de passe est requis",
+    "required_confirm_password": "Veuillez confirmer votre mot de passe",
+    "required_reset_token": "Le code de réinitialisation est requis",
     "confirm_password": "Confirmer le mot de passe",
     "password": "Mot de passe",
     "login": "Connexion",
@@ -59,7 +61,13 @@
         "isTyping": "écrit",
         "online": "En ligne",
         "offline": "Hors ligne",
-        "info": "Information"
+        "info": "Information",
+        "confirm": "Confirmer",
+        "success": "Succès",
+        "loadingError": "Échec du chargement des données"
+    },
+    "auth": {
+        "password": "Mot de passe"
     },
     "home": {
         "welcome": "Bienvenue",
@@ -158,7 +166,12 @@
         "passwordsMustMatch": "Les mots de passe ne correspondent pas",
         "confirmPassword": "Confirmer le mot de passe",
         "confirmPasswordDesc": "Veuillez entrer votre mot de passe pour confirmer le changement d'e-mail.",
-        "failedUpdate": "Échec de la mise à jour du mot de passe"
+        "failedUpdate": "Échec de la mise à jour du mot de passe",
+        "nameRequired": "Le nom est requis",
+        "emailRequired": "L'e-mail est requis",
+        "phoneRequired": "Le numéro de téléphone est requis",
+        "passwordRequired": "Le mot de passe est requis",
+        "subscription": "Abonnement"
     },
     "support": {
         "helpCenter": {
@@ -312,7 +325,8 @@
             "workingHoursDesc": "Configurez vos heures d'ouverture",
             "servicesDesc": "Gérez votre catalogue de services",
             "security": "Sécurité",
-            "securityDesc": "Mot de passe et vérification"
+            "securityDesc": "Mot de passe et vérification",
+            "manageDesc": "Gérez votre activité et votre compte"
         },
         "hours": {
             "title": "Heures de Travail",
@@ -415,5 +429,26 @@
             "user": "Utilisateur",
             "startConversation": "Commencer la conversation"
         }
+    },
+    "trial": {
+        "title": "Abonnement",
+        "access_suspended": "ACCÈS SUSPENDU",
+        "trial_ended": "Essai Terminé",
+        "trial_ended_desc": "Votre essai de {{days}} jours est terminé. Toutes les pages sont verrouillées jusqu'à ce que le paiement soit confirmé.",
+        "trial_end_date": "Date de fin d'essai",
+        "payment_details": "DÉTAILS DU PAIEMENT",
+        "bank_info": "Informations Bancaires (CCP)",
+        "baridimob_rip": "BaridiMob RIP",
+        "account_holder": "Titulaire du compte",
+        "upload_receipt": "TÉLÉCHARGER LE REÇU DE PAIEMENT",
+        "need_help": "BESOIN D'AIDE ? CONTACT WHATSAPP",
+        "logout": "DÉCONNEXION",
+        "success": "Succès",
+        "receipt_uploaded": "Reçu téléchargé et envoyé avec succès.",
+        "error": "Erreur",
+        "upload_failed": "Échec du téléchargement du reçu",
+        "copy_success": "Copié dans le presse-papiers",
+        "support_agent": "AGENT DE SUPPORT",
+        "chat": "Discuter"
     }
 }

@@ -12,6 +12,8 @@
     "min_password": "Password must be at least 8 characters",
     "password_match": "Passwords do not match",
     "required_password": "Password is required",
+    "required_confirm_password": "Please confirm your password",
+    "required_reset_token": "Reset code is required",
     "confirm_password": "Confirm Password",
     "password": "Password",
     "login": "Login",
@@ -59,7 +61,13 @@
         "isTyping": "is typing",
         "online": "Online",
         "offline": "Offline",
-        "info": "Information"
+        "info": "Information",
+        "confirm": "Confirm",
+        "success": "Success",
+        "loadingError": "Failed to load data"
+    },
+    "auth": {
+        "password": "Password"
     },
     "home": {
         "welcome": "Welcome",
@@ -158,7 +166,12 @@
         "passwordsMustMatch": "Passwords must match",
         "confirmPassword": "Confirm Password",
         "confirmPasswordDesc": "Please enter your password to confirm email change.",
-        "failedUpdate": "Failed to update password"
+        "failedUpdate": "Failed to update password",
+        "nameRequired": "Name is required",
+        "emailRequired": "Email is required",
+        "phoneRequired": "Phone number is required",
+        "passwordRequired": "Password is required",
+        "subscription": "Subscription"
     },
     "support": {
         "helpCenter": {
@@ -312,7 +325,8 @@
             "workingHoursDesc": "Configure your shop opening times",
             "servicesDesc": "Manage your service catalog",
             "security": "Security",
-            "securityDesc": "Password and verification"
+            "securityDesc": "Password and verification",
+            "manageDesc": "Manage your business and account"
         },
         "hours": {
             "title": "Working Hours",
@@ -415,5 +429,26 @@
             "user": "User",
             "startConversation": "Start the conversation"
         }
+    },
+    "trial": {
+        "title": "Subscription",
+        "access_suspended": "ACCESS SUSPENDED",
+        "trial_ended": "Trial Ended",
+        "trial_ended_desc": "Your {{days}}-day trial has ended. All pages are locked until payment is confirmed.",
+        "trial_end_date": "Trial end date",
+        "payment_details": "PAYMENT DETAILS",
+        "bank_info": "Bank Information (CCP)",
+        "baridimob_rip": "BaridiMob RIP",
+        "account_holder": "Account Holder",
+        "upload_receipt": "UPLOAD PAYMENT RECEIPT",
+        "need_help": "NEED HELP? WHATSAPP CONTACT",
+        "logout": "LOGOUT",
+        "success": "Success",
+        "receipt_uploaded": "Receipt uploaded and sent successfully.",
+        "error": "Error",
+        "upload_failed": "Failed to upload payment receipt",
+        "copy_success": "Copied to clipboard",
+        "support_agent": "SUPPORT AGENT",
+        "chat": "Chat"
     }
 }

@@ -1,0 +1,30 @@
+enum SubscriptionPlan {
+    MONTHLY
+    YEARLY
+}
+
+enum SubscriptionStatus {
+    ACTIVE
+    EXPIRED
+    CANCELLED
+}
+
+model Subscription {
+    id String @id @default(uuid())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    plan   SubscriptionPlan
+    status SubscriptionStatus @default(ACTIVE)
+    price  Int
+
+    startsAt    DateTime
+    endsAt      DateTime
+    cancelledAt DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId, status, endsAt])
+}

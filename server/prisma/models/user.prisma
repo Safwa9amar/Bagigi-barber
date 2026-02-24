@@ -17,6 +17,8 @@ model User {
     services Service[]
     workDays WorkingDay[]
     reviews  Review[]
+    subscriptions Subscription[]
+    paymentReceipts PaymentReceipt[]
 
     sentMessages     Message[] @relation("SentMessages")
     receivedMessages Message[] @relation("ReceivedMessages")

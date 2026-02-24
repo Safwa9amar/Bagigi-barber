@@ -1,0 +1,21 @@
+enum PaymentReceiptStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+model PaymentReceipt {
+    id String @id @default(uuid())
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    imageUrl String
+    note     String?
+    status   PaymentReceiptStatus @default(PENDING)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId, status, createdAt])
+}

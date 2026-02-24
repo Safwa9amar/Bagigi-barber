@@ -5,6 +5,7 @@ import servicesRoutes from '@/routes/services';
 import bookingRoutes from '@/routes/booking';
 import messageRoutes from '@/routes/messages';
 import adminRoutes from '@/routes/admin';
+import subscriptionRoutes from '@/routes/subscriptions';
 import { sendPushNotification } from './lib/push';
 import prisma from './lib/prisma';
 const app = express();
@@ -43,6 +44,7 @@ apiRouter.use('/services', servicesRoutes);
 apiRouter.use('/booking', bookingRoutes);
 apiRouter.use('/messages', messageRoutes);
 apiRouter.use('/admin', adminRoutes);
+apiRouter.use('/subscriptions', subscriptionRoutes);
 // Mount the main router at /api
 app.use('/bagigi/api', apiRouter);
 

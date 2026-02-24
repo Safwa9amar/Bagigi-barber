@@ -8,20 +8,20 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { I18nManager, View } from "react-native";
 import { useColorScheme } from "nativewind"; // Use NativeWind hook
 import { Stack } from "expo-router";
 import "@/lib/i18n/i18n"; // Initialize i18n
-import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { Text } from "@/components/ui/text";
-import { View } from "react-native";
 
 // Disable console.log in production
 if (!__DEV__) {
-  console.log = () => { };
-  console.info = () => { };
-  console.warn = () => { };
-  console.debug = () => { };
+  console.log = () => {};
+  console.info = () => {};
+  console.warn = () => {};
+  console.debug = () => {};
   // Keeping console.error for critical issue tracking
 }
 
@@ -35,19 +35,21 @@ SplashScreen.preventAutoHideAsync();
 import { registerForPushNotificationsAsync } from "@/lib/notifications";
 import { useAuthStore } from "@/store/useAuthStore";
 import axios from "axios";
+import { auth } from "@/lib/api";
+import { useReceiptStore } from "@/store/useReceiptStore";
+import { TrialGuard } from "@/components/TrialGuard";
 
 import { useSegments } from "expo-router";
 import { getSocket } from "@/lib/socket";
 import { useChatStore } from "@/store/useChatStore";
 
 export default function RootLayout() {
-
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
 
-  const { user, token } = useAuthStore();
+  const { user, token, isAuthenticated, logout } = useAuthStore();
   const { incrementUnreadCount } = useChatStore();
   const segments = useSegments();
 
@@ -72,8 +74,12 @@ export default function RootLayout() {
       // Check if we are NOT on a chat screen
       // Customer chat: [customer, Messages]
       // Admin chat: [admin, messages, [id]]
-      const isCustomerChat = segments[0] === 'customer' && segments[1] === 'Messages';
-      const isAdminChat = segments[0] === 'admin' && segments[1] === 'messages' && segments.length === 3;
+      const isCustomerChat =
+        segments[0] === "customer" && segments[1] === "Messages";
+      const isAdminChat =
+        segments[0] === "admin" &&
+        segments[1] === "messages" &&
+        segments.length === 3;
 
       if (!isCustomerChat && !isAdminChat) {
         incrementUnreadCount();
@@ -97,7 +103,7 @@ export default function RootLayout() {
           await axios.post(
             `${process.env.EXPO_PUBLIC_API_URL}/auth/push-token`,
             { pushToken },
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           );
           console.log("Push token registered with backend");
         } catch (e) {
@@ -107,19 +113,20 @@ export default function RootLayout() {
     });
   }, [loaded, user, token]); // Re-run if user logs in
 
-  return <RootLayoutNav />;
+  return (
+    <TrialGuard>
+      <RootLayoutNav onLogout={logout} />
+    </TrialGuard>
+  );
 }
-console.log(process.env.EXPO_PUBLIC_API_URL);
 
-function RootLayoutNav() {
+function RootLayoutNav({ onLogout }: { onLogout: () => Promise<void> | void }) {
   const { colorScheme } = useColorScheme();
   const colorMode = colorScheme === "dark" ? "dark" : "light";
 
   return (
     <GluestackUIProvider mode={colorMode as "light" | "dark"}>
-      <ThemeProvider
-        value={colorMode === "dark" ? DarkTheme : DefaultTheme}
-      >
+      <ThemeProvider value={colorMode === "dark" ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="admin" />
@@ -132,7 +139,6 @@ function RootLayoutNav() {
             }}
           />
         </Stack>
-
       </ThemeProvider>
     </GluestackUIProvider>
   );

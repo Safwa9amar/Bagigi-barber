@@ -170,6 +170,39 @@ const auth = {
     const response = await api.post("/auth/update-profile", data);
     return response.data;
   },
+  getAccessStatus: async (): Promise<{
+    blocked: boolean;
+    reason: string | null;
+    trialDays: number;
+    trialEndsAt?: string;
+    trialDaysRemaining?: number;
+    subscription?: {
+      id: string;
+      plan: "MONTHLY" | "YEARLY";
+      status: "ACTIVE" | "EXPIRED" | "CANCELLED";
+      startsAt: string;
+      endsAt: string;
+    };
+    message?: string;
+  }> => {
+    const response = await api.get("/auth/access-status");
+    return response.data;
+  },
+  uploadPaymentReceipt: async (data: FormData): Promise<{
+    message: string;
+    data: {
+      id: string;
+      userId: string;
+      imageUrl: string;
+      note?: string | null;
+      status: "PENDING" | "APPROVED" | "REJECTED";
+      createdAt: string;
+      updatedAt: string;
+    };
+  }> => {
+    const response = await api.post("/auth/upload-payment-receipt", data);
+    return response.data;
+  },
 };
 
 const booking = {
@@ -252,5 +285,40 @@ const admin = {
   },
 };
 
-export { auth, booking, services, admin };
+type SubscriptionPlan = "MONTHLY" | "YEARLY";
+type SubscriptionStatus = "ACTIVE" | "EXPIRED" | "CANCELLED";
+
+export interface SubscriptionRecord {
+  id: string;
+  userId: string;
+  plan: SubscriptionPlan;
+  status: SubscriptionStatus;
+  price: number;
+  startsAt: string;
+  endsAt: string;
+  cancelledAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const subscription = {
+  getMine: async (): Promise<{
+    isSubscribed: boolean;
+    daysRemaining?: number;
+    data: SubscriptionRecord | null;
+  }> => {
+    const response = await api.get("/subscriptions/me");
+    return response.data;
+  },
+  subscribe: async (plan: SubscriptionPlan): Promise<{ data: SubscriptionRecord; message: string }> => {
+    const response = await api.post("/subscriptions/subscribe", { plan });
+    return response.data;
+  },
+  cancel: async (): Promise<{ data: SubscriptionRecord; message: string }> => {
+    const response = await api.post("/subscriptions/cancel");
+    return response.data;
+  },
+};
+
+export { auth, booking, services, admin, subscription };
 export default api;

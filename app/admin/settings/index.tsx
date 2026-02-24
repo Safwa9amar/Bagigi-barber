@@ -55,6 +55,12 @@ export default function AdminSettings() {
                 <View className="mb-8">
                     <Text className="text-gray-400 font-black text-[10px] uppercase tracking-widest ml-1 mb-3">{t("admin.settings.shopManagement")}</Text>
                     <SettingItem
+                        icon="card-outline"
+                        label={t("profile.subscription") || "Subscription"}
+                        detail={"Manage monthly and yearly plans"}
+                        onPress={() => router.push("/admin/settings/subscription")}
+                    />
+                    <SettingItem
                         icon="time-outline"
                         label={t("admin.settings.workingHours")}
                         detail={t("admin.settings.workingHoursDesc")}

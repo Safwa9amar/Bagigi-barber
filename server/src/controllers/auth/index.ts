@@ -9,6 +9,8 @@ import { resetPassword } from './resetPassword';
 import { verifyConfirmationCode } from './verifyConfirmationCode';
 import { savePushToken } from './pushToken';
 import { updateProfile } from './updateProfile';
+import { accessStatus } from './accessStatus';
+import { uploadPaymentReceipt } from './uploadPaymentReceipt';
 export {
   login,
   logout,
@@ -21,4 +23,6 @@ export {
   verifyConfirmationCode,
   savePushToken,
   updateProfile,
+  accessStatus,
+  uploadPaymentReceipt,
 };
