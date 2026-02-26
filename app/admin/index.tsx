@@ -51,6 +51,15 @@ export default function AdminDashboard() {
       const res = await adminApi.getStats(startDate, endDate);
       if (res.success) {
         setStats(res.data);
+      } else {
+        setStats({
+          totalBookings: 0,
+          pendingBookings: 0,
+          todayBookings: 0,
+          totalClients: 0,
+          totalServices: 0,
+          totalRevenue: 0,
+        });
       }
     } catch (e) {
       console.error("Failed to fetch dashboard stats", e);

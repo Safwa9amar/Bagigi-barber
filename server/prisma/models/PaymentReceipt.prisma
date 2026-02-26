@@ -1,21 +1,21 @@
 enum PaymentReceiptStatus {
-    PENDING
-    APPROVED
-    REJECTED
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model PaymentReceipt {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    userId String
-    user   User   @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-    imageUrl String
-    note     String?
-    status   PaymentReceiptStatus @default(PENDING)
+  imageUrl String
+  note     String?
+  status   PaymentReceiptStatus @default(PENDING)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([userId, status, createdAt])
+  @@index([userId, status, createdAt])
 }

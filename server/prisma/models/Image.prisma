@@ -1,10 +1,22 @@
 //////////////////////
-// IMAGE
+// FILE
 //////////////////////
 
-model Image {
-  id        String   @id @default(uuid())
-  url       String
+model File {
+  id           String  @id @default(uuid())
+  url          String
+  uri          String?
+  originalName String?
+  mimeType     String?
+  size         Int?
+  uploadedById String?
+
+  uploadedBy      User?   @relation(fields: [uploadedById], references: [id])
+  adminBarberLogo Admin[] @relation("AdminBarberLogo")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([uploadedById])
+  @@map("Image")
 }

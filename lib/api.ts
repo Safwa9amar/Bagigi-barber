@@ -46,6 +46,16 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const isInactiveShop =
+      error.response?.status === 403 &&
+      typeof error.response?.data?.error === "string" &&
+      error.response.data.error.toLowerCase().includes("shop is inactive");
+
+    if (isInactiveShop) {
+      logoutUser();
+      await SecureStore.deleteItemAsync("refreshToken");
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -89,18 +99,39 @@ api.interceptors.response.use(
 );
 
 const auth = {
-  register: async (email: string, password: string, phone: string) => {
+  register: async (
+    email: string,
+    password: string,
+    phone: string,
+    adminCode: string
+  ) => {
     const response = await api.post("/auth/register", {
       email,
       password,
       phone,
+      adminCode,
     });
+    return response.data;
+  },
+  getAdmins: async (): Promise<{
+    success: boolean;
+    data: Array<{
+      id: string;
+      code: string;
+      name: string;
+      logo?: string | null;
+      barberLogoUri?: string | null;
+      barberLogoFileId?: string | null;
+    }>;
+  }> => {
+    const response = await api.get("/auth/admins");
     return response.data;
   },
 
   login: async (
     email: string,
-    password: string
+    password: string,
+    shopCode?: string
   ): Promise<{
     token: string;
     user: User | null;
@@ -108,6 +139,7 @@ const auth = {
     const response = await api.post("/auth/login", {
       email,
       password,
+      shopCode,
     });
     return response.data;
   },
@@ -119,7 +151,8 @@ const auth = {
 
   verifyConfirmationCode: async (
     email: string,
-    code: string
+    code: string,
+    shopCode?: string
   ): Promise<{
     token: string;
     user: User | null;
@@ -127,25 +160,29 @@ const auth = {
     const response = await api.post("/auth/verify-confirmation-code", {
       email,
       code,
+      shopCode,
     });
     return response.data;
   },
-  requestNewConfirmationCode: async (email: string) => {
+  requestNewConfirmationCode: async (email: string, shopCode?: string) => {
     const response = await api.post("/auth/request-new-confirmation-code", {
       email,
+      shopCode,
     });
     return response.data;
   },
-  forgotPassword: async (email: string) => {
+  forgotPassword: async (email: string, shopCode?: string) => {
     const response = await api.post("/auth/request-password-reset", {
       email,
+      shopCode,
     });
     return response.data;
   },
   resetPassword: async (
     email: string,
     newPassword: string,
-    resetToken: string
+    resetToken: string,
+    shopCode?: string
   ): Promise<{
     token: string;
     user: User | null;
@@ -154,6 +191,7 @@ const auth = {
       email,
       newPassword,
       resetToken,
+      shopCode,
     });
     return response.data;
   },

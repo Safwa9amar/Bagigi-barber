@@ -3,39 +3,88 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
-  TextInput,
   TouchableOpacity,
   useColorScheme,
 } from "react-native";
 import { Box } from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { useAuthStore } from "@/store/useAuthStore";
 import { useTranslation } from "react-i18next";
-import { Link, useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { Controller, set, useForm } from "react-hook-form";
+import { Link, useGlobalSearchParams, useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { object, string, ref } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import api, { auth } from "@/lib/api";
+import { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-
+const resolveLogoUri = (value?: string | null) => {
+  if (!value) return null;
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  return `${process.env.EXPO_PUBLIC_API_URL}${value}`;
+};
 
 export default function Login() {
   const router = useRouter();
   const scheme = useColorScheme();
   const [showPassword, setShowPassword] = useState(false);
   const { t } = useTranslation();
+  const { adminCode: adminCodeParam } = useGlobalSearchParams<{
+    adminCode?: string;
+  }>();
+  const selectedAdminCode = useMemo(
+    () =>
+      typeof adminCodeParam === "string"
+        ? adminCodeParam.trim().toUpperCase()
+        : "",
+    [adminCodeParam],
+  );
+  const [barberName, setBarberName] = useState("");
+  const [barberLogo, setBarberLogo] = useState<string | null>(null);
+  const [loadingBarber, setLoadingBarber] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchBarber = async () => {
+      if (!selectedAdminCode) {
+        setBarberName("");
+        setBarberLogo(null);
+        return;
+      }
+
+      try {
+        setLoadingBarber(true);
+        const res = await auth.getAdmins();
+        const matched = res?.data?.find(
+          (admin) => admin.code.toUpperCase() === selectedAdminCode,
+        );
+        if (!mounted) return;
+        setBarberName(matched?.name || "");
+        setBarberLogo(matched?.logo || matched?.barberLogoUri || null);
+      } catch (error) {
+        if (!mounted) return;
+        setBarberName("");
+        setBarberLogo(null);
+      } finally {
+        if (mounted) setLoadingBarber(false);
+      }
+    };
+
+    fetchBarber();
+    return () => {
+      mounted = false;
+    };
+  }, [selectedAdminCode]);
 
   const loginSchema = object({
     email: string().email(t("invalid_email")).required(t("required_email")),
     phone: string()
       .matches(/^0[567]\d{8}$/, t("invaild_phone"))
       .required(t("required_phone")),
-    password: string().min(8, t("min_password")).required(t("required_password")),
+    password: string()
+      .min(8, t("min_password"))
+      .required(t("required_password")),
     confirmPassword: string()
       .oneOf([ref("password")], t("password_match"))
       .required(),
@@ -51,8 +100,21 @@ export default function Login() {
 
   const onSubmit = async (data: any) => {
     console.log("LOGIN DATA:", data, isSubmitting);
+    if (!selectedAdminCode) {
+      setError("apiError", {
+        type: "manual",
+        message: "Please scan barber QR code first.",
+      });
+      return;
+    }
+
     try {
-      let response = await auth.register(data.email, data.password, data.phone);
+      let response = await auth.register(
+        data.email,
+        data.password,
+        data.phone,
+        selectedAdminCode,
+      );
       console.log("REGISTER RESPONSE:", response);
 
       router.push(`/(auth)/confirm_code?email=${data.email}`);
@@ -65,6 +127,15 @@ export default function Login() {
     }
   };
 
+  const brandDisplayName = barberName || t("brand_name");
+  const brandTagline = barberName
+    ? `Book your haircut with ${barberName}`
+    : t("brand_tagline");
+  const resolvedLogoUri = resolveLogoUri(barberLogo);
+  const logoSource = resolvedLogoUri
+    ? { uri: resolvedLogoUri }
+    : require("@/assets/images/logo.png");
+
   return (
     <Box className="flex-1 justify-center px-6 bg-background-light dark:bg-background-dark">
       <KeyboardAvoidingView
@@ -73,12 +144,14 @@ export default function Login() {
         {/* Branding */}
         <Box className="items-center mb-10">
           <Image
-            source={require("@/assets/images/logo.png")}
+            source={logoSource}
             className="w-44 h-44"
           />
-          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">{t("brand_name")}</Text>
+          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">
+            {brandDisplayName}
+          </Text>
           <Text className="text-typography-500 dark:text-typography-50 text-center mt-1">
-            {t("brand_tagline")}
+            {brandTagline}
           </Text>
         </Box>
 
@@ -89,6 +162,26 @@ export default function Login() {
           />
         ) : (
           <>
+            {!selectedAdminCode ? (
+              <Box className="mb-4 p-3 rounded-xl border border-typography-100">
+                <Text className="text-xs text-typography-500">
+                  Scan a barber QR code first, then continue registration.
+                </Text>
+              </Box>
+            ) : null}
+
+            {/* Email */}
+            <InputField
+              icon="person-outline"
+              value={
+                loadingBarber
+                  ? "Loading barber..."
+                  : barberName || "Unknown barber"
+              }
+              editable={false}
+              placeholder="Barber"
+            />
+
             {/* Email */}
             <Controller
               control={control}
@@ -173,7 +266,7 @@ export default function Login() {
             </Button>
           </>
         )}
-        <Link href="/(auth)" asChild>
+        <Link href="/(auth)/login" asChild>
           <TouchableOpacity className="mt-4 self-center">
             <Text className="text-secondary-500">
               {t("have_account")}

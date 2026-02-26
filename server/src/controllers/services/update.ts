@@ -6,13 +6,16 @@ export const updateService = async (req: Request, res: Response, next: NextFunct
         const { id } = req.params;
         const { name, category, duration, priceFrom, priceTo, description, isVip, image } = req.body;
         const imagePath = req.file ? `/uploads/${req.file.filename}` : image;
+        const adminUserId = (req as Request & { user?: { id?: string } }).user?.id;
+        if (!adminUserId) return res.status(401).json({ error: 'Unauthorized' });
 
         // Check availability
         const existing = await prisma.service.findUnique({ where: { id } });
         if (!existing) return res.status(404).json({ error: 'Service not found' });
+        if (existing.userId !== adminUserId) return res.status(403).json({ error: 'Forbidden' });
 
         // Build update data object, only including defined values
-        const updateData: any = {};
+        const updateData: Record<string, string | number | boolean | null> = {};
         
         if (name !== undefined) updateData.name = name;
         if (category !== undefined) updateData.category = category;

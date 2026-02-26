@@ -6,7 +6,8 @@ import axios from "axios";
 
 export interface User {
   id: string;
-  name: string;
+  shopId?: string;
+  name?: string;
   email: string;
   phone?: string;
   role: UserRole;

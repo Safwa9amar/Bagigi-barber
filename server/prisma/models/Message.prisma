@@ -1,12 +1,11 @@
-
 model Message {
-    id        String   @id @default(cuid())
-    content   String
-    fromId    String   // User ID of sender
-    toId      String?  // User ID of recipient (if null, maybe broadcast or system, but for now specific)
-    role      String   // 'ADMIN' | 'USER' - helpful for quick UI formatting
-    createdAt DateTime @default(now())
-    
-    from      User     @relation("SentMessages", fields: [fromId], references: [id])
-    to        User?    @relation("ReceivedMessages", fields: [toId], references: [id])
+  id        String   @id @default(cuid())
+  content   String
+  fromId    String // User ID of sender
+  toId      String? // User ID of recipient (if null, maybe broadcast or system, but for now specific)
+  role      String // 'ADMIN' | 'USER' - helpful for quick UI formatting
+  createdAt DateTime @default(now())
+
+  from User  @relation("SentMessages", fields: [fromId], references: [id])
+  to   User? @relation("ReceivedMessages", fields: [toId], references: [id])
 }

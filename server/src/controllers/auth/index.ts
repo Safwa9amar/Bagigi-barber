@@ -2,7 +2,7 @@ import { login } from './login';
 import { logout } from './logout';
 import { me } from './me';
 import { refreshToken } from './refreshToken';
-import { register } from './register';
+import { listAdmins, register } from './register';
 import { requestNewConfirmationCode } from './requestNewConfirmationCode';
 import { requestPasswordReset } from './requestPasswordReset';
 import { resetPassword } from './resetPassword';
@@ -17,6 +17,7 @@ export {
   me,
   refreshToken,
   register,
+  listAdmins,
   requestNewConfirmationCode,
   requestPasswordReset,
   resetPassword,

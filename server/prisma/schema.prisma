@@ -1,24 +1,23 @@
 // Prisma schema for authentication system
 
 generator client {
-    provider = "prisma-client-js"
-    previewFeatures = ["prismaSchemaFolder"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
 }
 
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
-    //shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  //shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
-
 
 //////////////////////
 // ENUMS
 //////////////////////
 
 enum BookingStatus {
-    PENDING // في الطابور
-    IN_PROGRESS // جاري
-    DONE // انتهى
-    CANCELLED
+  PENDING // في الطابور
+  IN_PROGRESS // جاري
+  DONE // انتهى
+  CANCELLED
 }

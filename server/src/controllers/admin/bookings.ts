@@ -4,7 +4,17 @@ import { addMinutes, format, isBefore, startOfDay, set } from 'date-fns';
 
 export const list = async (req: Request, res: Response) => {
     try {
+        const adminId = (req as any).user?.id as string | undefined;
+        if (!adminId) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+
         const bookings = await prisma.booking.findMany({
+            where: {
+                service: {
+                    userId: adminId,
+                },
+            },
             include: {
                 user: {
                     select: {
@@ -40,6 +50,11 @@ export const list = async (req: Request, res: Response) => {
 
 export const updateStatus = async (req: Request, res: Response) => {
     try {
+        const adminId = (req as any).user?.id as string | undefined;
+        if (!adminId) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+
         const { id } = req.params;
         const { status, estimatedAt } = req.body;
 
@@ -63,8 +78,21 @@ export const updateStatus = async (req: Request, res: Response) => {
             data.estimatedAt = new Date(estimatedAt);
         }
 
+        const targetBooking = await prisma.booking.findFirst({
+            where: {
+                id,
+                service: {
+                    userId: adminId,
+                },
+            },
+            select: { id: true },
+        });
+        if (!targetBooking) {
+            return res.status(404).json({ success: false, error: 'Booking not found' });
+        }
+
         const booking = await prisma.booking.update({
-            where: { id },
+            where: { id: targetBooking.id },
             data,
             include: {
                 user: true,
@@ -121,6 +149,11 @@ export const updateStatus = async (req: Request, res: Response) => {
 
 export const createWalkIn = async (req: Request, res: Response) => {
     try {
+        const adminId = (req as any).user?.id as string | undefined;
+        if (!adminId) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+
         const { serviceId, guestName, guestPhone } = req.body;
 
         if (!serviceId || !guestName) {
@@ -134,6 +167,9 @@ export const createWalkIn = async (req: Request, res: Response) => {
 
         if (!service) {
             return res.status(404).json({ success: false, error: 'Service not found' });
+        }
+        if (service.userId !== adminId) {
+            return res.status(403).json({ success: false, error: 'Forbidden' });
         }
 
         // 2. Fetch Shop Working Hours
@@ -231,10 +267,20 @@ export const createWalkIn = async (req: Request, res: Response) => {
 
 export const notifyUser = async (req: Request, res: Response) => {
     try {
+        const adminId = (req as any).user?.id as string | undefined;
+        if (!adminId) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+
         const { id } = req.params;
 
-        const booking = await prisma.booking.findUnique({
-            where: { id },
+        const booking = await prisma.booking.findFirst({
+            where: {
+                id,
+                service: {
+                    userId: adminId,
+                },
+            },
             include: {
                 user: true,
                 service: true

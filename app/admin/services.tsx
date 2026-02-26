@@ -14,11 +14,9 @@ import {
   RefreshControl,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import axios from "axios";
-import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import api, { services as servicesApi } from "@/lib/api";
+import { services as servicesApi } from "@/lib/api";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -69,7 +67,6 @@ type ServiceFormData = yup.InferType<typeof serviceSchema>;
 
 export default function AdminServices() {
   const { t } = useTranslation();
-  const { token } = useAuthStore();
   const [services, setServices] = useState<Service[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -99,17 +96,15 @@ export default function AdminServices() {
 
   const isVip = watch("isVip");
 
-  const SERVER_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000";
-
   useEffect(() => {
     fetchServices();
   }, []);
 
   const fetchServices = async () => {
     try {
-      const res = await axios.get(`${SERVER_URL}/services`);
-      if (res.data?.data) {
-        setServices(res.data.data);
+      const res = await servicesApi.getAll();
+      if (res?.data) {
+        setServices(res.data);
       }
     } catch (e) {
       console.error("Failed to fetch services", e);
@@ -134,9 +129,7 @@ export default function AdminServices() {
           style: "destructive",
           onPress: async () => {
             try {
-              await axios.delete(`${SERVER_URL}/services/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              });
+              await servicesApi.delete(id);
               fetchServices();
             } catch (e) {
               Alert.alert(t("common.error"), t("admin.services.deleteError"));

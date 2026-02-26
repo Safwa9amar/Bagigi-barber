@@ -1,33 +1,37 @@
 model User {
-    id                      String    @id @default(uuid())
-    email                   String    @unique
-    password                String
-    name                    String?
-    phone                   String    @unique
-    role                    Role      @default(USER)
-    verified                Boolean   @default(false)
-    confirmationCode        String?
-    confirmationCodeExpires DateTime?
-    emailConfirmed          Boolean   @default(false)
-    resetToken              String?   @unique
-    resetTokenExp           DateTime?
-    pushToken               String?
+  id                      String    @id @default(uuid())
+  adminId                 String?
+  admin                   Admin?    @relation("AdminUsers", fields: [adminId], references: [id])
+  email                   String    @unique
+  password                String
+  name                    String?
+  phone                   String    @unique
+  role                    Role      @default(USER)
+  verified                Boolean   @default(false)
+  confirmationCode        String?
+  confirmationCodeExpires DateTime?
+  emailConfirmed          Boolean   @default(false)
+  resetToken              String?   @unique
+  resetTokenExp           DateTime?
+  pushToken               String?
 
-    bookings Booking[]
-    services Service[]
-    workDays WorkingDay[]
-    reviews  Review[]
-    subscriptions Subscription[]
-    paymentReceipts PaymentReceipt[]
+  bookings        Booking[]
+  services        Service[]
+  files           File[]
+  workDays        WorkingDay[]
+  reviews         Review[]
+  subscriptions   Subscription[]
+  paymentReceipts PaymentReceipt[]
 
-    sentMessages     Message[] @relation("SentMessages")
-    receivedMessages Message[] @relation("ReceivedMessages")
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  adminProfile     Admin?    @relation("AdminOwner")
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
-    USER
-    ADMIN
+  USER
+  ADMIN
 }

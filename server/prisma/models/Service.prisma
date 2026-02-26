@@ -3,22 +3,22 @@
 //////////////////////
 
 model Service {
-    id          String  @id @default(uuid())
-    name        String
-    category    String
-    duration    Int // بالدقائق (مهم جدًا)
-    priceFrom   Int
-    priceTo     Int?
-    isVip       Boolean @default(false)
-    description String?
-    userId      String
-    is_vip      Boolean @default(false)
-    image       String?
-    user        User    @relation(fields: [userId], references: [id])
+  id          String  @id @default(uuid())
+  name        String
+  category    String
+  duration    Int // بالدقائق (مهم جدًا)
+  priceFrom   Int
+  priceTo     Int?
+  isVip       Boolean @default(false)
+  description String?
+  userId      String
+  is_vip      Boolean @default(false)
+  image       String?
+  user        User    @relation(fields: [userId], references: [id])
 
-    bookings      Booking[]
-    reviews       Review[]
+  bookings Booking[]
+  reviews  Review[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

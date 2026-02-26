@@ -32,10 +32,11 @@ import InputField from "@/components/ui/InputField";
 export default function Login() {
   const { login, isLoading } = useAuthStore();
   const scheme = useColorScheme();
-  const { email }: { email: string } = useGlobalSearchParams();
+  const { email, shopCode }: { email: string; shopCode?: string } = useGlobalSearchParams();
   const { t } = useTranslation();
 
   const loginSchema = object({
+    shopCode: string().required("Shop code is required"),
     email: string().email(t("invalid_email")).required(t("required_email")),
     password: string().min(6, t("min_password")).required(t("required_password")),
     resetToken: string().required(t("required_reset_token")),
@@ -54,6 +55,7 @@ export default function Login() {
     resolver: yupResolver(loginSchema),
     values: {
       email: email || "",
+      shopCode: shopCode || "",
       apiError: "",
       password: "",
       confirmPassword: "",
@@ -66,7 +68,8 @@ export default function Login() {
       let { token, user } = await auth.resetPassword(
         data.email,
         data.password,
-        data.resetToken
+        data.resetToken,
+        data.shopCode
       );
       login(user, token);
     } catch (error: any) {
@@ -103,6 +106,20 @@ export default function Login() {
           />
         ) : (
           <>
+            <Controller
+              control={control}
+              name="shopCode"
+              render={({ field }) => (
+                <InputField
+                  {...field}
+                  icon="business-outline"
+                  placeholder={"Shop code (example: bagigi-barber)"}
+                  autoCapitalize="none"
+                  error={errors.shopCode?.message}
+                />
+              )}
+            />
+
             {/* Email */}
             <Controller
               control={control}
@@ -175,7 +192,7 @@ export default function Login() {
             </Button>
           </>
         )}
-        <Link href="/(auth)" asChild>
+        <Link href="/(auth)/login" asChild>
           <TouchableOpacity className="mt-4 self-center">
             <Text className="text-secondary-500">{t("back_to_login")}</Text>
           </TouchableOpacity>

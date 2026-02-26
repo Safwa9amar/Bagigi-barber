@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   register,
+  listAdmins,
   login,
   logout,
   me,
@@ -20,6 +21,7 @@ import { upload } from '@/config/multer';
 const router = Router();
 
 router.post('/register', register);
+router.get('/admins', listAdmins);
 router.post('/login', login);
 router.post('/logout', authenticateJWT, logout);
 router.post('/verify-confirmation-code', verifyConfirmationCode);

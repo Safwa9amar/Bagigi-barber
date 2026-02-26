@@ -32,7 +32,7 @@ import InputField from "@/components/ui/InputField";
 export default function Login() {
   const { user, login, isLoading } = useAuthStore();
   const scheme = useColorScheme();
-  const { email }: { email: string } = useGlobalSearchParams();
+  const { email, shopCode }: { email: string; shopCode?: string } = useGlobalSearchParams();
   const [resending, setResending] = useState(false);
   const router = useRouter();
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ export default function Login() {
 
     console.log("LOGIN DATA:", data, isSubmitting);
     try {
-      let { token, user } = await auth.verifyConfirmationCode(email, data.code);
+      let { token, user } = await auth.verifyConfirmationCode(email, data.code, shopCode);
       login(user, token);
 
     } catch (error: any) {
@@ -69,7 +69,7 @@ export default function Login() {
 
     setResending(true);
     try {
-      let response = await auth.requestNewConfirmationCode(email);
+      let response = await auth.requestNewConfirmationCode(email, shopCode);
       console.log("RESEND CODE RESPONSE:", response);
     } catch (error: any) {
       console.error(error.response.data.error || error);
