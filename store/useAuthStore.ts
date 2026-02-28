@@ -7,9 +7,16 @@ import axios from "axios";
 export interface User {
   id: string;
   shopId?: string;
+  adminId?: string;
+  shopCode?: string;
+  adminCode?: string;
+  shopName?: string;
   name?: string;
   email: string;
   phone?: string;
+  logo?: string;
+  barberLogo?: string;
+  barberLogoUri?: string;
   role: UserRole;
 }
 export type UserRole = "ADMIN" | "USER" | "GUEST";
@@ -61,11 +68,7 @@ export const useAuthStore = create<AuthState>()(
         }),
 
       logout: async () => {
-        try {
-          await auth.logout();
-        } catch (error) {
-          console.warn("Logout request failed:", error);
-        }
+        const hadToken = !!get().token;
         set({
           user: null,
           token: null,
@@ -73,6 +76,17 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
         });
+
+        if (!hadToken) return;
+
+        try {
+          await auth.logout();
+        } catch (error: any) {
+          const status = error?.response?.status;
+          if (status !== 401 && status !== 404) {
+            console.warn("Logout request failed:", error);
+          }
+        }
       },
 
       checkAuth: async () => {

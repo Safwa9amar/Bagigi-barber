@@ -7,6 +7,7 @@ import {
   BookCheck,
   BookIcon,
   HomeIcon,
+  MapPinned,
   MessagesSquare,
   User2,
 } from "lucide-react-native";
@@ -57,7 +58,7 @@ const CustomerLayout = () => {
               <Icon as={MessagesSquare} size="xl" color={color} />
             ),
             tabBarBadge: unreadCount > 0 ? unreadCount : undefined,
-            tabBarBadgeStyle: { backgroundColor: '#EF4444' }
+            tabBarBadgeStyle: { backgroundColor: "#EF4444" },
           }}
         />
         <Tabs.Screen
@@ -69,46 +70,19 @@ const CustomerLayout = () => {
             ),
           }}
         />
+        <Tabs.Screen name="nearby" options={{ href: null }} />
+        <Tabs.Screen name="settings/personal-info" options={{ href: null }} />
+        <Tabs.Screen name="settings/notifications" options={{ href: null }} />
+        <Tabs.Screen name="settings/security" options={{ href: null }} />
+        <Tabs.Screen name="settings/language" options={{ href: null }} />
+        <Tabs.Screen name="support/help-center" options={{ href: null }} />
+        <Tabs.Screen name="support/terms" options={{ href: null }} />
+        <Tabs.Screen name="support/privacy" options={{ href: null }} />
 
-        <Tabs.Screen
-          name="settings/personal-info"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
-          name="settings/notifications"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
-          name="settings/security"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
-          name="settings/language"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
-          name="support/help-center"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
-          name="support/terms"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
-          name="support/privacy"
-          options={{ href: null }}
-        />
-
-        <Tabs.Screen
-          name="settings/appearance"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
-          name="support/developer"
-          options={{ href: null }}
-        />
+        <Tabs.Screen name="settings/appearance" options={{ href: null }} />
+        <Tabs.Screen name="support/developer" options={{ href: null }} />
       </Tabs>
-    </View >
+    </View>
   );
 };
 

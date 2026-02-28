@@ -236,11 +236,11 @@ export function TrialGuard({ children }: TrialGuardProps) {
                         {t("trial.bank_info")}
                       </Text>
                       <Text className="text-base font-black text-[#1A1A1A] dark:text-white">
-                        0012345678 90
+                        0022801506 88
                       </Text>
                     </View>
                     <TouchableOpacity
-                      onPress={() => copyToClipboard("0012345678 90")}
+                      onPress={() => copyToClipboard("0022801506 88")}
                       className="p-2"
                     >
                       <Copy size={18} color="#94A3B8" />

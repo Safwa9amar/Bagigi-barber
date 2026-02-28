@@ -127,6 +127,7 @@
     "tabs": {
         "home": "Home",
         "bookings": "Bookings",
+        "nearby": "Nearby",
         "messages": "Messages",
         "profile": "Profile",
         "dashboard": "Dashboard",

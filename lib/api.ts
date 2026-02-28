@@ -4,12 +4,13 @@ import * as SecureStore from "expo-secure-store";
 
 let getAccessToken: () => string | null = () => null;
 let setAccessToken: (token: string) => void = () => { };
-let logoutUser: () => void = () => { };
+let logoutUser: () => void | Promise<void> = () => { };
+let isHandlingAuthFailure = false;
 
 export const setupAxiosAuth = (
   getToken: () => string | null,
   setToken: (token: string) => void,
-  logout: () => void
+  logout: () => void | Promise<void>
 ) => {
   getAccessToken = getToken;
   setAccessToken = setToken;
@@ -46,14 +47,28 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const requestUrl = String(originalRequest?.url || "");
+    const isLogoutRequest = requestUrl.includes("/auth/logout");
+    const isRefreshRequest = requestUrl.includes("/auth/refresh-token");
     const isInactiveShop =
       error.response?.status === 403 &&
       typeof error.response?.data?.error === "string" &&
       error.response.data.error.toLowerCase().includes("shop is inactive");
 
     if (isInactiveShop) {
-      logoutUser();
-      await SecureStore.deleteItemAsync("refreshToken");
+      if (!isHandlingAuthFailure) {
+        isHandlingAuthFailure = true;
+        try {
+          await SecureStore.deleteItemAsync("refreshToken");
+          await logoutUser();
+        } finally {
+          isHandlingAuthFailure = false;
+        }
+      }
+      return Promise.reject(error);
+    }
+
+    if (error.response?.status === 401 && (isLogoutRequest || isRefreshRequest)) {
       return Promise.reject(error);
     }
 
@@ -63,7 +78,6 @@ api.interceptors.response.use(
       try {
         // ✅ Get refresh token from SecureStore
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
-        console.log("refrech token :", refreshToken);
 
         if (!refreshToken) throw new Error("No refresh token found");
 
@@ -89,8 +103,15 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         // Refresh failed → logout via injected function
-        logoutUser();
-        await SecureStore.deleteItemAsync("refreshToken");
+        if (!isHandlingAuthFailure) {
+          isHandlingAuthFailure = true;
+          try {
+            await SecureStore.deleteItemAsync("refreshToken");
+            await logoutUser();
+          } finally {
+            isHandlingAuthFailure = false;
+          }
+        }
       }
     }
 

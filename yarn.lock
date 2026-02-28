@@ -5055,6 +5055,11 @@ expo-localization@^17.0.8:
   dependencies:
     rtl-detect "^1.0.2"
 
+expo-location@~19.0.8:
+  version "19.0.8"
+  resolved "https://registry.npmjs.org/expo-location/-/expo-location-19.0.8.tgz"
+  integrity sha512-H/FI75VuJ1coodJbbMu82pf+Zjess8X8Xkiv9Bv58ZgPKS/2ztjC1YO1/XMcGz7+s9DrbLuMIw22dFuP4HqneA==
+
 expo-manifests@~1.0.10:
   version "1.0.10"
   resolved "https://registry.npmjs.org/expo-manifests/-/expo-manifests-1.0.10.tgz"
@@ -5062,6 +5067,11 @@ expo-manifests@~1.0.10:
   dependencies:
     "@expo/config" "~12.0.11"
     expo-json-utils "~0.15.0"
+
+expo-maps@~0.12.10:
+  version "0.12.10"
+  resolved "https://registry.npmjs.org/expo-maps/-/expo-maps-0.12.10.tgz"
+  integrity sha512-GmfWoUqhV7MIj6vYiK/JoH9jaVHB3ktJprDLIL/5WhDbR7lxJLLMzH7dGjaUJx+gyMaBnzRRGzF0WJbY+1RYOw==
 
 expo-modules-autolinking@3.0.23:
   version "3.0.23"

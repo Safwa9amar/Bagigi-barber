@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '@/lib/prisma';
 import { addMinutes, format, isBefore, max, parse, startOfDay, set } from 'date-fns';
 import { socketIo } from '@/socket';
+import { ensureBarberHasAccess, BarberAccessDeniedError } from '@/lib/barber-access';
 
 export async function create(req: Request, res: Response) {
   try {
@@ -57,6 +58,8 @@ export async function create(req: Request, res: Response) {
     // Find a provider/admin. For now, we assume single-provider or we pick the service owner.
     // The service has a userId (the provider).
     const providerId = service.userId;
+
+    await ensureBarberHasAccess(providerId);
 
     const workingDay = await prisma.workingDay.findFirst({
       where: {
@@ -175,6 +178,14 @@ export async function create(req: Request, res: Response) {
     });
 
   } catch (e) {
+    if (e instanceof BarberAccessDeniedError) {
+      return res.status(403).json({
+        error: 'barber.accessBlocked',
+        reason: e.reason ?? 'TRIAL_ENDED',
+        message: e.status.message ?? 'The barber cannot accept bookings at the moment.',
+      });
+    }
+
     console.error('Booking creation error:', e);
     return res.status(500).json({ error: 'Booking failed' });
   }

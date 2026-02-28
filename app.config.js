@@ -39,9 +39,27 @@ export default ({ config }) => {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff",
       },
+      config: {
+        googleMaps: {
+          apiKey: "AIzaSyBuow9_V5FmYxuktNAuFck4He1QITN_Ft4",
+        },
+      },
       edgeToEdgeEnabled: true,
       package: "com.astro0666.bagigibarber",
       googleServicesFile: "./google-services.json",
+      applicationId: "com.astro0666.bagigibarber",
+      manifest: {
+        ...(config?.android?.manifest || {}),
+        application: {
+          ...(config?.android?.manifest?.application || {}),
+          "meta-data": [
+            {
+              name: "com.google.android.geo.API_KEY",
+              value: process.env.GOOGLE_MAPS_API_KEY,
+            },
+          ],
+        },
+      },
     },
     web: {
       bundler: "metro",
@@ -53,6 +71,7 @@ export default ({ config }) => {
       "expo-web-browser",
       "expo-font",
       "expo-notifications",
+      "expo-maps",
       [
         "expo-splash-screen",
         {

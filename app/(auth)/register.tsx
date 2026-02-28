@@ -117,7 +117,13 @@ export default function Login() {
       );
       console.log("REGISTER RESPONSE:", response);
 
-      router.push(`/(auth)/confirm_code?email=${data.email}`);
+      router.push({
+        pathname: "/(auth)/confirm_code",
+        params: {
+          email: data.email,
+          shopCode: selectedAdminCode,
+        },
+      });
     } catch (error: any) {
       setError("apiError", {
         type: "manual",
@@ -143,10 +149,7 @@ export default function Login() {
       >
         {/* Branding */}
         <Box className="items-center mb-10">
-          <Image
-            source={logoSource}
-            className="w-44 h-44"
-          />
+          <Image source={logoSource} className="w-44 h-44" />
           <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">
             {brandDisplayName}
           </Text>
@@ -171,16 +174,6 @@ export default function Login() {
             ) : null}
 
             {/* Email */}
-            <InputField
-              icon="person-outline"
-              value={
-                loadingBarber
-                  ? "Loading barber..."
-                  : barberName || "Unknown barber"
-              }
-              editable={false}
-              placeholder="Barber"
-            />
 
             {/* Email */}
             <Controller

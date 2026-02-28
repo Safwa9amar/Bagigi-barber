@@ -3,8 +3,6 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
-  TextInput,
   TouchableOpacity,
   useColorScheme,
 } from "react-native";
@@ -13,29 +11,67 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useTranslation } from "react-i18next";
-import {
-  Link,
-  useFocusEffect,
-  useGlobalSearchParams,
-  useRouter,
-} from "expo-router";
-import { useCallback, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { Controller, set, useForm } from "react-hook-form";
-import { object, string, ref } from "yup";
+import { Link, useGlobalSearchParams } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { object, string } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import api, { auth } from "@/lib/api";
+import { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-
+const resolveLogoUri = (value?: string | null) => {
+  if (!value) return null;
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  return `${process.env.EXPO_PUBLIC_API_URL}${value}`;
+};
 
 export default function Login() {
-  const { user, login, isLoading } = useAuthStore();
+  const { login, isLoading } = useAuthStore();
   const scheme = useColorScheme();
-  const { email, shopCode }: { email: string; shopCode?: string } = useGlobalSearchParams();
+  const { email, shopCode, adminCode } = useGlobalSearchParams<{
+    email: string;
+    shopCode?: string;
+    adminCode?: string;
+  }>();
   const [resending, setResending] = useState(false);
-  const router = useRouter();
+  const [barberName, setBarberName] = useState("");
+  const [barberLogo, setBarberLogo] = useState<string | null>(null);
   const { t } = useTranslation();
+  const selectedAdminCode = useMemo(() => {
+    const raw = typeof adminCode === "string" ? adminCode : shopCode;
+    return typeof raw === "string" ? raw.trim().toUpperCase() : "";
+  }, [adminCode, shopCode]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchBarber = async () => {
+      if (!selectedAdminCode.startsWith("ADM")) {
+        setBarberName("");
+        setBarberLogo(null);
+        return;
+      }
+
+      try {
+        const res = await auth.getAdmins();
+        const matched = res?.data?.find(
+          (admin) => admin.code.toUpperCase() === selectedAdminCode,
+        );
+        if (!mounted) return;
+        setBarberName(matched?.name || "");
+        setBarberLogo(matched?.logo || matched?.barberLogoUri || null);
+      } catch (error) {
+        if (!mounted) return;
+        setBarberName("");
+        setBarberLogo(null);
+      }
+    };
+
+    fetchBarber();
+    return () => {
+      mounted = false;
+    };
+  }, [selectedAdminCode]);
 
   const loginSchema = object({
     code: string().required(t("required_code")),
@@ -50,7 +86,7 @@ export default function Login() {
 
   const onSubmit = async (data: any) => {
 
-    console.log("LOGIN DATA:", data, isSubmitting);
+      console.log("LOGIN DATA:", data, isSubmitting);
     try {
       let { token, user } = await auth.verifyConfirmationCode(email, data.code, shopCode);
       login(user, token);
@@ -78,6 +114,15 @@ export default function Login() {
     }
   };
 
+  const brandDisplayName = barberName || t("brand_name");
+  const brandTagline = barberName
+    ? `Book your haircut with ${barberName}`
+    : t("brand_tagline");
+  const resolvedLogoUri = resolveLogoUri(barberLogo);
+  const logoSource = resolvedLogoUri
+    ? { uri: resolvedLogoUri }
+    : require("@/assets/images/logo.png");
+
   return (
     <Box className="flex-1 justify-center px-6 bg-background-light dark:bg-background-dark">
       <KeyboardAvoidingView
@@ -85,13 +130,12 @@ export default function Login() {
       >
         {/* Branding */}
         <Box className="items-center mb-10">
-          <Image
-            source={require("@/assets/images/logo.png")}
-            className="w-44 h-44"
-          />
-          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">{t("brand_name")}</Text>
+          <Image source={logoSource} className="w-44 h-44" />
+          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">
+            {brandDisplayName}
+          </Text>
           <Text className="text-typography-500 dark:text-typography-50 text-center mt-1">
-            {t("brand_tagline")}
+            {brandTagline}
           </Text>
         </Box>
 

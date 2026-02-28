@@ -16,6 +16,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import { services as servicesApi, booking } from "@/lib/api";
+import {
+  fetchBarberAccessStatus,
+  getBarberAccessBlockedMessage,
+  BarberAccessResponse,
+} from "@/lib/barber-access";
 import { Calendar } from "react-native-calendars";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -64,6 +69,8 @@ export default function BookServiceScreen() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState("");
+  const [barberAccessStatus, setBarberAccessStatus] = useState<BarberAccessResponse | null>(null);
+  const [accessLoading, setAccessLoading] = useState(true);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -89,6 +96,27 @@ export default function BookServiceScreen() {
   }, [params.id]);
 
   const today = new Date().toISOString().split("T")[0];
+  const bookingBlockedMessage = getBarberAccessBlockedMessage(barberAccessStatus);
+  const bookingButtonDisabled =
+    accessLoading || !selectedDate || !estimation || bookingLoading || !!bookingBlockedMessage;
+
+  useEffect(() => {
+    let mounted = true;
+    const loadAccessStatus = async () => {
+      try {
+        const status = await fetchBarberAccessStatus();
+        if (mounted) setBarberAccessStatus(status);
+      } catch (error) {
+        console.error("Failed to load barber access status:", error);
+      } finally {
+        if (mounted) setAccessLoading(false);
+      }
+    };
+    loadAccessStatus();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Fetch estimate when date changes
   useEffect(() => {
@@ -120,6 +148,10 @@ export default function BookServiceScreen() {
   const handleBooking = async () => {
     if (!selectedDate) {
       Alert.alert(t("serviceDetails.selectDate"), t("serviceDetails.selectDateAlert"));
+      return;
+    }
+    if (bookingBlockedMessage) {
+      Alert.alert(t("common.error"), bookingBlockedMessage);
       return;
     }
     try {
@@ -480,10 +512,18 @@ export default function BookServiceScreen() {
             <Text style={styles.totalPrice} className="text-typography-900 dark:text-typography-white">
               {service.price_from ? service.price_from + ' ' + t("common.currency") : t("common.na")}
             </Text>
+            {bookingBlockedMessage && (
+              <Text
+                style={styles.blockedMessage}
+                className="text-[10px] text-red-600 mt-1"
+              >
+                {bookingBlockedMessage}
+              </Text>
+            )}
           </View>
           <TouchableOpacity
-            style={[styles.bookBtn, (!selectedDate || !estimation || bookingLoading) && { opacity: 0.6 }]}
-            disabled={!selectedDate || !estimation || bookingLoading}
+            style={[styles.bookBtn, bookingButtonDisabled && { opacity: 0.6 }]}
+            disabled={bookingButtonDisabled}
             onPress={handleBooking}
           >
             {bookingLoading ? (
@@ -626,5 +666,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 20,
     borderRadius: 15,
+  },
+  blockedMessage: {
+    fontSize: 10,
+    marginTop: 4,
+    color: "#DC2626",
+    maxWidth: 220,
   },
 });

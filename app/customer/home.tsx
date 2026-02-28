@@ -8,16 +8,20 @@ import {
   useColorScheme,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Box } from "@/components/ui/box";
-import api from "@/lib/api";
+import api, { auth } from "@/lib/api";
 import ServiceCard from "@/components/ui/ServiceCard";
-import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
+
+const resolveLogoUri = (value?: string | null) => {
+  if (!value) return null;
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  return `${process.env.EXPO_PUBLIC_API_URL}${value}`;
+};
 
 const HomeScreen = () => {
   const router = useRouter();
@@ -31,6 +35,8 @@ const HomeScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [barberName, setBarberName] = useState("");
+  const [barberLogo, setBarberLogo] = useState<string | null>(null);
 
   const categories = Array.from(
     new Set(services?.map((service) => service.category))
@@ -55,6 +61,63 @@ const HomeScreen = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadBarberBranding = async () => {
+      if (!user) {
+        setBarberName("");
+        setBarberLogo(null);
+        return;
+      }
+
+      try {
+        const response = await auth.getAdmins();
+        const admins = response?.data ?? [];
+
+        const normalizedShopId = user.shopId?.trim();
+        const normalizedAdminId = user.adminId?.trim();
+        const normalizedShopCode = user.shopCode?.trim().toUpperCase();
+        const normalizedAdminCode = user.adminCode?.trim().toUpperCase();
+
+        const matched = admins.find(
+          (admin: { id: string; code: string }) =>
+            (normalizedShopId && admin.id === normalizedShopId) ||
+            (normalizedAdminId && admin.id === normalizedAdminId) ||
+            (normalizedShopCode && admin.code.toUpperCase() === normalizedShopCode) ||
+            (normalizedAdminCode && admin.code.toUpperCase() === normalizedAdminCode),
+        );
+
+        const fallback = admins.length === 1 ? admins[0] : null;
+        const selected = matched || fallback;
+
+        if (!mounted) return;
+        setBarberName(selected?.name || "");
+        setBarberLogo(selected?.logo || selected?.barberLogoUri || null);
+      } catch (error) {
+        if (!mounted) return;
+        setBarberName("");
+        setBarberLogo(null);
+      }
+    };
+
+    loadBarberBranding();
+
+    return () => {
+      mounted = false;
+    };
+  }, [user]);
+
+  const resolvedLogoUri = resolveLogoUri(
+    barberLogo || user?.logo || user?.barberLogoUri || user?.barberLogo || null,
+  );
+  const logoSource = resolvedLogoUri
+    ? { uri: resolvedLogoUri }
+    : require("@/assets/images/logo.png");
+  const brandDisplayName = barberName || user?.shopName || t("brand_name");
+  const userDisplayName =
+    user?.name?.trim() || user?.email?.split("@")[0] || "Guest";
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -121,12 +184,12 @@ const HomeScreen = () => {
       <View className="flex-row justify-between items-center mb-8">
         <View className="flex-row items-center gap-3">
           <Image
-            source={require("@/assets/images/logo.png")}
+            source={logoSource}
             className="w-10 h-10 rounded-full"
             resizeMode="cover"
           />
           <Text className="text-lg font-black uppercase tracking-widest text-[#1A1A1A] dark:text-white">
-            {t("brand_name")}
+            {brandDisplayName}
           </Text>
         </View>
         <View className="flex-row gap-4">
@@ -145,7 +208,7 @@ const HomeScreen = () => {
           {t("home.welcome")},
         </Text>
         <Text className="text-3xl font-black text-[#1A1A1A] dark:text-white mb-2">
-          {user?.name?.split(" ")[0]} 👋
+          {userDisplayName} 👋
         </Text>
         <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest">
           {todayDate}
