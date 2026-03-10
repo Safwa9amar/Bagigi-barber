@@ -19,28 +19,47 @@
                 <img src="assets/logo.jpg" alt="Houari Bagigi Logo" class="logo-img">
                 <div class="logo-text">Houari BÂgîGî</div>
             </div>
-            <nav>
-                <a href="tel:0558109815" class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;">
-                    <i class="fas fa-phone"></i> 0558 10 98 15
-                </a>
-            </nav>
+            <div class="header-actions">
+                <nav class="primary-nav">
+                    <a href="index.html"><span data-i18n-key="navHome">Home</span></a>
+                    <a href="#features"><span data-i18n-key="navServices">Services</span></a>
+                    <a href="#download"><span data-i18n-key="navApp">App</span></a>
+                    <a href="contact.html"><span data-i18n-key="navContact">Contact</span></a>
+                </nav>
+                <div class="header-controls">
+                    <div class="lang-switcher" data-lang-switcher>
+                        <button type="button" data-lang="ar" class="active">AR</button>
+                        <button type="button" data-lang="en">EN</button>
+                    </div>
+                    <a href="tel:0558109815" class="btn btn-secondary phone-btn">
+                        <i class="fas fa-phone"></i> 0558 10 98 15
+                    </a>
+                </div>
+            </div>
         </header>
     </div>
 
     <section class="hero">
         <div class="container">
             <div class="hero-content">
-                <span class="badge">أفضل حلاق في العالم - غليزان</span>
-                <h1>حلاقة دقيقة <span>في قلب غليزان</span></h1>
-                <p>مرحباً بكم في صالون حلاقة هواري باجيجي الجديد. نقدم لكم أرقى خدمات الحلاقة، تنظيف البشرة، والعناية
-                    الكاملة بالرجل العصري.</p>
+                <span class="badge" data-i18n-key="heroBadge">أفضل حلاق في العالم - غليزان</span>
+                <h1>
+                    <span data-i18n-key="heroTitleLine1">حلاقة دقيقة</span>
+                    <span class="highlight" data-i18n-key="heroTitleLine2">في قلب غليزان</span>
+                </h1>
+                <p data-i18n-key="heroParagraph">
+                    مرحباً بكم في صالون حلاقة هواري باجيجي الجديد. نقدم لكم أرقى خدمات الحلاقة، تنظيف البشرة، والعناية
+                    الكاملة بالرجل العصري.
+                </p>
                 <div class="btn-group">
                     <a href="https://drive.google.com/drive/folders/1PVhhKypiyP7hF4yfRvqcsbmjFMIfvrFJ?usp=sharing"
                         target="_blank" class="btn btn-primary">
-                        <i class="fab fa-google-drive"></i> تحميل التطبيق (APK)
+                        <i class="fab fa-google-drive"></i>
+                        <span data-i18n-key="downloadButton">تحميل التطبيق (APK)</span>
                     </a>
                     <a href="https://www.instagram.com/bagigihouari/" target="_blank" class="btn btn-secondary">
-                        <i class="fab fa-instagram"></i> تابعنا على إنستغرام
+                        <i class="fab fa-instagram"></i>
+                        <span data-i18n-key="followButton">تابعنا على إنستغرام</span>
                     </a>
                 </div>
             </div>
@@ -50,30 +69,30 @@
     <section id="features" class="features">
         <div class="container">
             <div class="section-header">
-                <h2>خدمات صالون هواري باجيجي</h2>
-                <p style="color: var(--text-muted);">نتميز بالجودة والاحترافية في كل لمسة.</p>
+                <h2 data-i18n-key="featuresHeading">خدمات صالون هواري باجيجي</h2>
+                <p data-i18n-key="featuresSubHeading" style="color: var(--text-muted);">نتميز بالجودة والاحترافية في كل لمسة.</p>
             </div>
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="icon-box">
                         <i class="fas fa-cut"></i>
                     </div>
-                    <h3>حلاقة توقيع</h3>
-                    <p>قصات عصرية وكلاسيكية تناسب شخصيتك، بأيدي أفضل الحلاقين في المنطقة.</p>
+                    <h3 data-i18n-key="feature1Title">حلاقة توقيع</h3>
+                    <p data-i18n-key="feature1Description">قصات عصرية وكلاسيكية تناسب شخصيتك، بأيدي أفضل الحلاقين في المنطقة.</p>
                 </div>
                 <div class="feature-card">
                     <div class="icon-box">
                         <i class="fas fa-spa"></i>
                     </div>
-                    <h3>تنظيف البشرة</h3>
-                    <p>خدمات متخصصة للعناية بالوجه وتنظيف البشرة باستخدام أحدث التقنيات والمواد.</p>
+                    <h3 data-i18n-key="feature2Title">تنظيف البشرة</h3>
+                    <p data-i18n-key="feature2Description">خدمات متخصصة للعناية بالوجه وتنظيف البشرة باستخدام أحدث التقنيات والمواد.</p>
                 </div>
                 <div class="feature-card">
                     <div class="icon-box">
                         <i class="fas fa-magic"></i>
                     </div>
-                    <h3>خدمات Handmade</h3>
-                    <p>عناية دقيقة وتفاصيل يدوية تجعل من زيارتك تجربة فريدة لا تُنسى.</p>
+                    <h3 data-i18n-key="feature3Title">خدمات Handmade</h3>
+                    <p data-i18n-key="feature3Description">عناية دقيقة وتفاصيل يدوية تجعل من زيارتك تجربة فريدة لا تُنسى.</p>
                 </div>
             </div>
         </div>
@@ -82,21 +101,53 @@
     <section id="download" class="preview">
         <div class="container">
             <div class="section-header">
-                <h2>احجز موعدك عبر التطبيق</h2>
-                <p style="color: var(--text-muted); margin-bottom: 32px;">لقد افتتحنا محلنا الجديد بجانب القديم، والآن
+                <h2 data-i18n-key="previewHeading">احجز موعدك عبر التطبيق</h2>
+                <p data-i18n-key="previewSubtext" style="color: var(--text-muted); margin-bottom: 32px;">لقد افتتحنا محلنا الجديد بجانب القديم، والآن
                     يمكنك الحجز بسهولة.</p>
             </div>
 
             <div class="mockup-container">
                 <img src="app_mockup_preview.png" alt="تطبيق باجيجي" class="mockup-image">
                 <div style="padding: 40px;">
-                    <h3 style="margin-bottom: 16px;">تحميل تطبيق باجيجي</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 32px;">التطبيق متاح للتحميل عبر جوجل درايف. سهل
+                    <h3 data-i18n-key="previewCardTitle" style="margin-bottom: 16px;">تحميل تطبيق باجيجي</h3>
+                    <p data-i18n-key="previewCardText" style="color: var(--text-muted); margin-bottom: 32px;">التطبيق متاح للتحميل عبر جوجل درايف. سهل
                         حياتك واحجز مكانك في الطابور وأنت في بيتك.</p>
                     <a href="https://drive.google.com/drive/folders/1PVhhKypiyP7hF4yfRvqcsbmjFMIfvrFJ?usp=sharing"
                         target="_blank" class="btn btn-primary" style="padding: 20px 48px; font-size: 18px;">
-                        <i class="fab fa-google-drive"></i> تحميل التطبيق (APK)
+                        <i class="fab fa-google-drive"></i> <span data-i18n-key="previewDownloadButton">تحميل التطبيق (APK)</span>
                     </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact" style="padding-bottom: 80px;">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n-key="contactHeading">Need Help or a Custom Cut?</h2>
+                <p data-i18n-key="contactSubtitle" style="color: var(--text-muted);">Share your vision and we will confirm the perfect slot.</p>
+            </div>
+            <div class="contact-wrapper">
+                <form class="contact-form">
+                    <label>
+                        <span data-i18n-key="contactLabelName">Name</span>
+                        <input type="text" name="name" placeholder="Your full name" data-i18n-placeholder="contactPlaceholderName" required>
+                    </label>
+                    <label>
+                        <span data-i18n-key="contactLabelPhone">Phone or WhatsApp</span>
+                        <input type="tel" name="phone" placeholder="0558 10 98 15" data-i18n-placeholder="contactPlaceholderPhone" required>
+                    </label>
+                    <label>
+                        <span data-i18n-key="contactLabelMessage">Message</span>
+                        <textarea name="message" rows="5" placeholder="Tell us what you'd like—style, timing, preferences" data-i18n-placeholder="contactPlaceholderMessage" required></textarea>
+                    </label>
+                    <button type="submit" class="btn btn-primary" data-i18n-key="contactFormSubmit">Send Request</button>
+                </form>
+                <div class="contact-info-card">
+                    <h3 data-i18n-key="contactInfoTitle">Visit the salon</h3>
+                    <p data-i18n-key="contactInfoLocation">Rue Tanger, غليزان (Relizane)</p>
+                    <p class="contact-kicker" data-i18n-key="contactInfoSchedule">Open daily 9AM–9PM · walk-ins welcome</p>
+                    <a href="#download" class="btn btn-secondary" data-i18n-key="contactInfoAppButton">Download the app</a>
                 </div>
             </div>
         </div>
@@ -104,8 +155,8 @@
 
     <section class="info-section" style="padding: 80px 0; background: var(--surface);">
         <div class="container" style="text-align: center;">
-            <h2 style="margin-bottom: 32px;">تواصل معنا</h2>
-            <p style="font-size: 20px; margin-bottom: 16px;">
+            <h2 style="margin-bottom: 32px;" data-i18n-key="miniContactHeading">تواصل معنا</h2>
+            <p style="font-size: 20px; margin-bottom: 16px;" data-i18n-key="miniContactLocation">
                 <i class="fas fa-map-marker-alt" style="color: var(--secondary);"></i> شارع طنجة، غليزان (Rue Tanger,
                 Relizane)
             </p>
@@ -126,6 +177,14 @@
             <p>&copy; 2026 صالون حلاقة هواري باجيجي. جميع الحقوق محفوظة.</p>
         </div>
     </footer>
+    <script src="lang.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (window.initLanguageSwitcher) {
+                window.initLanguageSwitcher("ar");
+            }
+        });
+    </script>
 </body>
 
 </html>
