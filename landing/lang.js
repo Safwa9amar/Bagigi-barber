@@ -4,6 +4,7 @@ const translations = {
         navServices: "الخدمات",
         navApp: "التطبيق",
         navContact: "اتصل بنا",
+        navPrivacy: "الخصوصية",
         heroBadge: "أفضل حلاق في العالم - غليزان",
         heroTitleLine1: "حلاقة دقيقة",
         heroTitleLine2: "في قلب غليزان",
@@ -43,12 +44,27 @@ const translations = {
         contactPageHeading: "تواصل مع هواري باجيجي",
         contactPageSubtitle: "شارك احتياجك، استفسر عن المواعيد، أو اطلب قصة مخصصة.",
         contactPageDownloadButton: "تحميل التطبيق",
+        privacyHeading: "سياسة الخصوصية",
+        privacyIntro:
+            "نلتزم بحماية بياناتك وتنظيم طريقة استخدامنا للمعلومات التي تشاركها معنا عند الحجز أو التواصل.",
+        privacyDataTitle: "البيانات التي نجمعها",
+        privacyDataText:
+            "نطلب اسمك، رقم هاتفك، وتفضيلاتك المتعلقة بالخدمة لكي ننظم المواعيد ونؤمن تجربة مخصصة.",
+        privacySharingTitle: "مشاركة البيانات",
+        privacySharingText:
+            "نشارك معلومات الحجز فقط مع فريق الصالون وشركاء الدفع المعتمدين لتأكيد المواعيد.",
+        privacySecurityTitle: "أمان المعلومات",
+        privacySecurityText:
+            "نستخدم بروتوكولات HTTPS وتخزينًا مشفرًا لحفظها، ولا نبيع أو نؤجر بياناتك لأطراف خارجية.",
+        privacyContactTitle: "استفسارات الخصوصية",
+        privacyContactText: "تواصل معنا عبر support@bagigi.app إذا رغبت بمراجعة بياناتك أو حذفها.",
     },
     en: {
         navHome: "Home",
         navServices: "Services",
         navApp: "App",
         navContact: "Contact",
+        navPrivacy: "Privacy",
         heroBadge: "Best Barber in the World – Relizane",
         heroTitleLine1: "Precision grooming",
         heroTitleLine2: "in Relizane",
@@ -90,6 +106,20 @@ const translations = {
         contactPageHeading: "Contact Houari Bagigi",
         contactPageSubtitle: "Share a reference, ask about availability, or request a custom look.",
         contactPageDownloadButton: "Download the App",
+        privacyHeading: "Privacy Policy",
+        privacyIntro:
+            "We respect your privacy and only use the information you share when booking or messaging to deliver a tailored experience.",
+        privacyDataTitle: "Data We Collect",
+        privacyDataText:
+            "Your name, phone number, and service preferences help us schedule appointments and keep your visits familiar.",
+        privacySharingTitle: "Sharing and Disclosure",
+        privacySharingText:
+            "Booking information is shared solely with the salon team and trusted payment partners required to confirm appointments.",
+        privacySecurityTitle: "Security",
+        privacySecurityText:
+            "We rely on HTTPS and encrypted storage to protect your details, and we never sell or rent your data to third parties.",
+        privacyContactTitle: "Privacy Requests",
+        privacyContactText: "Reach out to support@bagigi.app to review or delete your personal data.",
     },
 };
 

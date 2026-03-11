@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سياسة الخصوصية | Bagigi Barber</title>
+    <meta name="description" content="تعرف على كيفية جمع صالون هواري باجيجي وتخزين واستخدام بياناتك لحجز الخدمات.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div dir="ltr" class="container">
+        <header>
+            <div class="logo-container">
+                <img src="assets/logo.jpg" alt="Houari Bagigi Logo" class="logo-img">
+                <div class="logo-text">Houari BÂgîGî</div>
+            </div>
+            <div class="header-actions">
+                <nav class="primary-nav">
+                    <a href="index.html"><span data-i18n-key="navHome">Home</span></a>
+                    <a href="index.html#features"><span data-i18n-key="navServices">Services</span></a>
+                    <a href="index.html#download"><span data-i18n-key="navApp">App</span></a>
+                    <a href="contact.html"><span data-i18n-key="navContact">Contact</span></a>
+                    <a href="privacy.html"><span data-i18n-key="navPrivacy">Privacy</span></a>
+                </nav>
+                <div class="header-controls">
+                    <div class="lang-switcher" data-lang-switcher>
+                        <button type="button" data-lang="ar" class="active">AR</button>
+                        <button type="button" data-lang="en">EN</button>
+                    </div>
+                    <a href="tel:0558109815" class="btn btn-secondary phone-btn">
+                        <i class="fas fa-phone"></i> 0558 10 98 15
+                    </a>
+                </div>
+            </div>
+        </header>
+    </div>
+
+    <section class="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-i18n-key="privacyHeading">سياسة الخصوصية</h2>
+                <p data-i18n-key="privacyIntro" style="color: var(--text-muted); max-width: 720px; margin: 0 auto;"></p>
+            </div>
+            <div class="contact-wrapper">
+                <div class="contact-info-card">
+                    <h3 data-i18n-key="privacyDataTitle">البيانات التي نجمعها</h3>
+                    <p data-i18n-key="privacyDataText"></p>
+                </div>
+                <div class="contact-info-card">
+                    <h3 data-i18n-key="privacySharingTitle">مشاركة البيانات</h3>
+                    <p data-i18n-key="privacySharingText"></p>
+                </div>
+                <div class="contact-info-card">
+                    <h3 data-i18n-key="privacySecurityTitle">أمان المعلومات</h3>
+                    <p data-i18n-key="privacySecurityText"></p>
+                </div>
+                <div class="contact-info-card">
+                    <h3 data-i18n-key="privacyContactTitle">استفسارات الخصوصية</h3>
+                    <p data-i18n-key="privacyContactText"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="https://www.facebook.com/houari.bagigi" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="https://www.instagram.com/bagigihouari/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@houaribagigi" target="_blank"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.threads.com/@bagigihouari" target="_blank"><i class="fab fa-threads"></i></a>
+            </div>
+            <p>&copy; 2026 صالون حلاقة هواري باجيجي. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script src="lang.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (window.initLanguageSwitcher) {
+                window.initLanguageSwitcher("ar");
+            }
+        });
+    </script>
+</body>
+
+</html>
