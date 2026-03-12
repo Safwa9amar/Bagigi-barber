@@ -18,7 +18,7 @@ export default ({ config }) => {
     ...config,
     name: "Bagigi-barber",
     slug: "Bagigi-barber",
-    version: "1.0.0",
+    version: "1.0.1",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "bagigi-barber",
@@ -33,7 +33,7 @@ export default ({ config }) => {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.astro0666.bagigibarber",
-      buildNumber: "1.0.0",
+      buildNumber: "1.0.1",
       itsAppUsesNonExemptEncryption: false,
       infoPlist: {
         NSPhotoLibraryUsageDescription:
