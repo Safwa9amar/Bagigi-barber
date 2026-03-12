@@ -6,20 +6,20 @@ import { useTranslation } from "react-i18next";
 import { TouchableOpacity, I18nManager } from "react-native";
 
 const AuthLayout = () => {
-  const { user } = useAuthStore();
+  const { user, _hasHydrated } = useAuthStore();
   const router = useRouter();
 
   useFocusEffect(
     useCallback(() => {
-      if (!user) return;
+      if (!_hasHydrated || !user) return;
       router.replace(
         user.role === "ADMIN"
           ? "/admin"
           : user.role === "USER"
             ? "/customer/home"
-            : "/guest"
+            : "/guest",
       );
-    }, [user])
+    }, [user, _hasHydrated]),
   );
   const { i18n, t } = useTranslation();
 
@@ -30,7 +30,6 @@ const AuthLayout = () => {
     I18nManager.allowRTL(isRTL);
     I18nManager.forceRTL(isRTL);
   };
-
 
   return (
     <View style={{ flex: 1 }}>

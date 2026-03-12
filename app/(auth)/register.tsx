@@ -22,8 +22,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api, { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-
-
 export default function Login() {
   const router = useRouter();
   const scheme = useColorScheme();
@@ -35,7 +33,9 @@ export default function Login() {
     phone: string()
       .matches(/^0[567]\d{8}$/, t("invaild_phone"))
       .required(t("required_phone")),
-    password: string().min(8, t("min_password")).required(t("required_password")),
+    password: string()
+      .min(8, t("min_password"))
+      .required(t("required_password")),
     confirmPassword: string()
       .oneOf([ref("password")], t("password_match"))
       .required(),
@@ -76,7 +76,9 @@ export default function Login() {
             source={require("@/assets/images/logo.png")}
             className="w-44 h-44"
           />
-          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">{t("brand_name")}</Text>
+          <Text className="text-3xl font-bold mt-4 text-typography-500 dark:text-typography-50">
+            {t("brand_name")}
+          </Text>
           <Text className="text-typography-500 dark:text-typography-50 text-center mt-1">
             {t("brand_tagline")}
           </Text>
@@ -173,7 +175,7 @@ export default function Login() {
             </Button>
           </>
         )}
-        <Link href="/(auth)" asChild>
+        <Link href="/(auth)/login" asChild>
           <TouchableOpacity className="mt-4 self-center">
             <Text className="text-secondary-500">
               {t("have_account")}

@@ -1,23 +1,31 @@
 import { useAuthStore } from "@/store/useAuthStore";
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import React from "react";
+import { ActivityIndicator, View } from "react-native";
 
 import type { UserRole } from "@/store/useAuthStore";
 
 export function withRoleGuard<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  role: UserRole
+  role: UserRole,
 ) {
   return function RoleProtectedComponent(props: P) {
-    const { isAuthenticated, hasRole } = useAuthStore();
-    const router = useRouter();
+    const { isAuthenticated, hasRole, _hasHydrated } = useAuthStore();
 
-    if (!isAuthenticated) {
-      return router.replace("/(auth)");
+    if (!_hasHydrated) {
+      return (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" />
+        </View>
+      );
     }
-    if (!hasRole(role)) {
-      return router.replace("/(auth)");
+
+    if (!isAuthenticated || !hasRole(role)) {
+      return <Redirect href="/(auth)/login" />;
     }
+
     return <WrappedComponent {...props} />;
   };
 }

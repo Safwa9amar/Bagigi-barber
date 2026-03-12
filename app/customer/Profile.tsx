@@ -28,10 +28,10 @@ export default function Profile() {
           style: "destructive",
           onPress: async () => {
             logout();
-            router.replace("/(auth)");
+            router.replace("/(auth)/login");
           },
         },
-      ]
+      ],
     );
   };
 
@@ -53,8 +53,9 @@ export default function Profile() {
       className={`flex-row items-center p-5 bg-white dark:bg-[#1E1E1E] mb-3 rounded-[24px] shadow-sm border border-gray-100 dark:border-gray-800`}
     >
       <View
-        className={`w-10 h-10 rounded-full items-center justify-center ${isDestructive ? "bg-red-50 dark:bg-red-900/10" : "bg-[#C5A35D]10"
-          }`}
+        className={`w-10 h-10 rounded-full items-center justify-center ${
+          isDestructive ? "bg-red-50 dark:bg-red-900/10" : "bg-[#C5A35D]10"
+        }`}
         style={!isDestructive ? { backgroundColor: "#C5A35D10" } : {}}
       >
         <Ionicons
@@ -65,8 +66,9 @@ export default function Profile() {
       </View>
       <View className="flex-1 ml-4">
         <Text
-          className={`text-sm font-black ${isDestructive ? "text-red-500" : "text-[#1A1A1A] dark:text-white"
-            }`}
+          className={`text-sm font-black ${
+            isDestructive ? "text-red-500" : "text-[#1A1A1A] dark:text-white"
+          }`}
         >
           {label}
         </Text>
@@ -130,7 +132,9 @@ export default function Profile() {
         showsVerticalScrollIndicator={false}
       >
         <View className="mb-8">
-          <SectionTitle title={t("profile.accountSettings") || "Account Settings"} />
+          <SectionTitle
+            title={t("profile.accountSettings") || "Account Settings"}
+          />
           <SettingItem
             icon="person-outline"
             label={t("profile.personalInfo")}

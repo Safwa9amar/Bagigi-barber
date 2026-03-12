@@ -19,8 +19,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-
-
 export default function Login() {
   const { login, isLoading } = useAuthStore();
   const router = useRouter();
@@ -30,7 +28,9 @@ export default function Login() {
 
   const loginSchema = object({
     email: string().email(t("invalid_email")).required(t("required_email")),
-    password: string().min(8, t("min_password")).required(t("required_password")),
+    password: string()
+      .min(8, t("min_password"))
+      .required(t("required_password")),
     apiError: string().notRequired(),
   });
 
@@ -48,11 +48,16 @@ export default function Login() {
       let { token, user } = await auth.login(data.email, data.password);
       login(user, token);
     } catch (error: any) {
+      console.error("Login Error:", error);
+
+      // Safe error extraction to prevent silent crashes
+      const errorMessage =
+        error.response?.data?.error || error.message || t("login_failed");
+
       setError("apiError", {
         type: "manual",
-        message: error.response.data.error || t("login_failed"),
+        message: errorMessage,
       });
-      console.error(error.response.data.error || error);
     }
   };
 

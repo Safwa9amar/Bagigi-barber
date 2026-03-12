@@ -18,10 +18,10 @@ import { View } from "react-native";
 
 // Disable console.log in production
 if (!__DEV__) {
-  console.log = () => { };
-  console.info = () => { };
-  console.warn = () => { };
-  console.debug = () => { };
+  console.log = () => {};
+  console.info = () => {};
+  console.warn = () => {};
+  console.debug = () => {};
   // Keeping console.error for critical issue tracking
 }
 
@@ -41,13 +41,12 @@ import { getSocket } from "@/lib/socket";
 import { useChatStore } from "@/store/useChatStore";
 
 export default function RootLayout() {
-
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
 
-  const { user, token } = useAuthStore();
+  const { user, token, _hasHydrated } = useAuthStore();
   const { incrementUnreadCount } = useChatStore();
   const segments = useSegments();
 
@@ -57,10 +56,10 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && _hasHydrated) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, _hasHydrated]);
 
   // Global Socket Listener for Badges
   useEffect(() => {
@@ -72,8 +71,12 @@ export default function RootLayout() {
       // Check if we are NOT on a chat screen
       // Customer chat: [customer, Messages]
       // Admin chat: [admin, messages, [id]]
-      const isCustomerChat = segments[0] === 'customer' && segments[1] === 'Messages';
-      const isAdminChat = segments[0] === 'admin' && segments[1] === 'messages' && segments.length === 3;
+      const isCustomerChat =
+        segments[0] === "customer" && segments[1] === "Messages";
+      const isAdminChat =
+        segments[0] === "admin" &&
+        segments[1] === "messages" &&
+        segments.length === 3;
 
       if (!isCustomerChat && !isAdminChat) {
         incrementUnreadCount();
@@ -97,7 +100,7 @@ export default function RootLayout() {
           await axios.post(
             `${process.env.EXPO_PUBLIC_API_URL}/auth/push-token`,
             { pushToken },
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           );
           console.log("Push token registered with backend");
         } catch (e) {
@@ -117,9 +120,7 @@ function RootLayoutNav() {
 
   return (
     <GluestackUIProvider mode={colorMode as "light" | "dark"}>
-      <ThemeProvider
-        value={colorMode === "dark" ? DarkTheme : DefaultTheme}
-      >
+      <ThemeProvider value={colorMode === "dark" ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="admin" />
@@ -132,7 +133,6 @@ function RootLayoutNav() {
             }}
           />
         </Stack>
-
       </ThemeProvider>
     </GluestackUIProvider>
   );

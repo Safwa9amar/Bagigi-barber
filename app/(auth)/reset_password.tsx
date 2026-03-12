@@ -27,8 +27,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api, { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-
-
 export default function Login() {
   const { login, isLoading } = useAuthStore();
   const scheme = useColorScheme();
@@ -37,7 +35,9 @@ export default function Login() {
 
   const loginSchema = object({
     email: string().email(t("invalid_email")).required(t("required_email")),
-    password: string().min(6, t("min_password")).required(t("required_password")),
+    password: string()
+      .min(6, t("min_password"))
+      .required(t("required_password")),
     resetToken: string().required(t("required_reset_token")),
     confirmPassword: string()
       .oneOf([ref("password")], t("password_match"))
@@ -66,7 +66,7 @@ export default function Login() {
       let { token, user } = await auth.resetPassword(
         data.email,
         data.password,
-        data.resetToken
+        data.resetToken,
       );
       login(user, token);
     } catch (error: any) {
@@ -175,7 +175,7 @@ export default function Login() {
             </Button>
           </>
         )}
-        <Link href="/(auth)" asChild>
+        <Link href="/(auth)/login" asChild>
           <TouchableOpacity className="mt-4 self-center">
             <Text className="text-secondary-500">{t("back_to_login")}</Text>
           </TouchableOpacity>

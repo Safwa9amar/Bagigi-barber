@@ -27,8 +27,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import api, { auth } from "@/lib/api";
 import InputField from "@/components/ui/InputField";
 
-
-
 export default function Login() {
   const router = useRouter();
   const scheme = useColorScheme();
@@ -124,7 +122,7 @@ export default function Login() {
             </Button>
           </>
         )}
-        <Link href="/(auth)" asChild>
+        <Link href="/(auth)/login" asChild>
           <TouchableOpacity className="mt-4 self-center">
             <Text className="text-secondary-500">{t("back_to_login")}</Text>
           </TouchableOpacity>

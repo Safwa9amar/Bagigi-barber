@@ -33,6 +33,12 @@ export default ({ config }) => {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.astro0666.bagigibarber",
+      buildNumber: "1.0.0",
+      itsAppUsesNonExemptEncryption: false,
+      infoPlist: {
+        NSPhotoLibraryUsageDescription:
+          "This app requires access to your photo library to let you upload and customize barber service images and profile pictures.",
+      },
     },
     android: {
       adaptiveIcon: {
