@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api, { auth } from "@/lib/api";
 import axios from "axios";
+import Constants from "expo-constants";
 
 export interface User {
   id: string;
@@ -78,18 +79,16 @@ export const useAuthStore = create<AuthState>()(
         const { token, refreshToken } = get();
         if (!token || !refreshToken) return;
 
-        set({ isLoading: true });
         try {
-          const { data } = await axios.get(
-            `${process.env.EXPO_PUBLIC_API_URL}/auth/refresh-accesstoken`,
-            { headers: { Authorization: `Bearer ${refreshToken}` } }
-          );
+          const res = await api.post("/auth/refresh-token", {
+            token: refreshToken,
+          });
 
           const profile = await auth.me(token);
 
           set({
             user: profile,
-            token: data.accessToken,
+            token: res.data.accessToken,
             isAuthenticated: true,
             isLoading: false,
           });

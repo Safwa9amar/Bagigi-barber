@@ -12,6 +12,7 @@ import {
 import { io, Socket } from "socket.io-client";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
+import Config from "@/constants/Config";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 
@@ -41,7 +42,7 @@ const Messages = () => {
   const typingTimeoutRef = useRef<any>(null);
 
   // Replace with your actual server URL or use env var
-  const SERVER_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000";
+  const SERVER_URL = Config.apiUrl || "http://localhost:3000/bagigi/api";
 
   useEffect(() => {
     if (!user) return;

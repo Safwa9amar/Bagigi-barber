@@ -80,6 +80,7 @@ export default ({ config }) => {
       eas: {
         projectId: "80a5c465-f647-4b4d-be15-294c27b68b0d",
       },
+      apiUrl: process.env.EXPO_PUBLIC_API_URL,
     },
     owner: "astro0666",
     updates: {

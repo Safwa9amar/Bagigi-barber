@@ -16,8 +16,10 @@ export const setupAxiosAuth = (
   logoutUser = logout;
 };
 
+import Config from "@/constants/Config";
+
 const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  baseURL: Config.apiUrl,
   timeout: 10000,
 });
 

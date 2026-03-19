@@ -16,6 +16,7 @@ import { Text } from "@/components/ui/text";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import Config from "@/constants/Config";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 
@@ -33,11 +34,11 @@ const HomeScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const categories = Array.from(
-    new Set(services?.map((service) => service.category))
+    new Set(services?.map((service) => service.category)),
   );
 
-  // const todayDate = format(new Date(), "EEEE, MMMM d"); 
-  // Hardcoded English format by default, but ideally use locale. 
+  // const todayDate = format(new Date(), "EEEE, MMMM d");
+  // Hardcoded English format by default, but ideally use locale.
   // For simplicity keeping it English-like since design showed English.
   const todayDate = format(new Date(), "EEEE, MMMM d");
 
@@ -66,11 +67,13 @@ const HomeScreen = () => {
     let result = services;
     if (searchQuery.trim() !== "") {
       result = result?.filter((service) =>
-        service.name.toLowerCase().includes(searchQuery.toLowerCase())
+        service.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
     if (selectedCategory) {
-      result = result?.filter((service) => service.category === selectedCategory);
+      result = result?.filter(
+        (service) => service.category === selectedCategory,
+      );
     }
     setFilteredServices(result);
   }, [searchQuery, selectedCategory, services]);
@@ -84,7 +87,7 @@ const HomeScreen = () => {
     return (
       <View className="bg-white dark:bg-[#1E1E1E] p-4 rounded-[24px] flex-row items-center mb-8 shadow-sm border border-gray-100 dark:border-gray-800">
         <Image
-          source={{ uri: process.env.EXPO_PUBLIC_API_URL + featured.image }}
+          source={{ uri: Config.apiUrl + featured.image }}
           className="w-16 h-16 rounded-xl bg-gray-200"
         />
         <View className="flex-1 ml-4 justify-center">
@@ -93,11 +96,18 @@ const HomeScreen = () => {
           </Text>
           <View className="flex-row items-center mt-1">
             <Ionicons name="star" size={12} color="#D4AF37" />
-            <Text className="text-xs text-gray-500 font-bold ml-1">4.8 (114)</Text>
+            <Text className="text-xs text-gray-500 font-bold ml-1">
+              4.8 (114)
+            </Text>
           </View>
         </View>
         <TouchableOpacity
-          onPress={() => router.push({ pathname: "/service-details", params: { ...featured } })}
+          onPress={() =>
+            router.push({
+              pathname: "/service-details",
+              params: { ...featured },
+            })
+          }
           className="bg-[#1A1A1A] dark:bg-white px-5 py-2.5 rounded-full"
         >
           <Text className="text-white dark:text-black font-bold text-xs">
@@ -113,7 +123,11 @@ const HomeScreen = () => {
       className="flex-1 bg-[#F9FAFB] dark:bg-[#0F0F0F] px-6"
       contentContainerStyle={{ paddingTop: 20, paddingBottom: 50 }}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor="#D4AF37"
+        />
       }
       showsVerticalScrollIndicator={false}
     >
@@ -134,7 +148,11 @@ const HomeScreen = () => {
             <Ionicons name="notifications-outline" size={24} color={isDark ? "white" : "#1A1A1A"} />
           </TouchableOpacity> */}
           <TouchableOpacity onPress={() => router.push("/customer/Profile")}>
-            <Ionicons name="menu-outline" size={24} color={isDark ? "white" : "#1A1A1A"} />
+            <Ionicons
+              name="menu-outline"
+              size={24}
+              color={isDark ? "white" : "#1A1A1A"}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -165,19 +183,25 @@ const HomeScreen = () => {
       </View>
 
       {/* Categories */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-8">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="mb-8"
+      >
         <TouchableOpacity
           onPress={() => setSelectedCategory(null)}
-          className={`px-6 py-3 rounded-full mr-3 border ${selectedCategory === null
-            ? "bg-[#1A1A1A] dark:bg-white border-[#1A1A1A] dark:border-white"
-            : "bg-transparent border-gray-200 dark:border-gray-800"
-            }`}
+          className={`px-6 py-3 rounded-full mr-3 border ${
+            selectedCategory === null
+              ? "bg-[#1A1A1A] dark:bg-white border-[#1A1A1A] dark:border-white"
+              : "bg-transparent border-gray-200 dark:border-gray-800"
+          }`}
         >
           <Text
-            className={`text-xs font-bold uppercase tracking-wider ${selectedCategory === null
-              ? "text-white dark:text-[#1A1A1A]"
-              : "text-gray-500 dark:text-gray-400"
-              }`}
+            className={`text-xs font-bold uppercase tracking-wider ${
+              selectedCategory === null
+                ? "text-white dark:text-[#1A1A1A]"
+                : "text-gray-500 dark:text-gray-400"
+            }`}
           >
             {t("home.all")}
           </Text>
@@ -187,16 +211,18 @@ const HomeScreen = () => {
           <TouchableOpacity
             key={cat}
             onPress={() => setSelectedCategory(cat)}
-            className={`px-6 py-3 rounded-full mr-3 border ${selectedCategory === cat
-              ? "bg-[#C5A35D] border-[#C5A35D]"
-              : "bg-transparent border-gray-200 dark:border-gray-800"
-              }`}
+            className={`px-6 py-3 rounded-full mr-3 border ${
+              selectedCategory === cat
+                ? "bg-[#C5A35D] border-[#C5A35D]"
+                : "bg-transparent border-gray-200 dark:border-gray-800"
+            }`}
           >
             <Text
-              className={`text-xs font-bold uppercase tracking-wider ${selectedCategory === cat
-                ? "text-white"
-                : "text-gray-500 dark:text-gray-400"
-                }`}
+              className={`text-xs font-bold uppercase tracking-wider ${
+                selectedCategory === cat
+                  ? "text-white"
+                  : "text-gray-500 dark:text-gray-400"
+              }`}
             >
               {cat}
             </Text>
@@ -230,7 +256,7 @@ const HomeScreen = () => {
             subtitle={item.category}
             price={item.priceFrom}
             duration={item.duration}
-            image={{ uri: process.env.EXPO_PUBLIC_API_URL + item.image }}
+            image={{ uri: Config.apiUrl + item.image }}
             onPress={() =>
               router.push({
                 pathname: "/service-details",
@@ -248,7 +274,6 @@ const HomeScreen = () => {
           </Text>
         )}
       </View>
-
     </ScrollView>
   );
 };

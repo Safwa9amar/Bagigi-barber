@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { io, Socket } from "socket.io-client";
 import { useAuthStore } from "@/store/useAuthStore";
+import Config from "@/constants/Config";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -47,9 +48,7 @@ const AdminChatDetail = () => {
   const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<any>(null);
 
-  const SERVER_URL = (
-    process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000"
-  ).replace("/api", "/api");
+  const SERVER_URL = Config.apiUrl || "http://localhost:3000/bagigi/api";
 
   const [userName, setUserName] = useState<string>("");
   const userNameRef = useRef<string>(""); // ref so handlers don't re-register on name change

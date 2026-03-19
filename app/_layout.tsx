@@ -35,6 +35,7 @@ SplashScreen.preventAutoHideAsync();
 import { registerForPushNotificationsAsync } from "@/lib/notifications";
 import { useAuthStore } from "@/store/useAuthStore";
 import axios from "axios";
+import Config from "@/constants/Config";
 
 import { useSegments } from "expo-router";
 import { getSocket } from "@/lib/socket";
@@ -98,7 +99,7 @@ export default function RootLayout() {
         // Send to backend
         try {
           await axios.post(
-            `${process.env.EXPO_PUBLIC_API_URL}/auth/push-token`,
+            `${Config.apiUrl}/auth/push-token`,
             { pushToken },
             { headers: { Authorization: `Bearer ${token}` } },
           );
@@ -112,7 +113,7 @@ export default function RootLayout() {
 
   return <RootLayoutNav />;
 }
-console.log(process.env.EXPO_PUBLIC_API_URL);
+console.log(Config.apiUrl);
 
 function RootLayoutNav() {
   const { colorScheme } = useColorScheme();

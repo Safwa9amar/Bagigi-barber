@@ -16,6 +16,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 import { services as servicesApi, booking } from "@/lib/api";
+import Config from "@/constants/Config";
 import { Calendar } from "react-native-calendars";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -55,7 +56,9 @@ export default function BookServiceScreen() {
 
   // State
   const [service, setService] = useState<Service | null>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [estimation, setEstimation] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -110,7 +113,10 @@ export default function BookServiceScreen() {
       setEstimation(null);
       // Don't alert if it's just "shop closed" as that's expected for some days
       if (error.response?.status !== 400) {
-        Alert.alert(t("common.notice"), error.response?.data?.error || t("serviceDetails.fetchEstimateError"));
+        Alert.alert(
+          t("common.notice"),
+          error.response?.data?.error || t("serviceDetails.fetchEstimateError"),
+        );
       }
     } finally {
       setLoading(false);
@@ -119,7 +125,10 @@ export default function BookServiceScreen() {
 
   const handleBooking = async () => {
     if (!selectedDate) {
-      Alert.alert(t("serviceDetails.selectDate"), t("serviceDetails.selectDateAlert"));
+      Alert.alert(
+        t("serviceDetails.selectDate"),
+        t("serviceDetails.selectDateAlert"),
+      );
       return;
     }
     try {
@@ -134,20 +143,24 @@ export default function BookServiceScreen() {
         res.message || t("serviceDetails.successMsg"),
         [
           {
-            text: t("common.ok"), onPress: () => {
+            text: t("common.ok"),
+            onPress: () => {
               fetchEstimate(); // Refresh to show current status
-            }
-          }
-        ]
+            },
+          },
+        ],
       );
     } catch (error: any) {
       console.error(error);
       const errorMsg = error.response?.data?.error;
       // Handle the localized error code from backend
-      if (errorMsg && errorMsg.includes('.')) {
+      if (errorMsg && errorMsg.includes(".")) {
         Alert.alert(t("common.error"), t(errorMsg));
       } else {
-        Alert.alert(t("common.error"), errorMsg || t("serviceDetails.bookingFailed"));
+        Alert.alert(
+          t("common.error"),
+          errorMsg || t("serviceDetails.bookingFailed"),
+        );
       }
     } finally {
       setBookingLoading(false);
@@ -160,7 +173,7 @@ export default function BookServiceScreen() {
       setSubmittingReview(true);
       await servicesApi.addReview(service.id, {
         rating: newRating,
-        comment: newComment.trim() || undefined
+        comment: newComment.trim() || undefined,
       });
 
       Alert.alert(t("common.notice"), t("serviceDetails.reviewSuccess"));
@@ -172,17 +185,22 @@ export default function BookServiceScreen() {
         t("common.error"),
         error.response?.data?.error === "You have already reviewed this service"
           ? t("serviceDetails.alreadyReviewed")
-          : t("serviceDetails.reviewError")
+          : t("serviceDetails.reviewError"),
       );
     } finally {
       setSubmittingReview(false);
     }
   };
 
-
   if (!service && loading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]} className="bg-background-light dark:bg-background-dark">
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+        className="bg-background-light dark:bg-background-dark"
+      >
         <ActivityIndicator size="large" color="#D4AF37" />
       </View>
     );
@@ -193,17 +211,24 @@ export default function BookServiceScreen() {
   const isAlreadyBooked = !!estimation?.userBooking;
 
   return (
-    <View className="bg-background-light dark:bg-background-dark" style={styles.container}>
+    <View
+      className="bg-background-light dark:bg-background-dark"
+      style={styles.container}
+    >
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#D4AF37" />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#D4AF37"
+          />
         }
       >
         {/* Header Image */}
         <View>
           <Image
-            source={{ uri: process.env.EXPO_PUBLIC_API_URL + service.image }}
+            source={{ uri: Config.apiUrl + service.image }}
             style={styles.image}
           />
           <TouchableOpacity
@@ -214,18 +239,30 @@ export default function BookServiceScreen() {
           </TouchableOpacity>
         </View>
 
-        <View className="bg-background-light dark:bg-background-dark" style={styles.content}>
+        <View
+          className="bg-background-light dark:bg-background-dark"
+          style={styles.content}
+        >
           <View className="flex-row justify-between items-start">
             <View className="flex-1">
               <View className="flex-row items-center gap-2 mb-1">
-                <Text style={styles.category}>{service.category?.toUpperCase()}</Text>
+                <Text style={styles.category}>
+                  {service.category?.toUpperCase()}
+                </Text>
                 {service.is_vip && (
                   <View className="bg-[#D4AF37]/20 px-2 py-0.5 rounded-md border border-[#D4AF37]/30">
-                    <Text className="text-[#D4AF37] text-[10px] font-bold">VIP</Text>
+                    <Text className="text-[#D4AF37] text-[10px] font-bold">
+                      VIP
+                    </Text>
                   </View>
                 )}
               </View>
-              <Text style={styles.title} className="text-typography-900 dark:text-typography-white">{service.name}</Text>
+              <Text
+                style={styles.title}
+                className="text-typography-900 dark:text-typography-white"
+              >
+                {service.name}
+              </Text>
             </View>
             <View className="items-end">
               <Text className="text-[#D4AF37] font-black text-xl">
@@ -249,7 +286,10 @@ export default function BookServiceScreen() {
             <View style={styles.infoItem}>
               <Ionicons name="star" size={18} color="#D4AF37" />
               <Text style={styles.infoText}>
-                {service.rating?.toFixed(1) || "0.0"} {t("serviceDetails.reviews", { count: service.reviews_count || 0 })}
+                {service.rating?.toFixed(1) || "0.0"}{" "}
+                {t("serviceDetails.reviews", {
+                  count: service.reviews_count || 0,
+                })}
               </Text>
             </View>
           </View>
@@ -262,21 +302,34 @@ export default function BookServiceScreen() {
             </View>
           )}
 
-          <View style={styles.divider} className="bg-outline-300 dark:bg-outline-200" />
+          <View
+            style={styles.divider}
+            className="bg-outline-300 dark:bg-outline-200"
+          />
 
           {/* Date Selection - Always visible so user can check other days */}
-          <Text style={styles.sectionTitle} className="text-typography-900 dark:text-typography-white">{t("serviceDetails.selectDate")}</Text>
+          <Text
+            style={styles.sectionTitle}
+            className="text-typography-900 dark:text-typography-white"
+          >
+            {t("serviceDetails.selectDate")}
+          </Text>
 
           <TouchableOpacity
             onPress={() => setShowCalendar(true)}
             className="flex-row items-center justify-between p-4 bg-white dark:bg-background-muted rounded-2xl border border-outline-300 dark:border-gray-800 mb-4"
           >
             <View className="flex-row items-center">
-              <View className="w-10 h-10 rounded-full bg-[#C5A35D]20 items-center justify-center mr-3" style={{ backgroundColor: '#C5A35D15' }}>
+              <View
+                className="w-10 h-10 rounded-full bg-[#C5A35D]20 items-center justify-center mr-3"
+                style={{ backgroundColor: "#C5A35D15" }}
+              >
                 <Ionicons name="calendar-outline" size={20} color="#D4AF37" />
               </View>
               <Text className="text-typography-900 dark:text-typography-white font-bold">
-                {selectedDate ? format(new Date(selectedDate), 'PPPP') : t("serviceDetails.selectDateHelper")}
+                {selectedDate
+                  ? format(new Date(selectedDate), "PPPP")
+                  : t("serviceDetails.selectDateHelper")}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
@@ -311,11 +364,27 @@ export default function BookServiceScreen() {
             <>
               {/* Estimation Card (Only if NOT already booked) */}
               {estimation && !loading && (
-                <View style={styles.estimationCard} className="bg-white dark:bg-background-muted border-outline-300 dark:border-primary-500 mb-6">
-                  <Text style={styles.estimationTitle}>{t("serviceDetails.nextAvailable")}</Text>
-                  <Text style={styles.estimationTime} className="text-typography-900 dark:text-typography-white">{estimation.formattedEstimatedAt}</Text>
-                  <Text style={styles.estimationInfo} className="text-typography-900 dark:text-typography-white">
-                    {t("serviceDetails.queuePos")} <Text style={{ fontWeight: 'bold', color: '#D4AF37' }}>#{estimation.position}</Text>
+                <View
+                  style={styles.estimationCard}
+                  className="bg-white dark:bg-background-muted border-outline-300 dark:border-primary-500 mb-6"
+                >
+                  <Text style={styles.estimationTitle}>
+                    {t("serviceDetails.nextAvailable")}
+                  </Text>
+                  <Text
+                    style={styles.estimationTime}
+                    className="text-typography-900 dark:text-typography-white"
+                  >
+                    {estimation.formattedEstimatedAt}
+                  </Text>
+                  <Text
+                    style={styles.estimationInfo}
+                    className="text-typography-900 dark:text-typography-white"
+                  >
+                    {t("serviceDetails.queuePos")}{" "}
+                    <Text style={{ fontWeight: "bold", color: "#D4AF37" }}>
+                      #{estimation.position}
+                    </Text>
                   </Text>
                 </View>
               )}
@@ -325,22 +394,35 @@ export default function BookServiceScreen() {
           {/* Today's Schedule / Queue Transparency */}
           {estimation?.schedule && estimation.schedule.length > 0 && (
             <View className="mb-6">
-              <Text style={styles.sectionTitle} className="text-typography-900 dark:text-typography-white">
+              <Text
+                style={styles.sectionTitle}
+                className="text-typography-900 dark:text-typography-white"
+              >
                 {t("serviceDetails.todaysSchedule")}
               </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="flex-row"
+              >
                 {estimation.schedule.map((slot: any, idx: number) => (
                   <View
                     key={idx}
-                    className={`p-4 rounded-2xl border mr-3 items-center min-w-[90px] ${slot.isUser
-                      ? "bg-[#C5A35D] border-[#C5A35D]"
-                      : "bg-white dark:bg-background-paper border-outline-200 dark:border-gray-800"
-                      }`}
+                    className={`p-4 rounded-2xl border mr-3 items-center min-w-[90px] ${
+                      slot.isUser
+                        ? "bg-[#C5A35D] border-[#C5A35D]"
+                        : "bg-white dark:bg-background-paper border-outline-200 dark:border-gray-800"
+                    }`}
                   >
-                    <Text className={`text-[10px] font-extrabold uppercase mb-1 ${slot.isUser ? "text-white/70" : "text-gray-400"}`}>
-                      #{slot.position} {slot.isUser ? t("serviceDetails.you") : ""}
+                    <Text
+                      className={`text-[10px] font-extrabold uppercase mb-1 ${slot.isUser ? "text-white/70" : "text-gray-400"}`}
+                    >
+                      #{slot.position}{" "}
+                      {slot.isUser ? t("serviceDetails.you") : ""}
                     </Text>
-                    <Text className={`text-sm font-black ${slot.isUser ? "text-white" : "text-typography-900 dark:text-typography-white"}`}>
+                    <Text
+                      className={`text-sm font-black ${slot.isUser ? "text-white" : "text-typography-900 dark:text-typography-white"}`}
+                    >
                       {slot.time}
                     </Text>
                   </View>
@@ -349,19 +431,31 @@ export default function BookServiceScreen() {
             </View>
           )}
 
-          <View style={styles.divider} className="bg-outline-300 dark:bg-outline-200" />
+          <View
+            style={styles.divider}
+            className="bg-outline-300 dark:bg-outline-200"
+          />
 
           {/* Reviews Section */}
           <View className="mb-10">
-            <Text style={styles.sectionTitle} className="text-typography-900 dark:text-typography-white">
+            <Text
+              style={styles.sectionTitle}
+              className="text-typography-900 dark:text-typography-white"
+            >
               {t("serviceDetails.reviewsTitle")}
             </Text>
 
             {service.reviews && service.reviews.length > 0 ? (
               service.reviews.map((rev) => (
-                <View key={rev.id} style={styles.reviewItem} className="border-b border-outline-200 dark:border-gray-800">
+                <View
+                  key={rev.id}
+                  style={styles.reviewItem}
+                  className="border-b border-outline-200 dark:border-gray-800"
+                >
                   <View className="flex-row justify-between mb-1">
-                    <Text className="font-bold text-typography-900 dark:text-typography-white">{rev.user.name}</Text>
+                    <Text className="font-bold text-typography-900 dark:text-typography-white">
+                      {rev.user.name}
+                    </Text>
                     <View className="flex-row">
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Ionicons
@@ -374,19 +468,30 @@ export default function BookServiceScreen() {
                     </View>
                   </View>
                   {rev.comment && (
-                    <Text className="text-gray-500 dark:text-gray-400 text-sm">{rev.comment}</Text>
+                    <Text className="text-gray-500 dark:text-gray-400 text-sm">
+                      {rev.comment}
+                    </Text>
                   )}
-                  <Text className="text-gray-400 text-[10px] mt-1">{new Date(rev.createdAt).toLocaleDateString()}</Text>
+                  <Text className="text-gray-400 text-[10px] mt-1">
+                    {new Date(rev.createdAt).toLocaleDateString()}
+                  </Text>
                 </View>
               ))
             ) : (
-              <Text style={styles.helperText}>{t("serviceDetails.noReviews")}</Text>
+              <Text style={styles.helperText}>
+                {t("serviceDetails.noReviews")}
+              </Text>
             )}
 
             {/* Write a Review (Only for Customers) */}
             {user?.role === "USER" && (
-              <View style={styles.writeReviewContainer} className="bg-secondary-50 p-5 rounded-xl mt-5 dark:bg-background-muted">
-                <Text className="font-bold text-lg mb-3 dark:text-white">{t("serviceDetails.writeReview")}</Text>
+              <View
+                style={styles.writeReviewContainer}
+                className="bg-secondary-50 p-5 rounded-xl mt-5 dark:bg-background-muted"
+              >
+                <Text className="font-bold text-lg mb-3 dark:text-white">
+                  {t("serviceDetails.writeReview")}
+                </Text>
                 <View className="flex-row gap-2 mb-4">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <TouchableOpacity key={s} onPress={() => setNewRating(s)}>
@@ -406,7 +511,7 @@ export default function BookServiceScreen() {
                     value={newComment}
                     onChangeText={setNewComment}
                     className="text-typography-900 dark:text-typography-white text-sm"
-                    style={{ textAlignVertical: 'top' }}
+                    style={{ textAlignVertical: "top" }}
                   />
                 </View>
                 <TouchableOpacity
@@ -417,7 +522,9 @@ export default function BookServiceScreen() {
                   {submittingReview ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
-                    <Text className="text-white font-bold">{t("serviceDetails.submitReview")}</Text>
+                    <Text className="text-white font-bold">
+                      {t("serviceDetails.submitReview")}
+                    </Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -436,7 +543,9 @@ export default function BookServiceScreen() {
             >
               <Pressable className="bg-white dark:bg-[#1E1E1E] rounded-[32px] overflow-hidden p-4">
                 <View className="flex-row justify-between items-center mb-4 px-2">
-                  <Text className="text-lg font-black text-[#1A1A1A] dark:text-white">{t("serviceDetails.selectDate")}</Text>
+                  <Text className="text-lg font-black text-[#1A1A1A] dark:text-white">
+                    {t("serviceDetails.selectDate")}
+                  </Text>
                   <TouchableOpacity onPress={() => setShowCalendar(false)}>
                     <Ionicons name="close-circle" size={24} color="#9CA3AF" />
                   </TouchableOpacity>
@@ -447,42 +556,59 @@ export default function BookServiceScreen() {
                     setShowCalendar(false);
                   }}
                   markedDates={{
-                    [selectedDate]: { selected: true, selectedColor: '#D4AF37' }
+                    [selectedDate]: {
+                      selected: true,
+                      selectedColor: "#D4AF37",
+                    },
                   }}
                   minDate={today}
                   theme={{
-                    backgroundColor: 'transparent',
-                    calendarBackground: 'transparent',
-                    textSectionTitleColor: '#b6c1cd',
-                    selectedDayBackgroundColor: '#D4AF37',
-                    selectedDayTextColor: '#000000',
-                    todayTextColor: '#D4AF37',
-                    dayTextColor: '#9CA3AF',
-                    textDisabledColor: '#444',
-                    arrowColor: '#D4AF37',
-                    monthTextColor: '#D4AF37',
-                    indicatorColor: '#D4AF37',
+                    backgroundColor: "transparent",
+                    calendarBackground: "transparent",
+                    textSectionTitleColor: "#b6c1cd",
+                    selectedDayBackgroundColor: "#D4AF37",
+                    selectedDayTextColor: "#000000",
+                    todayTextColor: "#D4AF37",
+                    dayTextColor: "#9CA3AF",
+                    textDisabledColor: "#444",
+                    arrowColor: "#D4AF37",
+                    monthTextColor: "#D4AF37",
+                    indicatorColor: "#D4AF37",
                   }}
                 />
               </Pressable>
             </Pressable>
           </Modal>
-
         </View>
         <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Bottom Booking Bar */}
       {!isAlreadyBooked && (
-        <View style={styles.footer} className="bg-white dark:bg-background-muted border-outline-200 dark:border-gray-800">
+        <View
+          style={styles.footer}
+          className="bg-white dark:bg-background-muted border-outline-200 dark:border-gray-800"
+        >
           <View>
-            <Text style={styles.totalLabel}>{t("serviceDetails.totalPrice")}</Text>
-            <Text style={styles.totalPrice} className="text-typography-900 dark:text-typography-white">
-              {service.price_from ? service.price_from + ' ' + t("common.currency") : t("common.na")}
+            <Text style={styles.totalLabel}>
+              {t("serviceDetails.totalPrice")}
+            </Text>
+            <Text
+              style={styles.totalPrice}
+              className="text-typography-900 dark:text-typography-white"
+            >
+              {service.price_from
+                ? service.price_from + " " + t("common.currency")
+                : t("common.na")}
             </Text>
           </View>
           <TouchableOpacity
-            style={[styles.bookBtn, (!selectedDate || !estimation || bookingLoading) && { opacity: 0.6 }]}
+            style={[
+              styles.bookBtn,
+              (!selectedDate || !estimation || bookingLoading) && {
+                opacity: 0.6,
+              },
+            ]}
             disabled={!selectedDate || !estimation || bookingLoading}
             onPress={handleBooking}
           >
@@ -557,38 +683,38 @@ const styles = StyleSheet.create({
   calendarContainer: {
     marginBottom: 20,
     borderRadius: 15,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
   },
   estimationCard: {
     padding: 20,
     borderRadius: 15,
     borderWidth: 1,
-    alignItems: 'center',
-    marginTop: 10
+    alignItems: "center",
+    marginTop: 10,
   },
   estimationTitle: {
-    color: '#9CA3AF',
+    color: "#9CA3AF",
     fontSize: 14,
-    marginBottom: 5
+    marginBottom: 5,
   },
   estimationTime: {
     fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 5
+    fontWeight: "bold",
+    marginBottom: 5,
   },
   estimationInfo: {
-    fontSize: 16
+    fontSize: 16,
   },
   estimationSub: {
-    color: '#666',
+    color: "#666",
     fontSize: 12,
-    marginTop: 5
+    marginTop: 5,
   },
   helperText: {
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 20
+    color: "#666",
+    textAlign: "center",
+    marginTop: 20,
   },
   footer: {
     position: "absolute",

@@ -19,6 +19,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import api, { services as servicesApi } from "@/lib/api";
+import Config from "@/constants/Config";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -99,7 +100,7 @@ export default function AdminServices() {
 
   const isVip = watch("isVip");
 
-  const SERVER_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000";
+  const SERVER_URL = Config.apiUrl || "http://localhost:3000/bagigi/api";
 
   useEffect(() => {
     fetchServices();
@@ -398,7 +399,7 @@ export default function AdminServices() {
                       <Image
                         source={{
                           uri: selectedImage.startsWith("/uploads")
-                            ? process.env.EXPO_PUBLIC_API_URL + selectedImage
+                            ? Config.apiUrl + selectedImage
                             : selectedImage,
                         }}
                         className="w-full h-full"
