@@ -1,31 +1,29 @@
 model User {
-    id                      String    @id @default(uuid())
-    email                   String    @unique
-    password                String
-    name                    String?
-    phone                   String    @unique
-    role                    Role      @default(USER)
-    verified                Boolean   @default(false)
-    confirmationCode        String?
-    confirmationCodeExpires DateTime?
-    emailConfirmed          Boolean   @default(false)
-    resetToken              String?   @unique
-    resetTokenExp           DateTime?
-    pushToken               String?
-
-    bookings Booking[]
-    services Service[]
-    workDays WorkingDay[]
-    reviews  Review[]
-
-    sentMessages     Message[] @relation("SentMessages")
-    receivedMessages Message[] @relation("ReceivedMessages")
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id                      String       @id @default(uuid())
+  email                   String       @unique
+  password                String
+  phone                   String       @unique
+  role                    Role         @default(USER)
+  verified                Boolean      @default(false)
+  confirmationCode        String?
+  confirmationCodeExpires DateTime?
+  emailConfirmed          Boolean      @default(false)
+  resetToken              String?      @unique
+  resetTokenExp           DateTime?
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+  pushToken               String?
+  image                   String?
+  name                    String?
+  bookings                Booking[]
+  sentMessages            Message[]    @relation("SentMessages")
+  receivedMessages        Message[]    @relation("ReceivedMessages")
+  reviews                 Review[]
+  services                Service[]
+  workDays                WorkingDay[]
 }
 
 enum Role {
-    USER
-    ADMIN
+  USER
+  ADMIN
 }

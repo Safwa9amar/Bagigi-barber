@@ -18,6 +18,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Input, InputField as GluestackInputField } from "@/components/ui/input";
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 
 interface ProfileFormData {
     name: string;
@@ -178,21 +179,11 @@ export default function PersonalInfo() {
 
             <ScrollView className="flex-1 p-5" showsVerticalScrollIndicator={false}>
                 <View className="items-center mb-8">
-                    <View
-                        className="w-24 h-24 rounded-full items-center justify-center relative shadow-sm"
-                        style={{ backgroundColor: "#C5A35D15" }}
-                    >
-                        <Ionicons name="person" size={48} color="#C5A35D" />
-                        <TouchableOpacity className="absolute bottom-0 right-0 w-8 h-8 bg-[#C5A35D] rounded-full items-center justify-center border-2 border-white dark:border-[#0F0F0F]">
-                            <Ionicons name="camera" size={16} color="#fff" />
-                        </TouchableOpacity>
-                    </View>
-                    <Text className="text-lg font-black text-[#1A1A1A] dark:text-white mt-4">
-                        {watchedName || user?.name || user?.email?.split("@")[0]}
-                    </Text>
-                    <Text className="text-gray-400 font-bold text-xs">
-                        {t("profile.customer") || "Customer"}
-                    </Text>
+                   <ProfileAvatar
+                             image={user?.image}
+                             name={user?.name}
+                             email={user?.email}
+                           />
                 </View>
 
                 <Controller

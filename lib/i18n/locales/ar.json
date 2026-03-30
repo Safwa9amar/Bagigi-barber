@@ -40,7 +40,17 @@
     "email": "البريد الإلكتروني",
     "phone_number": "رقم الهاتف",
     "code": "الرمز",
+    "auth": {
+        "bookingGuestMsg": "يرجى التسجيل أو إنشاء حساب لتقديم حجز.",
+        "login_register": "تسجيل الدخول / التسجيل",
+        "password": "كلمة المرور",
+        "registerRequired": "التسجيل مطلوب",
+        "reviewGuestMsg": "يرجى التسجيل أو إنشاء حساب لتقديم تقييم."
+    },
+    "required_confirm_password": "تأكيد كلمة المرور مطلوب",
+    "required_reset_token": "رمز إعادة التعيين مطلوب",
     "common": {
+        "back": "رجوع",
         "save": "حفظ",
         "saveChanges": "حفظ التغييرات",
         "cancel": "إلغاء",
@@ -59,7 +69,11 @@
         "isTyping": "يستعد للرد",
         "online": "متصل",
         "offline": "غير متصل",
-        "info": "معلومات"
+        "info": "معلومات",
+        "back_home": "العودة إلى الرئيسية",
+        "confirm": "تأكيد",
+        "loadingError": "فشل في تحميل البيانات",
+        "success": "نجاح"
     },
     "home": {
         "welcome": "مرحباً",
@@ -70,12 +84,15 @@
         "all": "الكل",
         "latestVisit": "آخر زيارة",
         "book": "حجز",
-        "nearby": "صالون مجاور"
+        "nearby": "صالون مجاور",
+        "guest": "ضيف"
     },
     "bookings": {
         "title": "حجزاتي",
         "empty": "لا توجد حجوزات",
         "queuePosition": "الترتيب في الطابور: #",
+        "guestTitle": "حجوزاتك",
+        "guestDescription": "يرجى تسجيل الدخول أو التسجيل لرؤية تاريخ حجزك وحالتك الحالية.",
         "status": {
             "PENDING": "قيد الانتظار",
             "IN_PROGRESS": "جارى التنفيذ",
@@ -115,6 +132,10 @@
         "queueFull": "الطابور طويل حالياً",
         "timeSlot": "موعد",
         "you": "أنت"
+    },
+    "messages": {
+        "guestTitle": "رسائلك",
+        "guestDescription": "يرجى تسجيل الدخول أو التسجيل للدردشة مع الحلاقين والحصول على نصائح مخصصة."
     },
     "tabs": {
         "home": "الرئيسية",
@@ -158,7 +179,16 @@
         "passwordsMustMatch": "كلمات المرور غير متطابقة",
         "confirmPassword": "تأكيد كلمة المرور",
         "confirmPasswordDesc": "يرجى إدخال كلمة المرور لتأكيد تغيير البريد الإلكتروني.",
-        "failedUpdate": "فشل تحديث كلمة المرور"
+        "failedUpdate": "فشل تحديث كلمة المرور",
+        "emailRequired": "البريد الإلكتروني مطلوب",
+        "guestDescription": "يرجى تسجيل الدخول أو التسجيل لإدارة حسابك والوصول إلى كافة الميزات.",
+        "guestTitle": "ملفك الشخصي",
+        "imageUpdateError": "فشل في تحديث صورة الملف الشخصي.",
+        "imageUpdated": "تم تحديث صورة الملف الشخصي!",
+        "invalidEmail": "بريد إلكتروني غير صالح",
+        "nameRequired": "الاسم مطلوب",
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "phoneRequired": "رقم الهاتف مطلوب"
     },
     "support": {
         "helpCenter": {
@@ -312,7 +342,8 @@
             "workingHoursDesc": "تكوين أوقات فتح الصالون الخاص بك",
             "servicesDesc": "إدارة كتالوج الخدمات الخاص بك",
             "security": "الأمان",
-            "securityDesc": "كلمة المرور والتحقق"
+            "securityDesc": "كلمة المرور والتحقق",
+            "manageDesc": "إدارة أعمالك وحسابك"
         },
         "hours": {
             "title": "ساعات العمل",

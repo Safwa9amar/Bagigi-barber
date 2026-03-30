@@ -40,7 +40,17 @@
     "email": "E-mail",
     "phone_number": "Numéro de téléphone",
     "code": "Code",
+    "auth": {
+        "bookingGuestMsg": "Veuillez vous inscrire ou créer votre compte pour soumettre une réservation.",
+        "login_register": "Connexion / S'inscrire",
+        "password": "Mot de passe",
+        "registerRequired": "Inscription requise",
+        "reviewGuestMsg": "Veuillez vous inscrire ou créer votre compte pour soumettre un avis."
+    },
+    "required_confirm_password": "La confirmation du mot de passe est requise",
+    "required_reset_token": "Le jeton de réinitialisation est requis",
     "common": {
+        "back": "Retour",
         "save": "Enregistrer",
         "saveChanges": "Enregistrer les modifications",
         "cancel": "Annuler",
@@ -59,23 +69,30 @@
         "isTyping": "écrit",
         "online": "En ligne",
         "offline": "Hors ligne",
-        "info": "Information"
+        "info": "Information",
+        "back_home": "Retour à l'accueil",
+        "confirm": "Confirmer",
+        "loadingError": "Échec du chargement des données",
+        "success": "Succès"
     },
     "home": {
         "welcome": "Bienvenue",
         "intro": "Bienvenue chez Bagigi",
         "bookToday": "Réservez votre rendez-vous pour aujourd'hui",
         "ourServices": "Nos Services Signature",
-        "search": "Rechercher un service...",
-        "all": "Tout",
+        "search": "Rechercher des services...",
+        "all": "Tous",
         "latestVisit": "Dernière Visite",
         "book": "Réserver",
-        "nearby": "Salon de Coiffure à Proximité"
+        "nearby": "Barberie à proximité",
+        "guest": "Invité"
     },
     "bookings": {
         "title": "Mes Réservations",
         "empty": "Aucune réservation trouvée",
         "queuePosition": "Position dans la file: #",
+        "guestTitle": "Vos réservations",
+        "guestDescription": "Veuillez vous connecter ou vous inscrire pour voir votre historique de réservation et votre statut actuel.",
         "status": {
             "PENDING": "En attente",
             "IN_PROGRESS": "En cours",
@@ -115,6 +132,10 @@
         "queueFull": "La file d'attente est longue actuellement",
         "timeSlot": "Créneau",
         "you": "Vous"
+    },
+    "messages": {
+        "guestTitle": "Vos messages",
+        "guestDescription": "Veuillez vous connecter ou vous inscrire pour discuter avec nos barbiers et obtenir des conseils personnalisés."
     },
     "tabs": {
         "home": "Accueil",
@@ -158,7 +179,16 @@
         "passwordsMustMatch": "Les mots de passe ne correspondent pas",
         "confirmPassword": "Confirmer le mot de passe",
         "confirmPasswordDesc": "Veuillez entrer votre mot de passe pour confirmer le changement d'e-mail.",
-        "failedUpdate": "Échec de la mise à jour du mot de passe"
+        "failedUpdate": "Échec de la mise à jour du mot de passe",
+        "emailRequired": "L'e-mail est requis",
+        "guestDescription": "Veuillez vous connecter ou vous inscrire pour gérer votre compte et accéder à toutes les fonctionnalités.",
+        "guestTitle": "Votre profil",
+        "imageUpdateError": "Échec de la mise à jour de la photo de profil.",
+        "imageUpdated": "Photo de profil mise à jour !",
+        "invalidEmail": "E-mail invalide",
+        "nameRequired": "Le nom est requis",
+        "passwordRequired": "Le mot de passe est requis",
+        "phoneRequired": "Le numéro de téléphone est requis"
     },
     "support": {
         "helpCenter": {
@@ -312,7 +342,8 @@
             "workingHoursDesc": "Configurez vos heures d'ouverture",
             "servicesDesc": "Gérez votre catalogue de services",
             "security": "Sécurité",
-            "securityDesc": "Mot de passe et vérification"
+            "securityDesc": "Mot de passe et vérification",
+            "manageDesc": "Gérer votre entreprise et votre compte"
         },
         "hours": {
             "title": "Heures de Travail",

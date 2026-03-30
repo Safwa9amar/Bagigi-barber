@@ -50,6 +50,12 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Don't retry if it's already a refresh or logout request
+      if (originalRequest.url?.includes("/auth/refresh-token") || 
+          originalRequest.url?.includes("/auth/logout")) {
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
 
       try {

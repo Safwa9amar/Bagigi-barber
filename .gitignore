@@ -38,3 +38,11 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Do not ignore .env files required for EAS local building, like .env.preview
+# Do not ignore yarn.lock required for reproducible builds
+
+*.tar.*
+
+
+build-extra*

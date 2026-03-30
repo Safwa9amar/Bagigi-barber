@@ -8,18 +8,21 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Image,
+  Dimensions,
 } from "react-native";
-import { io, Socket } from "socket.io-client";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import Config from "@/constants/Config";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { useRouter } from "expo-router";
 
 import TypingIndicator from "@/components/TypingIndicator";
-
 import { getSocket } from "@/lib/socket";
 import { useChatStore } from "@/store/useChatStore";
+
+const { width } = Dimensions.get("window");
 
 interface Message {
   id: string;
@@ -30,41 +33,34 @@ interface Message {
 }
 
 const Messages = () => {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { t } = useTranslation();
+  const router = useRouter();
   const { resetUnreadCount } = useChatStore();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [isAdminTyping, setIsAdminTyping] = useState(false);
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<any>(null);
   const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<any>(null);
 
-  // Replace with your actual server URL or use env var
   const SERVER_URL = Config.apiUrl || "http://localhost:3000/bagigi/api";
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isAuthenticated) return;
 
-    // Reset badge when screen is opened
     resetUnreadCount();
-
-    // Use Global Socket
     socketRef.current = getSocket(user.id, user.role);
     const socket = socketRef.current;
-
-    // Sync connection state
     setIsConnected(socket.connected);
 
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
 
     const handleMessage = (msg: Message) => {
-      console.log("Received message in screen:", msg);
       setMessages((prev) => {
         if (prev.some((m) => m.id === msg.id)) return prev;
-        // Replace optimistic temp message with the real server message
         const tempIdx = prev.findIndex(
           (m) =>
             m.id.startsWith("temp-") &&
@@ -103,36 +99,23 @@ const Messages = () => {
       socket.off("typing", handleTyping);
       socket.off("stop_typing", handleStopTyping);
     };
-  }, [user, resetUnreadCount]);
+  }, [user, isAuthenticated]);
 
   const handleInputChange = (text: string) => {
     setInputText(text);
-
     if (!socketRef.current) return;
-
-    // Emit typing event
     socketRef.current.emit("typing", {});
-
-    // Clear existing timeout
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    // Set timeout to emit stop_typing
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
       socketRef.current?.emit("stop_typing", {});
     }, 2000);
   };
 
   useEffect(() => {
-    if (!user) return;
-
-    // Fetch history
+    if (!user || !isAuthenticated) return;
     const fetchHistory = async () => {
       try {
-        const res = await axios.get(
-          `${SERVER_URL}/messages/history/${user.id}`,
-        );
+        const res = await axios.get(`${SERVER_URL}/messages/history/${user.id}`);
         const data = res.data;
         if (Array.isArray(data)) {
           setMessages(
@@ -150,16 +133,12 @@ const Messages = () => {
         console.error("Failed to fetch history", e);
       }
     };
-
     fetchHistory();
-  }, [user]);
+  }, [user, isAuthenticated]);
 
   const sendMessage = () => {
     if (!inputText.trim() || !socketRef.current) return;
-
     const content = inputText.trim();
-
-    // Optimistic update — show message immediately while waiting for server echo
     const optimisticMsg: Message = {
       id: `temp-${Date.now()}`,
       from: user!.id,
@@ -168,7 +147,6 @@ const Messages = () => {
       role: "USER",
     };
     setMessages((prev) => [...prev, optimisticMsg]);
-
     socketRef.current.emit("send_message", { content });
     socketRef.current.emit("stop_typing", {});
     setInputText("");
@@ -184,7 +162,7 @@ const Messages = () => {
           isMe ? styles.myMessage : styles.theirMessage,
         ]}
         className={
-          isMe ? "bg-primary-500" : "bg-gray-200 dark:bg-background-muted"
+          isMe ? "bg-[#C5A35D]" : "bg-gray-200 dark:bg-background-muted"
         }
       >
         <Text
@@ -202,7 +180,7 @@ const Messages = () => {
         </Text>
         <Text
           style={styles.timestamp}
-          className={isMe ? "text-primary-100" : "text-gray-500"}
+          className={isMe ? "text-white/70" : "text-gray-500"}
         >
           {new Date(item.timestamp).toLocaleTimeString([], {
             hour: "2-digit",
@@ -212,6 +190,51 @@ const Messages = () => {
       </View>
     );
   };
+
+  if (!isAuthenticated) {
+    return (
+      <View
+        style={styles.container}
+        className="bg-background-light dark:bg-background-dark"
+      >
+        <Image
+          source={require("@/assets/images/messages_guest.png")}
+          style={styles.illustration}
+          resizeMode="cover"
+        />
+        <View style={styles.guestContent}>
+          <Text
+            style={styles.guestTitle}
+            className="text-typography-900 dark:text-typography-white"
+          >
+            {t("messages.guestTitle") || "Your Messages"}
+          </Text>
+          <Text style={styles.guestDescription}>
+            {t("messages.guestDescription") ||
+              "Please login or register to chat with our barbers and get personalized advice."}
+          </Text>
+
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => router.push("/customer/Profile")}
+          >
+            <Text style={styles.loginButtonText}>
+              {t("auth.login_register") || "Login / Register"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.backHomeButton}
+            onPress={() => router.push("/customer/home")}
+          >
+            <Text style={styles.backHomeText}>
+              {t("common.back_home") || "Back to Home"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -247,18 +270,17 @@ const Messages = () => {
         onContentSizeChange={() =>
           flatListRef.current?.scrollToEnd({ animated: false })
         }
-        inverted={false} // Normal order
       />
 
       {isAdminTyping && (
-        <View style={[styles.typingIndicator, { paddingHorizontal: 20 }]}>
+        <View style={{ paddingHorizontal: 20, marginBottom: 5 }}>
           <TypingIndicator label={`Bagigi Barber ${t("common.isTyping")}`} />
         </View>
       )}
 
       <View
         style={styles.inputContainer}
-        className="bg-white dark:bg-background-muted  border-outline-300 dark:border-gray-800"
+        className="bg-white dark:bg-background-muted border-t border-outline-300 dark:border-gray-800"
       >
         <TextInput
           style={styles.input}
@@ -271,7 +293,7 @@ const Messages = () => {
         <TouchableOpacity
           onPress={sendMessage}
           style={styles.sendBtn}
-          className="bg-primary-500"
+          className="bg-[#C5A35D]"
         >
           <Ionicons name="send" size={20} color="#fff" />
         </TouchableOpacity>
@@ -282,6 +304,55 @@ const Messages = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  illustration: {
+    width: width,
+    height: width * 0.8,
+    marginTop: 40,
+  },
+  guestContent: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: 40,
+    paddingTop: 20,
+  },
+  guestTitle: {
+    fontSize: 28,
+    fontWeight: "900",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  guestDescription: {
+    fontSize: 16,
+    color: "#9CA3AF",
+    textAlign: "center",
+    lineHeight: 24,
+    marginBottom: 40,
+  },
+  loginButton: {
+    backgroundColor: "#C5A35D",
+    width: "100%",
+    paddingVertical: 18,
+    borderRadius: 20,
+    alignItems: "center",
+    shadowColor: "#C5A35D",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  loginButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  backHomeButton: {
+    marginTop: 24,
+  },
+  backHomeText: {
+    color: "#9CA3AF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   header: {
     paddingTop: 60,
     paddingBottom: 20,
@@ -330,9 +401,6 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-  },
-  typingIndicator: {
-    marginBottom: -5,
   },
 });
 

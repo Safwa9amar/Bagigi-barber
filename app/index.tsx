@@ -14,7 +14,7 @@ export default function Index() {
   }
 
   if (!isAuthenticated || !user) {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/customer/home" />;
   }
 
   if (user.role === "ADMIN") {

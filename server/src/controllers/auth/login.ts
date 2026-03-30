@@ -17,6 +17,8 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
+    console.log(user);
+    
     res.status(200).json({
       token,
       user: {
@@ -24,6 +26,7 @@ export const login = async (req: Request, res: Response) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        image : user.image
       },
     });
   } catch (e) {

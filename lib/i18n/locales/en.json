@@ -40,7 +40,17 @@
     "email": "Email",
     "phone_number": "Phone number",
     "code": "Code",
+    "auth": {
+        "bookingGuestMsg": "Please register or create your account to submit a booking.",
+        "login_register": "Login / Register",
+        "password": "Password",
+        "registerRequired": "Register Required",
+        "reviewGuestMsg": "Please register or create your account to submit a review."
+    },
+    "required_confirm_password": "Confirm password is required",
+    "required_reset_token": "Reset token is required",
     "common": {
+        "back": "Back",
         "save": "Save",
         "saveChanges": "Save Changes",
         "cancel": "Cancel",
@@ -59,7 +69,11 @@
         "isTyping": "is typing",
         "online": "Online",
         "offline": "Offline",
-        "info": "Information"
+        "info": "Information",
+        "back_home": "Back to Home",
+        "confirm": "Confirm",
+        "loadingError": "Failed to load data",
+        "success": "Success"
     },
     "home": {
         "welcome": "Welcome",
@@ -70,12 +84,15 @@
         "all": "All",
         "latestVisit": "Latest Visit",
         "book": "Book",
-        "nearby": "Nearby Barbershop"
+        "nearby": "Nearby Barbershop",
+        "guest": "Guest"
     },
     "bookings": {
         "title": "My Bookings",
         "empty": "No bookings found",
         "queuePosition": "Queue Position: #",
+        "guestTitle": "Your Bookings",
+        "guestDescription": "Please login or register to see your booking history and current status.",
         "status": {
             "PENDING": "Pending",
             "IN_PROGRESS": "In Progress",
@@ -115,6 +132,10 @@
         "queueFull": "Queue is currently long",
         "timeSlot": "Slot",
         "you": "You"
+    },
+    "messages": {
+        "guestTitle": "Your Messages",
+        "guestDescription": "Please login or register to chat with our barbers and get personalized advice."
     },
     "tabs": {
         "home": "Home",
@@ -158,7 +179,16 @@
         "passwordsMustMatch": "Passwords must match",
         "confirmPassword": "Confirm Password",
         "confirmPasswordDesc": "Please enter your password to confirm email change.",
-        "failedUpdate": "Failed to update password"
+        "failedUpdate": "Failed to update password",
+        "emailRequired": "Email is required",
+        "guestDescription": "Please login or register to manage your account and access all features.",
+        "guestTitle": "Your Profile",
+        "imageUpdateError": "Failed to update profile picture.",
+        "imageUpdated": "Profile picture updated!",
+        "invalidEmail": "Invalid email",
+        "nameRequired": "Name is required",
+        "passwordRequired": "Password is required",
+        "phoneRequired": "Phone number is required"
     },
     "support": {
         "helpCenter": {
@@ -312,7 +342,8 @@
             "workingHoursDesc": "Configure your shop opening times",
             "servicesDesc": "Manage your service catalog",
             "security": "Security",
-            "securityDesc": "Password and verification"
+            "securityDesc": "Password and verification",
+            "manageDesc": "Manage your business and account"
         },
         "hours": {
             "title": "Working Hours",

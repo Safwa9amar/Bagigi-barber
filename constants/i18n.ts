@@ -32,7 +32,7 @@ function getFlatTranslations(lang: Language): Record<string, string> {
   );
 }
 
-// Usage: t("home")
+// Usage: t("tabs.home")
 export function t(key: string) {
   const flat = getFlatTranslations(currentLanguage);
   return flat[key] || key;

@@ -22,6 +22,11 @@ export const updateProfile = async (req: Request, res: Response) => {
         }
 
         const updates: any = {};
+        
+        // Handle image upload
+        if (req.file) {
+            updates.image = `/uploads/${req.file.filename}`;
+        }
 
         if (name && name !== currentUser.name) {
             updates.name = name;
@@ -72,7 +77,7 @@ export const updateProfile = async (req: Request, res: Response) => {
             updates.password = await bcrypt.hash(newPassword, 10);
         }
 
-        if (Object.keys(updates).length === 0) {
+        if (Object.keys(updates).length === 0 && !req.file) {
             return res.status(200).json({ message: 'No changes made', user: currentUser });
         }
 

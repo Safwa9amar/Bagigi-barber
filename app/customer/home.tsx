@@ -163,7 +163,7 @@ const HomeScreen = () => {
           {t("home.welcome")},
         </Text>
         <Text className="text-3xl font-black text-[#1A1A1A] dark:text-white mb-2">
-          {user?.name?.split(" ")[0]} 👋
+          {user?.name?.split(" ")[0] || t("home.guest")}
         </Text>
         <Text className="text-gray-400 font-bold text-xs uppercase tracking-widest">
           {todayDate}

@@ -112,4 +112,4 @@ const CustomerLayout = () => {
   );
 };
 
-export default withRoleGuard(CustomerLayout, "USER");
+export default CustomerLayout;

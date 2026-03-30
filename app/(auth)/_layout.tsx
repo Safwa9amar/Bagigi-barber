@@ -1,27 +1,43 @@
-import { View, Text } from "react-native";
-import React, { useCallback } from "react";
-import { Slot, useFocusEffect, useRouter } from "expo-router";
+import { View, Text, ActivityIndicator } from "react-native";
+import React from "react";
+import { Slot, Redirect, useNavigation } from "expo-router";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useTranslation } from "react-i18next";
 import { TouchableOpacity, I18nManager } from "react-native";
 
 const AuthLayout = () => {
   const { user, _hasHydrated } = useAuthStore();
-  const router = useRouter();
+  const { i18n } = useTranslation();
+  const navigation = useNavigation();
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!_hasHydrated || !user) return;
-      router.replace(
-        user.role === "ADMIN"
-          ? "/admin"
-          : user.role === "USER"
-            ? "/customer/home"
-            : "/guest",
-      );
-    }, [user, _hasHydrated]),
-  );
-  const { i18n, t } = useTranslation();
+  // 1. Wait for Zustand to hydrate from AsyncStorage before making any
+  //    navigation decisions — avoids flashing the login screen on Android.
+  if (!_hasHydrated) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#C5A35D" />
+      </View>
+    );
+  }
+
+  // 2. Authenticated user: send to their role-specific screen.
+  if (user) {
+    const route =
+      user.role === "ADMIN"
+        ? "/admin"
+        : user.role === "USER"
+          ? "/customer/home"
+          : "/guest";
+    return <Redirect href={route} />;
+  }
+
+  // 3. Guest with no navigation history = cold start landed here (Android issue).
+  //    Redirect to home so guests can browse without logging in.
+  //    If canGoBack() is true the guest intentionally pressed "Login / Register",
+  //    so we fall through and show the auth screens normally.
+  if (!navigation.canGoBack()) {
+    return <Redirect href="/customer/home" />;
+  }
 
   const changeLanguage = async (lang: string) => {
     if (i18n.language === lang) return;
@@ -54,3 +70,4 @@ const AuthLayout = () => {
 };
 
 export default AuthLayout;
+

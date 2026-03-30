@@ -14,7 +14,7 @@ export const me = async (req: Request, res: Response) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json({ id: user.id, email: user.email, role: user.role });
+    res.json({ id: user.id, email: user.email, role: user.role , image : user.image , name : user.name , phone : user.phone });
   } catch (e) {
     console.log('me error', e);
     res.status(500).json({ error: 'Failed to fetch user' });

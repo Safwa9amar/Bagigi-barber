@@ -1,24 +1,20 @@
-//////////////////////
-// SERVICE
-//////////////////////
-
 model Service {
-    id          String  @id @default(uuid())
-    name        String
-    category    String
-    duration    Int // بالدقائق (مهم جدًا)
-    priceFrom   Int
-    priceTo     Int?
-    isVip       Boolean @default(false)
-    description String?
-    userId      String
-    is_vip      Boolean @default(false)
-    image       String?
-    user        User    @relation(fields: [userId], references: [id])
+  id          String    @id @default(uuid())
+  name        String
+  category    String
+  duration    Int
+  priceFrom   Int
+  priceTo     Int?
+  isVip       Boolean   @default(false)
+  description String?
+  userId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  is_vip      Boolean   @default(false)
+  image       String?
+  bookings    Booking[]
+  reviews     Review[]
+  user        User      @relation(fields: [userId], references: [id])
 
-    bookings      Booking[]
-    reviews       Review[]
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  @@index([userId], map: "Service_userId_fkey")
 }

@@ -10,7 +10,7 @@ export function withRoleGuard<P extends object>(
   role: UserRole,
 ) {
   return function RoleProtectedComponent(props: P) {
-    const { isAuthenticated, hasRole, _hasHydrated } = useAuthStore();
+    const { isAuthenticated, user, _hasHydrated } = useAuthStore();
 
     if (!_hasHydrated) {
       return (
@@ -22,7 +22,7 @@ export function withRoleGuard<P extends object>(
       );
     }
 
-    if (!isAuthenticated || !hasRole(role)) {
+    if (!isAuthenticated || user?.role !== role) {
       return <Redirect href="/(auth)/login" />;
     }
 

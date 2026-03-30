@@ -47,5 +47,8 @@
     "nodemailer": "^7.0.12",
     "socket.io": "^4.8.3",
     "tsconfig-paths": "^4.2.0"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

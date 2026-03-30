@@ -11,6 +11,7 @@ export interface User {
   email: string;
   phone?: string;
   role: UserRole;
+  image?: string;
 }
 export type UserRole = "ADMIN" | "USER" | "GUEST";
 
@@ -77,26 +78,34 @@ export const useAuthStore = create<AuthState>()(
 
       checkAuth: async () => {
         const { token, refreshToken } = get();
-        if (!token || !refreshToken) return;
+        if (!token) return;
 
         try {
-          const res = await api.post("/auth/refresh-token", {
-            token: refreshToken,
-          });
-
+          // Always fetch fresh user data from the server on every app start.
           const profile = await auth.me(token);
-
           set({
             user: profile,
-            token: res.data.accessToken,
             isAuthenticated: true,
             isLoading: false,
           });
+
+          // Separately refresh the access token if we have a refresh token.
+          if (refreshToken) {
+            try {
+              const res = await api.post("/auth/refresh-token", { token: refreshToken });
+              set({ token: res.data.accessToken });
+            } catch (refreshError) {
+              // Refresh failed but we still have a valid session from auth.me — keep going.
+              console.warn("Token refresh failed, keeping current token:", refreshError);
+            }
+          }
         } catch (error) {
-          console.warn("Auth check failed:", error);
+          // auth.me failed — token is expired or invalid. Clear stale state.
+          console.warn("Auth check failed, clearing session:", error);
           set({
             user: null,
             token: null,
+            refreshToken: null,
             isAuthenticated: false,
             isLoading: false,
           });

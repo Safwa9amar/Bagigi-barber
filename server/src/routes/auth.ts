@@ -13,6 +13,7 @@ import {
   updateProfile
 } from '@/controllers/auth';
 import { authenticateJWT } from '@/middlewares/authMiddleware';
+import { upload } from '@/config/multer';
 
 const router = Router();
 
@@ -27,7 +28,7 @@ router.post('/reset-password', resetPassword);
 router.get('/me', authenticateJWT, me);
 router.post('/refresh-token', authenticateJWT, refreshToken);
 router.post('/push-token', authenticateJWT, savePushToken);
-router.post('/update-profile', authenticateJWT, updateProfile);
+router.post('/update-profile', authenticateJWT, upload.single('image'), updateProfile);
 
 
 export default router;

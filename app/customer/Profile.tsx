@@ -4,16 +4,17 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Image,
   Alert,
 } from "react-native";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { AuthFlow } from "@/components/ui/AuthFlow";
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 
 export default function Profile() {
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -34,6 +35,7 @@ export default function Profile() {
       ],
     );
   };
+
 
   const SettingItem = ({
     icon,
@@ -92,27 +94,19 @@ export default function Profile() {
     </Text>
   );
 
+  if (!isAuthenticated) {
+    return <AuthFlow />;
+  }
+  
   return (
     <View className="flex-1 bg-gray-50 dark:bg-[#0F0F0F]">
       {/* Header */}
       <View className="pt-16 pb-8 px-5 bg-white dark:bg-[#0F0F0F] items-center border-b border-gray-100 dark:border-gray-800">
-        <View
-          className="w-24 h-24 rounded-full items-center justify-center relative shadow-sm"
-          style={{ backgroundColor: "#C5A35D15" }}
-        >
-          <Image
-            source={{
-              uri:
-                "https://ui-avatars.com/api/?name=" +
-                (user?.name || user?.email?.split("@")[0] || "User") +
-                "&background=C5A35D&color=fff",
-            }}
-            className="w-24 h-24 rounded-full border-4 border-white dark:border-[#1E1E1E]"
-          />
-          <TouchableOpacity className="absolute bottom-0 right-0 w-8 h-8 bg-[#C5A35D] rounded-full items-center justify-center border-2 border-white dark:border-[#0F0F0F]">
-            <Ionicons name="camera" size={16} color="#fff" />
-          </TouchableOpacity>
-        </View>
+        <ProfileAvatar
+          image={user?.image}
+          name={user?.name}
+          email={user?.email}
+        />
         <Text className="text-xl font-black text-[#1A1A1A] dark:text-white mt-4">
           {user?.name || user?.email?.split("@")[0] || t("profile.guest")}
         </Text>

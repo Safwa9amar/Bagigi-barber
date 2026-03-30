@@ -21,6 +21,7 @@ import { Calendar } from "react-native-calendars";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "expo-router";
 
 type Review = {
   id: string;
@@ -52,6 +53,7 @@ export default function BookServiceScreen() {
   const navigation = useNavigation();
   const params = useGlobalSearchParams();
   const { user, token } = useAuthStore();
+  const router = useRouter();
   const { t } = useTranslation();
 
   // State
@@ -71,7 +73,7 @@ export default function BookServiceScreen() {
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchServiceDetails();
-    if (selectedDate) await fetchEstimate();
+    if (selectedDate && token) await fetchEstimate();
     setRefreshing(false);
   };
 
@@ -88,19 +90,20 @@ export default function BookServiceScreen() {
   };
 
   useEffect(() => {
-    fetchServiceDetails();
+    params.id && fetchServiceDetails();
   }, [params.id]);
 
   const today = new Date().toISOString().split("T")[0];
 
   // Fetch estimate when date changes
   useEffect(() => {
-    if (selectedDate && params.id) {
+    if (selectedDate && params.id && token) {
       fetchEstimate();
     }
-  }, [selectedDate]);
+  }, [selectedDate, token]);
 
   const fetchEstimate = async () => {
+    if (!token) return;
     try {
       setLoading(true);
       const res = await booking.estimate({
@@ -131,6 +134,21 @@ export default function BookServiceScreen() {
       );
       return;
     }
+    if (!user || !token) {
+      Alert.alert(
+        t("auth.registerRequired") || "Register Required",
+        t("auth.bookingGuestMsg") || "Please register or create your account to submit a booking.",
+        [
+          { text: t("common.cancel"), style: "cancel" },
+          { 
+            text: t("auth.login_register") || "Login / Register", 
+            onPress: () => router.push("/customer/Profile") 
+          },
+        ]
+      );
+      return;
+    }
+
     try {
       setBookingLoading(true);
       const res = await booking.create({
@@ -169,6 +187,22 @@ export default function BookServiceScreen() {
 
   const handleSubmittingReview = async () => {
     if (!service) return;
+    
+    if (!user || !token) {
+      Alert.alert(
+        t("auth.registerRequired") || "Register Required",
+        t("auth.reviewGuestMsg") || "Please register or create your account to submit a review.",
+        [
+          { text: t("common.cancel"), style: "cancel" },
+          { 
+            text: t("auth.login_register") || "Login / Register", 
+            onPress: () => router.push("/customer/Profile") 
+          },
+        ]
+      );
+      return;
+    }
+
     try {
       setSubmittingReview(true);
       await servicesApi.addReview(service.id, {
@@ -391,20 +425,20 @@ export default function BookServiceScreen() {
             </>
           )}
 
-          {/* Today's Schedule / Queue Transparency */}
-          {estimation?.schedule && estimation.schedule.length > 0 && (
-            <View className="mb-6">
-              <Text
-                style={styles.sectionTitle}
-                className="text-typography-900 dark:text-typography-white"
-              >
-                {t("serviceDetails.todaysSchedule")}
-              </Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                className="flex-row"
-              >
+              {/* Today's Schedule / Queue Transparency (Only for logged-in users) */}
+              {token && estimation?.schedule && estimation.schedule.length > 0 && (
+                <View className="mb-6">
+                  <Text
+                    style={styles.sectionTitle}
+                    className="text-typography-900 dark:text-typography-white"
+                  >
+                    {t("serviceDetails.todaysSchedule")}
+                  </Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    className="flex-row"
+                  >
                 {estimation.schedule.map((slot: any, idx: number) => (
                   <View
                     key={idx}
@@ -605,11 +639,11 @@ export default function BookServiceScreen() {
           <TouchableOpacity
             style={[
               styles.bookBtn,
-              (!selectedDate || !estimation || bookingLoading) && {
+              (!selectedDate || bookingLoading || (token && !estimation)) && {
                 opacity: 0.6,
               },
             ]}
-            disabled={!selectedDate || !estimation || bookingLoading}
+            disabled={!!(!selectedDate || bookingLoading || (token && !estimation))}
             onPress={handleBooking}
           >
             {bookingLoading ? (
